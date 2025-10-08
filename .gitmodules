@@ -1,0 +1,6 @@
+[submodule "hdkit"]
+	path = hdkit
+	url = https://github.com/jdempcy/hdkit.git
+[submodule "super_dash"]
+	path = super_dash
+	url = https://github.com/flutter/super_dash.git
