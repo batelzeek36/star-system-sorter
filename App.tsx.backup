@@ -1,0 +1,677 @@
+import { Sparkles, Upload, MapPin, Calendar, Clock } from 'lucide-react';
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-[#0a0612] text-white overflow-auto">
+      <div className="max-w-[1600px] mx-auto p-8">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl mb-2">Star System Sorter</h1>
+          <p className="text-gray-400">Concept Exploration — Two Visual Directions</p>
+        </div>
+
+        {/* Direction A */}
+        <section className="mb-20">
+          <div className="mb-8">
+            <h2 className="text-3xl mb-3 text-purple-300">Direction A: Ethereal Flow</h2>
+            <p className="text-gray-400 max-w-2xl mb-2">
+              Soft gradients, organic shapes, and flowing animations. Feels mystical and dreamlike.
+            </p>
+            <p className="text-gray-500 text-sm">
+              Motion vibe: Gentle fades, floating particles, smooth morphing transitions between states.
+            </p>
+          </div>
+
+          {/* Style Tile A */}
+          <div className="mb-12 p-8 bg-gradient-to-br from-[#1a0f2e] to-[#0f0820] rounded-2xl border border-purple-900/30">
+            <h3 className="mb-6 text-purple-200">Style Tile A</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Colors */}
+              <div>
+                <p className="text-sm text-gray-400 mb-4">Color Palette</p>
+                <div className="flex gap-3 mb-6">
+                  <div className="flex-1">
+                    <div className="h-20 rounded-lg bg-[#0a0612] border border-purple-900/50 mb-2"></div>
+                    <p className="text-xs text-gray-500">Canvas</p>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-20 rounded-lg bg-gradient-to-br from-[#a78bfa] to-[#c4b5fd] mb-2"></div>
+                    <p className="text-xs text-gray-500">Lavender</p>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-20 rounded-lg bg-gradient-to-br from-[#fbbf24] to-[#f59e0b] mb-2"></div>
+                    <p className="text-xs text-gray-500">Gold</p>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-20 rounded-lg bg-gradient-to-br from-purple-900/20 to-purple-800/30 mb-2"></div>
+                    <p className="text-xs text-gray-500">Muted</p>
+                  </div>
+                </div>
+
+                {/* Typography */}
+                <p className="text-sm text-gray-400 mb-3">Typography</p>
+                <div className="space-y-2 mb-6">
+                  <p className="text-2xl text-purple-200">Heading Large</p>
+                  <p className="text-lg text-purple-300">Heading Medium</p>
+                  <p className="text-white">Body Regular</p>
+                  <p className="text-sm text-gray-400">Caption Small</p>
+                </div>
+              </div>
+
+              {/* Components */}
+              <div>
+                <p className="text-sm text-gray-400 mb-4">Components</p>
+                
+                {/* Buttons */}
+                <div className="space-y-3 mb-6">
+                  <button className="w-full px-6 py-4 bg-gradient-to-r from-[#a78bfa] to-[#c4b5fd] rounded-full hover:opacity-90 transition-opacity">
+                    Primary Button
+                  </button>
+                  <button className="w-full px-6 py-4 bg-white/5 border border-purple-400/30 rounded-full hover:bg-white/10 transition-colors">
+                    Secondary Button
+                  </button>
+                </div>
+
+                {/* Chips */}
+                <div className="flex gap-2 mb-6">
+                  <div className="px-4 py-2 bg-gradient-to-r from-amber-500/20 to-amber-400/20 border border-amber-400/40 rounded-full text-sm text-amber-300">
+                    Ally 18%
+                  </div>
+                  <div className="px-4 py-2 bg-purple-500/20 border border-purple-400/40 rounded-full text-sm text-purple-300">
+                    Ally 12%
+                  </div>
+                </div>
+
+                {/* Card */}
+                <div className="p-5 bg-gradient-to-br from-purple-900/20 to-purple-800/10 border border-purple-700/30 rounded-2xl backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-purple-200">Card Title</p>
+                  </div>
+                  <p className="text-sm text-gray-400">Card content with subtle gradient background and soft borders.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Frames A */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Onboarding A */}
+            <div className="flex flex-col">
+              <p className="text-sm text-purple-300 mb-3">1. Onboarding</p>
+              <div className="w-full aspect-[393/852] bg-gradient-to-b from-[#0a0612] via-[#1a0f2e] to-[#0a0612] rounded-[3rem] border-4 border-gray-800 p-6 flex flex-col relative overflow-hidden">
+                {/* Decorative background */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
+                
+                <div className="relative flex-1 flex flex-col">
+                  {/* Status bar area */}
+                  <div className="h-12"></div>
+                  
+                  {/* Logo/Icon */}
+                  <div className="flex justify-center mb-8">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                      <Sparkles className="w-12 h-12 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div className="text-center mb-12">
+                    <h1 className="text-3xl mb-3 bg-gradient-to-r from-purple-200 to-purple-400 bg-clip-text text-transparent">Stellar Sort</h1>
+                    <p className="text-sm text-gray-400 px-6">Discover your primary star system origin through Human Design</p>
+                  </div>
+
+                  {/* Steps */}
+                  <div className="space-y-4 mb-auto px-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-sm text-purple-300 flex-shrink-0">1</div>
+                      <div>
+                        <p className="text-sm text-purple-200 mb-1">Input</p>
+                        <p className="text-xs text-gray-500">Enter birth data or upload chart</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-sm text-purple-300 flex-shrink-0">2</div>
+                      <div>
+                        <p className="text-sm text-purple-200 mb-1">Deterministic Sort</p>
+                        <p className="text-xs text-gray-500">Rules engine classifies your chart</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-sm text-purple-300 flex-shrink-0">3</div>
+                      <div>
+                        <p className="text-sm text-purple-200 mb-1">Narrative</p>
+                        <p className="text-xs text-gray-500">Receive your star system story</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="pt-6">
+                    <button className="w-full px-6 py-4 bg-gradient-to-r from-[#a78bfa] to-[#c4b5fd] rounded-full text-white shadow-lg shadow-purple-500/25">
+                      Begin Sorting
+                    </button>
+                  </div>
+
+                  {/* Bottom safe area */}
+                  <div className="h-8"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Input A */}
+            <div className="flex flex-col">
+              <p className="text-sm text-purple-300 mb-3">2. Input</p>
+              <div className="w-full aspect-[393/852] bg-gradient-to-b from-[#0a0612] via-[#1a0f2e] to-[#0a0612] rounded-[3rem] border-4 border-gray-800 p-6 flex flex-col relative overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
+                
+                <div className="relative flex-1 flex flex-col">
+                  <div className="h-12"></div>
+                  
+                  {/* Header */}
+                  <div className="mb-6">
+                    <h2 className="text-xl mb-2 text-purple-200">Your Chart Data</h2>
+                    <p className="text-xs text-gray-500">Enter details or upload PDF</p>
+                  </div>
+
+                  {/* Tabs */}
+                  <div className="flex gap-2 mb-6">
+                    <button className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#a78bfa] to-[#c4b5fd] rounded-full text-sm">
+                      Birth Data
+                    </button>
+                    <button className="flex-1 px-4 py-2.5 bg-white/5 border border-purple-400/20 rounded-full text-sm text-gray-400">
+                      Upload Chart PDF
+                    </button>
+                  </div>
+
+                  {/* Form */}
+                  <div className="space-y-4 mb-auto">
+                    <div>
+                      <label className="text-sm text-purple-300 mb-2 block">Date of Birth</label>
+                      <div className="px-4 py-3 bg-purple-900/20 border border-purple-700/30 rounded-2xl flex items-center gap-3">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                        <input 
+                          type="text" 
+                          placeholder="MM/DD/YYYY" 
+                          className="bg-transparent outline-none flex-1 text-sm text-white placeholder:text-gray-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-purple-300 mb-2 block">Time of Birth</label>
+                      <div className="px-4 py-3 bg-purple-900/20 border border-purple-700/30 rounded-2xl flex items-center gap-3">
+                        <Clock className="w-4 h-4 text-purple-400" />
+                        <input 
+                          type="text" 
+                          placeholder="HH:MM AM/PM" 
+                          className="bg-transparent outline-none flex-1 text-sm text-white placeholder:text-gray-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-purple-300 mb-2 block">Location</label>
+                      <div className="px-4 py-3 bg-purple-900/20 border border-purple-700/30 rounded-2xl flex items-center gap-3">
+                        <MapPin className="w-4 h-4 text-purple-400" />
+                        <input 
+                          type="text" 
+                          placeholder="City, Country" 
+                          className="bg-transparent outline-none flex-1 text-sm text-white placeholder:text-gray-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="pt-6">
+                    <button className="w-full px-6 py-4 bg-gradient-to-r from-[#a78bfa] to-[#c4b5fd] rounded-full text-white shadow-lg shadow-purple-500/25">
+                      Compute Chart
+                    </button>
+                  </div>
+
+                  <div className="h-8"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Result A */}
+            <div className="flex flex-col">
+              <p className="text-sm text-purple-300 mb-3">3. Sort Result</p>
+              <div className="w-full aspect-[393/852] bg-gradient-to-b from-[#0a0612] via-[#1a0f2e] to-[#0a0612] rounded-[3rem] border-4 border-gray-800 p-6 flex flex-col relative overflow-hidden">
+                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+                
+                <div className="relative flex-1 flex flex-col">
+                  <div className="h-12"></div>
+                  
+                  <div className="mb-6">
+                    <p className="text-xs text-purple-400 mb-1">Your Primary Star System</p>
+                    <h2 className="text-2xl bg-gradient-to-r from-purple-200 to-purple-400 bg-clip-text text-transparent">Pleiades</h2>
+                  </div>
+
+                  {/* Radial Chart */}
+                  <div className="flex justify-center mb-6">
+                    <div className="relative w-48 h-48">
+                      {/* Outer ring */}
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle
+                          cx="96"
+                          cy="96"
+                          r="80"
+                          stroke="rgba(168, 85, 247, 0.1)"
+                          strokeWidth="16"
+                          fill="none"
+                        />
+                        <circle
+                          cx="96"
+                          cy="96"
+                          r="80"
+                          stroke="url(#gradient)"
+                          strokeWidth="16"
+                          fill="none"
+                          strokeDasharray={`${2 * Math.PI * 80 * 0.62} ${2 * Math.PI * 80}`}
+                          strokeLinecap="round"
+                        />
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#a78bfa" />
+                            <stop offset="100%" stopColor="#c4b5fd" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <p className="text-4xl mb-1 bg-gradient-to-r from-purple-200 to-purple-400 bg-clip-text text-transparent">62%</p>
+                        <p className="text-xs text-gray-500">Alignment</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ally chips */}
+                  <div className="mb-6">
+                    <p className="text-xs text-gray-500 mb-3">Ally Star Systems</p>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-amber-400/20 border border-amber-400/40 rounded-full text-xs text-amber-300">
+                        Sirius 18%
+                      </div>
+                      <div className="px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-amber-400/20 border border-amber-400/40 rounded-full text-xs text-amber-300">
+                        Lyra 12%
+                      </div>
+                      <div className="px-3 py-1.5 bg-purple-500/20 border border-purple-400/30 rounded-full text-xs text-purple-300">
+                        Andromeda 8%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="space-y-3 mb-4">
+                    <button className="w-full px-6 py-3.5 bg-gradient-to-r from-[#a78bfa] to-[#c4b5fd] rounded-full text-sm">
+                      View Why
+                    </button>
+                    <button className="w-full px-6 py-3.5 bg-white/5 border border-purple-400/30 rounded-full text-sm">
+                      Generate Narrative
+                    </button>
+                  </div>
+
+                  {/* Disclaimer */}
+                  <div className="p-3 bg-purple-900/10 border border-purple-800/30 rounded-xl">
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      For insight & entertainment. Not medical, financial, or legal advice.
+                    </p>
+                  </div>
+
+                  <div className="h-8"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Direction B */}
+        <section className="mb-20">
+          <div className="mb-8">
+            <h2 className="text-3xl mb-3 text-amber-300">Direction B: Geometric Structure</h2>
+            <p className="text-gray-400 max-w-2xl mb-2">
+              Sharp edges, precise grids, technical overlays. Feels like a mystical data terminal.
+            </p>
+            <p className="text-gray-500 text-sm">
+              Motion vibe: Snappy reveals, grid animations, holographic glitches, angular wipes.
+            </p>
+          </div>
+
+          {/* Style Tile B */}
+          <div className="mb-12 p-8 bg-[#0f0a1a] rounded-lg border-2 border-purple-500/30 relative overflow-hidden">
+            {/* Corner accents */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-amber-400"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-amber-400"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-amber-400"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400"></div>
+            
+            <h3 className="mb-6 text-amber-200">Style Tile B</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Colors */}
+              <div>
+                <p className="text-sm text-gray-400 mb-4">Color Palette</p>
+                <div className="flex gap-3 mb-6">
+                  <div className="flex-1">
+                    <div className="h-20 bg-[#0a0612] border-2 border-purple-500/50 mb-2"></div>
+                    <p className="text-xs text-gray-500">Canvas</p>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-20 bg-[#8b5cf6] border-2 border-purple-400 mb-2"></div>
+                    <p className="text-xs text-gray-500">Lavender</p>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-20 bg-[#f59e0b] border-2 border-amber-400 mb-2"></div>
+                    <p className="text-xs text-gray-500">Gold</p>
+                  </div>
+                  <div className="flex-1">
+                    <div className="h-20 bg-purple-900/30 border-2 border-purple-700/50 mb-2"></div>
+                    <p className="text-xs text-gray-500">Muted</p>
+                  </div>
+                </div>
+
+                {/* Typography */}
+                <p className="text-sm text-gray-400 mb-3">Typography</p>
+                <div className="space-y-2 mb-6">
+                  <p className="text-2xl text-purple-200 tracking-wide uppercase">Heading Large</p>
+                  <p className="text-lg text-purple-300 tracking-wide">Heading Medium</p>
+                  <p className="text-white">Body Regular</p>
+                  <p className="text-xs text-gray-400 tracking-wider uppercase">Caption Small</p>
+                </div>
+              </div>
+
+              {/* Components */}
+              <div>
+                <p className="text-sm text-gray-400 mb-4">Components</p>
+                
+                {/* Buttons */}
+                <div className="space-y-3 mb-6">
+                  <button className="w-full px-6 py-3.5 bg-purple-600 border-2 border-purple-400 hover:bg-purple-500 transition-colors relative overflow-hidden group">
+                    <span className="relative z-10">Primary Button</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                  </button>
+                  <button className="w-full px-6 py-3.5 bg-transparent border-2 border-purple-500/50 hover:border-purple-400 hover:bg-purple-900/20 transition-colors">
+                    Secondary Button
+                  </button>
+                </div>
+
+                {/* Chips */}
+                <div className="flex gap-2 mb-6">
+                  <div className="px-4 py-1.5 bg-amber-500/20 border-2 border-amber-400/60 text-xs text-amber-300 tracking-wider uppercase">
+                    Ally 18%
+                  </div>
+                  <div className="px-4 py-1.5 bg-purple-500/20 border-2 border-purple-400/60 text-xs text-purple-300 tracking-wider uppercase">
+                    Ally 12%
+                  </div>
+                </div>
+
+                {/* Card */}
+                <div className="p-5 bg-purple-950/30 border-2 border-purple-700/40 relative">
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-amber-400"></div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-purple-600 border-2 border-purple-400 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <p className="text-purple-200 tracking-wide">Card Title</p>
+                  </div>
+                  <p className="text-sm text-gray-400">Card with sharp edges, precise borders, and technical accents.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Frames B */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Onboarding B */}
+            <div className="flex flex-col">
+              <p className="text-sm text-amber-300 mb-3">1. Onboarding</p>
+              <div className="w-full aspect-[393/852] bg-[#0a0612] rounded-[3rem] border-4 border-gray-800 p-6 flex flex-col relative overflow-hidden">
+                {/* Grid overlay */}
+                <div className="absolute inset-0 opacity-10" style={{
+                  backgroundImage: 'linear-gradient(rgba(139, 92, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.5) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}></div>
+                
+                <div className="relative flex-1 flex flex-col">
+                  <div className="h-12"></div>
+                  
+                  {/* Logo/Icon */}
+                  <div className="flex justify-center mb-8">
+                    <div className="relative w-24 h-24 bg-purple-600 border-2 border-purple-400 flex items-center justify-center">
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400"></div>
+                      <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-amber-400"></div>
+                      <Sparkles className="w-12 h-12 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div className="text-center mb-12">
+                    <h1 className="text-3xl mb-3 text-purple-200 tracking-wider uppercase">Stellar Sort</h1>
+                    <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent mx-auto mb-4"></div>
+                    <p className="text-sm text-gray-400 px-6">Discover your primary star system origin through Human Design</p>
+                  </div>
+
+                  {/* Steps */}
+                  <div className="space-y-4 mb-auto px-4">
+                    <div className="flex items-start gap-4 border-l-2 border-purple-500/50 pl-4 pb-4">
+                      <div className="w-8 h-8 bg-purple-900/50 border-2 border-purple-400 flex items-center justify-center text-sm text-purple-300 flex-shrink-0">1</div>
+                      <div>
+                        <p className="text-sm text-purple-200 tracking-wide">INPUT</p>
+                        <p className="text-xs text-gray-500">Enter birth data or upload chart</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4 border-l-2 border-purple-500/50 pl-4 pb-4">
+                      <div className="w-8 h-8 bg-purple-900/50 border-2 border-purple-400 flex items-center justify-center text-sm text-purple-300 flex-shrink-0">2</div>
+                      <div>
+                        <p className="text-sm text-purple-200 tracking-wide">DETERMINISTIC SORT</p>
+                        <p className="text-xs text-gray-500">Rules engine classifies your chart</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4 border-l-2 border-amber-400 pl-4">
+                      <div className="w-8 h-8 bg-amber-900/50 border-2 border-amber-400 flex items-center justify-center text-sm text-amber-300 flex-shrink-0">3</div>
+                      <div>
+                        <p className="text-sm text-amber-200 tracking-wide">NARRATIVE</p>
+                        <p className="text-xs text-gray-500">Receive your star system story</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="pt-6">
+                    <button className="w-full px-6 py-4 bg-purple-600 border-2 border-purple-400 text-white relative overflow-hidden group">
+                      <span className="relative z-10 tracking-wider">BEGIN SORTING</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
+                  </div>
+
+                  <div className="h-8"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Input B */}
+            <div className="flex flex-col">
+              <p className="text-sm text-amber-300 mb-3">2. Input</p>
+              <div className="w-full aspect-[393/852] bg-[#0a0612] rounded-[3rem] border-4 border-gray-800 p-6 flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{
+                  backgroundImage: 'linear-gradient(rgba(139, 92, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.5) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}></div>
+                
+                <div className="relative flex-1 flex flex-col">
+                  <div className="h-12"></div>
+                  
+                  {/* Header */}
+                  <div className="mb-6 pb-4 border-b-2 border-purple-500/30">
+                    <h2 className="text-xl mb-1 text-purple-200 tracking-wider uppercase">Chart Data</h2>
+                    <p className="text-xs text-gray-500 tracking-wide">ENTER DETAILS OR UPLOAD PDF</p>
+                  </div>
+
+                  {/* Tabs */}
+                  <div className="grid grid-cols-2 gap-2 mb-6">
+                    <button className="px-4 py-2.5 bg-purple-600 border-2 border-purple-400 text-sm tracking-wider">
+                      BIRTH DATA
+                    </button>
+                    <button className="px-4 py-2.5 bg-transparent border-2 border-purple-500/30 text-sm text-gray-500 tracking-wider">
+                      UPLOAD PDF
+                    </button>
+                  </div>
+
+                  {/* Form */}
+                  <div className="space-y-4 mb-auto">
+                    <div>
+                      <label className="text-xs text-purple-300 mb-2 block tracking-wider uppercase">Date of Birth</label>
+                      <div className="px-4 py-3 bg-purple-950/30 border-2 border-purple-700/40 flex items-center gap-3 relative">
+                        <div className="absolute top-0 right-0 w-2 h-2 bg-amber-400"></div>
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                        <input 
+                          type="text" 
+                          placeholder="MM/DD/YYYY" 
+                          className="bg-transparent outline-none flex-1 text-sm text-white placeholder:text-gray-700"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-purple-300 mb-2 block tracking-wider uppercase">Time of Birth</label>
+                      <div className="px-4 py-3 bg-purple-950/30 border-2 border-purple-700/40 flex items-center gap-3 relative">
+                        <div className="absolute top-0 right-0 w-2 h-2 bg-amber-400"></div>
+                        <Clock className="w-4 h-4 text-purple-400" />
+                        <input 
+                          type="text" 
+                          placeholder="HH:MM AM/PM" 
+                          className="bg-transparent outline-none flex-1 text-sm text-white placeholder:text-gray-700"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-purple-300 mb-2 block tracking-wider uppercase">Location</label>
+                      <div className="px-4 py-3 bg-purple-950/30 border-2 border-purple-700/40 flex items-center gap-3 relative">
+                        <div className="absolute top-0 right-0 w-2 h-2 bg-amber-400"></div>
+                        <MapPin className="w-4 h-4 text-purple-400" />
+                        <input 
+                          type="text" 
+                          placeholder="CITY, COUNTRY" 
+                          className="bg-transparent outline-none flex-1 text-sm text-white placeholder:text-gray-700"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="pt-6">
+                    <button className="w-full px-6 py-4 bg-purple-600 border-2 border-purple-400 text-white relative overflow-hidden group">
+                      <span className="relative z-10 tracking-wider">COMPUTE CHART</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
+                  </div>
+
+                  <div className="h-8"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Result B */}
+            <div className="flex flex-col">
+              <p className="text-sm text-amber-300 mb-3">3. Sort Result</p>
+              <div className="w-full aspect-[393/852] bg-[#0a0612] rounded-[3rem] border-4 border-gray-800 p-6 flex flex-col relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{
+                  backgroundImage: 'linear-gradient(rgba(139, 92, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.5) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}></div>
+                
+                <div className="relative flex-1 flex flex-col">
+                  <div className="h-12"></div>
+                  
+                  <div className="mb-6 pb-3 border-b-2 border-purple-500/30">
+                    <p className="text-xs text-purple-400 mb-1 tracking-wider uppercase">Your Primary Star System</p>
+                    <h2 className="text-2xl text-purple-200 tracking-wider uppercase">Pleiades</h2>
+                  </div>
+
+                  {/* Radial Chart - more technical */}
+                  <div className="flex justify-center mb-6">
+                    <div className="relative w-48 h-48">
+                      {/* Background grid */}
+                      <div className="absolute inset-0" style={{
+                        backgroundImage: 'linear-gradient(rgba(139, 92, 246, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.2) 1px, transparent 1px)',
+                        backgroundSize: '8px 8px'
+                      }}></div>
+                      
+                      {/* Outer ring */}
+                      <svg className="w-full h-full transform -rotate-90 relative z-10">
+                        <circle
+                          cx="96"
+                          cy="96"
+                          r="80"
+                          stroke="rgba(139, 92, 246, 0.2)"
+                          strokeWidth="12"
+                          fill="none"
+                        />
+                        <circle
+                          cx="96"
+                          cy="96"
+                          r="80"
+                          stroke="#8b5cf6"
+                          strokeWidth="12"
+                          fill="none"
+                          strokeDasharray={`${2 * Math.PI * 80 * 0.62} ${2 * Math.PI * 80}`}
+                        />
+                      </svg>
+                      
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-amber-400"></div>
+                        <p className="text-5xl mb-1 text-purple-200 tracking-wider">62</p>
+                        <p className="text-xs text-gray-500 tracking-widest uppercase">Percent</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ally chips */}
+                  <div className="mb-6">
+                    <p className="text-xs text-gray-500 mb-3 tracking-widest uppercase">Ally Star Systems</p>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="px-3 py-1.5 bg-amber-500/20 border-2 border-amber-400/60 text-xs text-amber-300 tracking-wider uppercase">
+                        Sirius 18%
+                      </div>
+                      <div className="px-3 py-1.5 bg-amber-500/20 border-2 border-amber-400/60 text-xs text-amber-300 tracking-wider uppercase">
+                        Lyra 12%
+                      </div>
+                      <div className="px-3 py-1.5 bg-purple-500/20 border-2 border-purple-400/50 text-xs text-purple-300 tracking-wider uppercase">
+                        Andromeda 8%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="space-y-3 mb-4">
+                    <button className="w-full px-6 py-3.5 bg-purple-600 border-2 border-purple-400 text-sm tracking-wider relative overflow-hidden group">
+                      <span className="relative z-10">VIEW WHY</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    </button>
+                    <button className="w-full px-6 py-3.5 bg-transparent border-2 border-purple-500/50 text-sm tracking-wider">
+                      GENERATE NARRATIVE
+                    </button>
+                  </div>
+
+                  {/* Disclaimer */}
+                  <div className="p-3 bg-purple-950/30 border-2 border-purple-800/40 relative">
+                    <div className="absolute top-1 right-1 w-2 h-2 bg-amber-400"></div>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      For insight & entertainment. Not medical, financial, or legal advice.
+                    </p>
+                  </div>
+
+                  <div className="h-8"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

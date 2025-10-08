@@ -1,0 +1,273 @@
+You are an elite mobile engineer (React Native + Flutter/Flame) and product lead. Build a **hybrid app** where:
+(1) The app UI is **React Native (TypeScript)** using our design tokens and 19 screens,
+(2) The games are a self-contained **Flutter module** using **Flame** (2 mini-games) embedded into RN via a native bridge,
+(3) Sorting into a primary **star system** is **deterministic rules** (never say “house”),
+(4) Safety/moderation is mandatory across chats and the avatar generator,
+(5) A Node server re-simulates/revalidates runs and aggregates leaderboards.
+
+Do NOT invent the real canon yet. Use a tiny **mock canon** ONLY for tests.
+
+================================================================
+## CONTEXT (FILES YOU CAN ASSUME EXIST)
+
+****PLEASE CHECK THE ROOT AND COMPONENTS FOLDER FOR WHAT ALREADY EXISTS BEFORE YOU CREATE***
+We already have UI guidance and tokens. At repo root (or /ui), assume:
+- `design-tokens.json` (core tokens: colors/typography/spacing/radii/shadows)
+- `game-tokens.json` (HUD/control sizes, opacities, team gradients)
+- Optional SVGs for crests (if missing, synthesize placeholders)
+- If any file is missing, generate a small compatible placeholder with the correct shape/keys.
+
+Result screens must show: “For insight & entertainment. Not medical, financial, or legal advice.”  
+Use **“star system”** everywhere (never “house”).
+
+================================================================
+## OUTPUT FORMAT (STRICT)
+Reply with a concise plan first, then emit **files in code blocks**, each beginning with:
+`// FILE: <path/from/repo/root>`
+Follow with file contents. No commentary inside file blocks.
+
+================================================================
+## REPO PLAN (HYBRID)
+- apps/
+  - rn-app/                        # React Native app (bare, TypeScript)
+    - android/                     # RN Android app (Gradle)
+    - ios/                         # RN iOS app (CocoaPods)
+    - src/
+      - App.tsx                    # Mounts Navigation + 19 screens
+      - theme/
+        - tokens.ts                # loads design-tokens.json → RN theme object
+        - gameTokens.ts            # loads game-tokens.json
+      - components/                # Native RN versions of S³ components (mirroring props)
+        - AppBar.tsx, Button.tsx, Card.tsx, Chip.tsx, Field.tsx, TabBar.tsx, Toast.tsx
+        - StarSystemCrest.tsx      # react-native-svg wrapper mapping label→SVG
+        - game/
+          - HUDComponents.tsx      # Joystick, HUDButton, HPHearts, XPBar, Distance, Timer, Counter, Pause
+          - GameCards.tsx, GameBadges.tsx, PartyMember.tsx, GameModals.tsx
+      - screens/                   # 19 screens (9 core + 10 game)
+        - Onboarding.tsx, Input.tsx, Result.tsx, Why.tsx, Community.tsx,
+          Profile.tsx, Paywall.tsx, Settings.tsx, EmptyError.tsx,
+          GameHub.tsx, TeamSelect.tsx, ModeSelect.tsx, Lobby.tsx,
+          Horde.tsx, Runner.tsx, MatchResult.tsx, Leaderboard.tsx, MusicTheme.tsx, Quests.tsx
+      - scorer/                    # TS deterministic scorer (library usage)
+        - types.ts, canon.ts, score.ts, tie.ts, checksum.ts, index.ts
+        - prompts/narrative.md     # LLM prompt template ONLY (no calls)
+      - moderation/
+        - types.ts, blocklists.ts, sanitizer.ts, service.ts, index.ts
+      - bridge/                    # RN <-> Flutter bridge shims
+        - GameBridge.ts            # JS wrapper around native modules + event emitter
+      - state/
+        - session.ts, music.ts
+      - lib/
+        - i18n.ts, routing.ts, a11y.ts, avatar.ts (sanitizer bindings)
+    - package.json, tsconfig.json, react-native.config.js, metro.config.js
+  - server/                        # Node validator + API (no DB dep; in-memory)
+    - src/
+      - http.ts
+      - routes/runs.ts             # POST /api/runs/submit
+      - routes/events.ts           # GET /api/events/active
+      - routes/leaderboard.ts      # GET /api/leaderboard/daily
+      - music/prefs.ts
+      - store/memory.ts
+      - validate.ts
+      - index.ts
+    - package.json, tsconfig.json
+- games/
+  - flutter_module/                # Flutter module containing two Flame games
+    - lib/
+      - main.dart                  # entry, routes, channel setup
+      - bridge/
+        - message_bus.dart         # MethodChannel/EventChannel
+        - schema.dart              # JSON schema for commands/results
+      - core/                      # Deterministic game core (pure Dart)
+        - rng.dart, time.dart, input_timeline.dart, spawner.dart, physics.dart, schemas.dart
+      - horde/                     # Flame game #1 (10-min wave survival with level-ups)
+        - horde_game.dart
+        - systems/level_up.dart, systems/waves.dart
+        - entities/*
+      - runner/                    # Flame game #2 (3–5min side runner)
+        - runner_game.dart
+        - segments/*, hazards/*, systems/collectibles.dart
+      - hud/                       # Flame overlays or Flutter widgets layered on top
+        - hud_overlay.dart
+      - audio/
+        - mixer.dart               # layered stems, volume ducking
+      - ghosts/
+        - replay.dart              # re-sim from seed + inputs
+    - pubspec.yaml, analysis_options.yaml
+- packages/
+  - games-headless/                # Node headless re-sim validator (determinism checks)
+    - src/{ replayer.ts, validator.ts, schemas.ts, index.ts }
+    - tests/headless.test.ts
+    - package.json, tsconfig.json
+- db/schema.sql                    # Reference SQL (teams, runs, events, leaderboards_daily, seasons, music_prefs)
+- tests/
+  - scorer.test.ts                 # TS scorer unit + golden
+  - moderation.test.ts
+  - bridge.contract.test.ts        # JSON contract (RN↔Flutter) golden fixtures
+- scripts/
+  - dev.sh                         # starts Metro + Flutter hot reload + Node server
+- README.md, CANON_GUIDE.md, SECURITY.md
+- package.json (workspaces), pnpm-workspace.yaml
+- .editorconfig, .gitignore
+
+================================================================
+## BRIDGING (RN ↔ Flutter)
+**Message schema (JSON)**
+- RN → Flutter (MethodChannel `s3/game/cmd`):
+  - `{"type":"start","payload":{"game":"horde"|"runner","seed":"<string>","team":"Orion"|"Sirius"|...}}`
+  - `{"type":"pause"}`
+  - `{"type":"resume"}`
+  - `{"type":"quit"}`
+  - `{"type":"set-music","payload":{"pack":"Sirius"}}`
+- Flutter → RN (EventChannel `s3/game/events`):
+  - `{"type":"result","payload":{"game":"runner","score":12450,"durationMs":284000,"suspect":false,"clientHash":"...","metrics":{"kills":42,"coins":121}}}`
+  - `{"type":"error","payload":{"code":"CHEAT_DETECTED","message":"..."}}`
+  - `{"type":"ready"}` (engine ready)
+  - `{"type":"state","payload":{"fps":60}}` (optional debug)
+
+**Android**
+- Add Flutter module to RN app:
+  - `settings.gradle`: `include ':flutter_module'`
+  - `app/build.gradle`: `implementation project(':flutter_module')`
+- Cache engine in `Application`:
+  - Create `S3Application.kt`: init `FlutterEngine`, executeDartEntrypoint, put into `FlutterEngineCache` as `"s3_engine"`.
+- Launch from `GameBridgeModule.kt`:
+  - `startActivity(FlutterActivity.withCachedEngine("s3_engine").backgroundMode(FlutterActivityLaunchConfigs.BackgroundMode.transparent).build(context))`
+- Wire MethodChannel/EventChannel:
+  - Channel names above; post JSON strings.
+
+**iOS**
+- Add to Podfile:
+  - `flutter_application_path = '../games/flutter_module'`
+  - `install_all_flutter_pods(flutter_application_path)`
+- Cache engine in `AppDelegate.swift`:
+  - `let engine = FlutterEngine(name: "s3_engine"); engine.run(); GeneratedPluginRegistrant.register(with: engine)`
+- Present VC in `GameBridge.swift`:
+  - `let controller = FlutterViewController(engine: engine, nibName: nil, bundle: nil)`
+- Set up `FlutterMethodChannel` and `FlutterEventChannel`.
+
+**RN side**
+- `NativeModules.GameBridge.open(game, seed, team)`
+- `NativeModules.GameBridge.close()`
+- `DeviceEventEmitter.addListener('S3GameEvent', handler)` (wrap in TS class with typed events).
+
+================================================================
+## GAMES (Flame, deterministic, async team competition)
+Two mini-games:
+1) **Horde Survival** (10 min cap): top-down waves + level-up choices (Vampire-Survivors-ish)
+2) **Side Runner** (3–5 min): auto-run, jump/dash, hazards, collectibles
+
+Determinism:
+- Seeded RNG (`PCG` or `XorShift`), fixed timestep, frame-indexed input timeline.
+- Record inputs (down/up w/ frame); compress via RLE/delta; compute `clientHash`.
+- **Ghosts**: use teammates’ saved input timelines with same seed; render as translucent silhouettes.
+
+Anti-cheat:
+- Server re-sim (Node packages/games-headless) must recompute the same score from `{seed, inputs, version}`.
+- Clamp max speed/DPS; validate intervals/state transitions; mark `suspect=true` if drift > tolerance.
+
+Team scoring & seasons:
+- Daily team score = `sum(top K) + median(all)`, with `K = clamp(round(sqrt(N)), 5, 25)`.
+- Weekly seasons aggregate dailies. Transparent formula in UI.
+
+Music & haptics:
+- Default soundtrack per star system (mapping via JSON); allow override.
+- In Flutter: audio mixer with layered stems; in RN: preference UI + persistence.
+
+================================================================
+## SCORER (DETERMINISTIC; TS LIB USED BY RN)
+- Inputs: HD extract (type, authority, profile, centers, channels, gates).
+- Load **canon.yaml** (mock only for tests) with weights & “why”; compute per-system scores.
+- Normalize to 0.1%; tie policy defaults: `{ leadPct: 8, minPrimaryPct: 20, hybridWindowPct: [0..8] }`.
+- Return: `{ primary | hybrid | unresolved, allies[], percentages, contributorsPerSystem[], meta:{ canonVersion, canonChecksum } }`.
+- `checksum`: SHA256 of canonicalized canon JSON (sorted keys, comments stripped).
+- **LLM prompt**: `prompts/narrative.md` with JSON-only output:
+  `{"ceremony": "<=140 words", "traits": ["...","...","..."], "practices": ["...","..."]}` (no medical/financial advice).
+
+================================================================
+## SAFETY & MODERATION (MANDATORY)
+Scope: DMs, star system rooms, posts/comments, **avatar generator** prompts/outputs.
+
+**Hard block**:
+- Sexual content/nudity/fetish; any sexualization of minors (report + perma ban)
+- Harassment/hate/slurs/threats/bullying/stalking/doxxing
+- Extremism promotion; credible threats; self-harm instructions
+- Explicit gore; illegal solicitation; scams/impersonation; deepfakes/face swaps/revenge porn
+- Creepy/sexualized content about young-looking characters or age roleplay
+- Sharing others’ PII (birth data, addresses, phones, financial)
+
+Age gating: default 18+. If under-18 later, avatar = abstract crests only; DMs off.
+
+Implementation:
+- `ModerationService` TS interfaces on RN side:
+  - `checkText({text, context, authorId}) -> { decision:'allow'|'soft_block'|'hard_block'|'review', reasons:string[], severity:number, redactions? }`
+  - `checkImage({prompt, bytes?, context, authorId}) -> ModResult`
+- Pipeline: client pre-filter → server check → decision handlers:
+  - `allow`: deliver; `soft_block`: block & show “Please rephrase…”; `hard_block`: reject with policy copy; `review`: queue & hide.
+- Avatar gen: pre-sanitize prompts (allowlist abstract/crest/cosmic; block body/age/sexual terms; block real names). Post-check any generated image; discard on flag; show copy:
+  - Soft: “That message breaks our community rules. Please rephrase and keep it kind.”
+  - Hard: “This content isn’t allowed here. See Community Guidelines.”
+  - Avatar: “We only support abstract, crest-style avatars. Try different words.”
+- Rate limits: DMs ≤20/5min; rooms ≤8/min; links ≤3/hr; mentions ≤5/10min; new accounts = half limits.
+
+Tests: text categories, avatar sanitizer, decisions, rate limits.
+
+================================================================
+## SERVER (Node, no DB dependency)
+- `/api/runs/submit` (POST): `{ game_key, event_id, team_id, seed, inputs, client_hash, metrics }` → re-sim, store, return `{score, validated, suspect}`.
+- `/api/leaderboard/daily?event_id=...` (GET)
+- `/api/events/active` (GET)
+- `/api/music/packs` (GET) & `/api/music/prefs` (POST)
+Use in-memory store; schemas in `db/schema.sql` for later Postgres.
+
+================================================================
+## DEV LOOP
+- **RN UI**: `pnpm --filter apps/rn-app start` → Metro; JS edits use Fast Refresh.
+- **Flutter games**: `cd games/flutter_module && flutter run -d <device>` for hot reload while embedded; or attach to the cached engine.
+- **Server**: `pnpm --filter apps/server dev`
+- Script `scripts/dev.sh` starts all three and prints URLs/commands.
+
+================================================================
+## DEPENDENCIES (STRICT BUDGET)
+**RN side:** react, react-native, react-navigation, react-native-svg, @react-native-async-storage/async-storage, (optional) react-native-gesture-handler, react-native-reanimated  
+**TS libs:** zod, yaml (server/CLI only), commander, vitest, tsup, zod-to-json-schema  
+**Server:** node:http only (no Express)  
+**Flutter:** flutter, flame, flutter_svg, audioplayers  
+**Shared games (Node):** seedrandom (or pure PCG) for test vectors
+
+No other deps. No telemetry.
+
+================================================================
+## EXECUTION CONSTRAINTS
+- **MVP > everything**; build only what Acceptance Criteria needs.
+- **Small files/functions**: ~150 LOC/file (prefer 60–120), ~40 LOC/function; named exports.
+- **Determinism**: fixed timestep; no `Date.now()`/wall time in logic; stable ordering; sorted keys before hashing.
+- **Schemas first**: validate HD JSON, canon YAML (tests), tie policy, run submissions, tokens JSON.
+- **Clear errors**: one-line, actionable.
+- **No LLM calls**; provide only `prompts/narrative.md`.
+- **A11y**: ≥44px touch targets; focus rings; WCAG AA contrast.
+- **Stop when done**.
+
+If token budget is tight: prioritize scorer + tests, moderation + tests, RN screens with minimal components, Flutter Flame scenes (minimal but playable), bridge modules, validator server, and docs. Defer niceties.
+
+Self-check:
+- [ ] RN app runs on Android/iOS; 19 screens reachable
+- [ ] Flutter module launches from RN; both games render; hot reload works
+- [ ] RN↔Flutter message contract tests pass (golden JSON)
+- [ ] Determinism: client vs headless validator match on fixed fixtures
+- [ ] Moderation + avatar sanitizer tests pass
+
+================================================================
+## ACCEPTANCE CRITERIA
+- **RN UI**: 19 screens (core + game) with tokens applied and a11y respected; star system disclaimer shown.
+- **Scorer**: loads mock canon for tests; deterministic % + contributors; tie policy enforced; `{canonVersion, canonChecksum}` included.
+- **CLI (optional)**: `classify` demo via Node (uses scorer).
+- **Moderation**: text/image rules enforced; rate limits; avatar sanitizer blocks unsafe prompts and shows correct copy.
+- **Games (Flutter/Flame)**: Horde + Runner playable; ghosts visible; per-run JSON (seed + inputs) submitted; Node re-sim validator agrees; tampered runs flagged `suspect`.
+- **Leaderboards**: daily aggregation with population fairness (`sum(top K)+median`); weekly seasons.
+- **Bridge**: Android/iOS native modules implemented; RN `GameBridge` JS wrapper; start/pause/quit + result events.
+- **Docs**: README (dev instructions for RN + Flutter + server), CANON_GUIDE (how to author real canon later), SECURITY (PII stance).
+
+--- NOW BUILD IT ---
+
+Start with a concise plan, then emit files with headers `// FILE: <path>`. Keep code tight, idiomatic, and runnable on RN (Android/iOS), Flutter, and Node 20.
