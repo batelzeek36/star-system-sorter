@@ -1,5 +1,9 @@
 # App Reload Guide
 
+npm run reload:both
+
+npm run reload:both:clean
+
 Quick reference for reloading the React Native app during development.
 
 ## Quick Reload (In Simulator)
@@ -7,9 +11,11 @@ Quick reference for reloading the React Native app during development.
 If Metro is already running and you only changed JS/TS code:
 
 **iOS Simulator:**
+
 - Press `Cmd + R`
 
 **Android Emulator:**
+
 - Press `R` twice quickly (double-tap R)
 - Or: `Cmd + M` → "Reload"
 
@@ -57,6 +63,7 @@ npm run reload:both:clean
 ### Clean Reload (`reload:*:clean`)
 
 Does everything above, plus:
+
 - **iOS**: Removes Pods, reinstalls CocoaPods dependencies
 - **Android**: Runs `./gradlew clean`
 
@@ -116,11 +123,13 @@ tail -f metro.log
 ## Dev Menu Shortcuts
 
 **iOS Simulator:**
+
 - `Cmd + D` - Open dev menu
 - `Cmd + R` - Reload
 - `Cmd + Ctrl + Z` - Shake gesture
 
 **Android Emulator:**
+
 - `Cmd + M` (Mac) / `Ctrl + M` (Windows/Linux) - Open dev menu
 - `R + R` - Reload
 
@@ -134,14 +143,14 @@ Enable Fast Refresh in the dev menu for automatic reloads on file save:
 
 ## When to Use Each Method
 
-| Scenario | Method |
-|----------|--------|
-| Changed JS/TS code, Metro running | `Cmd + R` (iOS) or `R + R` (Android) |
-| Changed JS/TS code, Metro not running | `npm run reload:both` |
-| Installed new npm package | `npm run reload:both` |
-| Changed native code (iOS/Android) | `npm run reload:both:clean` |
-| Changed Podfile or build.gradle | `npm run reload:both:clean` |
-| App won't start or shows errors | `npm run reload:both:clean` |
+| Scenario                              | Method                               |
+| ------------------------------------- | ------------------------------------ |
+| Changed JS/TS code, Metro running     | `Cmd + R` (iOS) or `R + R` (Android) |
+| Changed JS/TS code, Metro not running | `npm run reload:both`                |
+| Installed new npm package             | `npm run reload:both`                |
+| Changed native code (iOS/Android)     | `npm run reload:both:clean`          |
+| Changed Podfile or build.gradle       | `npm run reload:both:clean`          |
+| App won't start or shows errors       | `npm run reload:both:clean`          |
 
 ## Script Location
 

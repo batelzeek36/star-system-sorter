@@ -89,7 +89,7 @@ Before deployment:
     - Use StyleSheet for styling based on globals.css tokens
     - _Requirements: 1.2, 1.3, 1.4, 1.8_
 
-  - [ ] 1.5 Set up React Navigation
+  - [x] 1.5 Set up React Navigation
     - Configure native-stack navigator for main screens (faster than stack)
     - Set up navigation types with TypeScript
     - Configure deep linking if needed

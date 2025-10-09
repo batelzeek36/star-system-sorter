@@ -4,66 +4,25 @@
  */
 
 import React from 'react';
-import {
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-  useColorScheme,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {StatusBar, useColorScheme} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {RootNavigator, linking} from './src/navigation';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff',
-    flex: 1,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaProvider>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+        backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
       />
-      <View style={styles.container}>
-        <Text style={[styles.title, {color: isDarkMode ? '#ffffff' : '#000000'}]}>
-          Star System Sorter
-        </Text>
-        <Text style={[styles.subtitle, {color: isDarkMode ? '#cccccc' : '#666666'}]}>
-          S³
-        </Text>
-        <Text style={[styles.description, {color: isDarkMode ? '#aaaaaa' : '#888888'}]}>
-          React Native app initialized successfully
-        </Text>
-      </View>
-    </SafeAreaView>
+      <NavigationContainer linking={linking}>
+        <RootNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  description: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-});
 
 export default App;
