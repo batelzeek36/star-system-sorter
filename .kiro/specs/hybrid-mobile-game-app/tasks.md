@@ -97,7 +97,7 @@ Before deployment:
 
 - [ ] 2. Integrate hdkit for Human Design data generation
 
-  - [ ] 2.0 Inspect and integrate local hdkit
+  - [x] 2.0 Inspect and integrate local hdkit
 
     - Inspect hdkit/ at repo root: hdkit.js, constants.js, bodygraph-data.js, sample-apps/v1/
     - Find utilities that yield type, authority, profile, centers, channels, gates from date/time/location
@@ -132,7 +132,7 @@ Before deployment:
     - Use react-hook-form + Zod validation
     - _Requirements: 1.3, 12.10_
 
-  - [ ] 2.4 Wire Input screen to hdkit adapter
+  - [x] 2.4 Wire Input screen to hdkit adapter
 
     - On form submit: validate with Zod + react-hook-form
     - Call `computeHDExtract(...)` with form data
@@ -141,14 +141,14 @@ Before deployment:
     - Handle errors gracefully with user-friendly messages
     - _Requirements: 4.1, 4.10_
 
-  - [ ] 2.5 Add hdkit licensing
+  - [x] 2.5 Add hdkit licensing
 
     - Copy hdkit/LICENSE to third_party/hdkit-LICENSE
     - Add entry in NOTICE.md or Attributions.md
     - Document hdkit usage and attribution
     - _Requirements: 1.14, 12.10_
 
-  - [ ] 2.6 Write hdkit adapter tests (REQUIRED)
+  - [x] 2.6 Write hdkit adapter tests (REQUIRED)
     - Create tests/hdkit-adapter.test.ts
     - Add 2-3 fixtures with known date/time/location → expected HDExtract
     - Assert full, typed HDExtract returned
@@ -164,7 +164,7 @@ Before deployment:
     - Define SystemWeights and contributor types
     - _Requirements: 4.1, 4.7_
 
-  - [ ] 3.2 Implement canon loading and checksum
+  - [x] 3.2 Implement canon loading and checksum
 
     - Write canon.ts to load mock canon YAML
     - Implement SHA256 checksum computation for canonicalized JSON
