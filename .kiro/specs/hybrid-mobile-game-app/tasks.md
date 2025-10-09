@@ -124,7 +124,7 @@ Before deployment:
     - Functions ≤40 LOC each
     - _Requirements: 4.1, 11.1, 11.3_
 
-  - [ ] 2.3 Add timezone selection to Input screen
+  - [x] 2.3 Add timezone selection to Input screen
 
     - Add Time Zone select with IANA IDs to Input form
     - Default to `Intl.DateTimeFormat().resolvedOptions().timeZone`

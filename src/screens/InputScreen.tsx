@@ -18,6 +18,7 @@ import {useForm, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import type {ScreenProps} from '@/navigation/types';
+import {TimeZonePicker} from '@/components/TimeZonePicker';
 
 type Props = ScreenProps<'Input'>;
 
@@ -177,18 +178,11 @@ export function InputScreen({navigation}: Props) {
             <Controller
               control={control}
               name="timeZone"
-              render={({field: {onChange, onBlur, value}}) => (
-                <TextInput
-                  style={[styles.input, errors.timeZone && styles.inputError]}
-                  placeholder="IANA Time Zone"
-                  placeholderTextColor="#999999"
+              render={({field: {onChange, value}}) => (
+                <TimeZonePicker
                   value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  keyboardType="default"
-                  accessibilityLabel="Time zone"
-                  accessibilityHint="IANA time zone identifier"
-                  aria-invalid={!!errors.timeZone}
+                  onChange={onChange}
+                  error={!!errors.timeZone}
                 />
               )}
             />
