@@ -4,8 +4,7 @@
  */
 
 import React from 'react';
-import {render, fireEvent} from '@testing-library/react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import {render, fireEvent, waitFor} from '@testing-library/react-native';
 import {OnboardingScreen} from '../src/screens/OnboardingScreen';
 import {InputScreen} from '../src/screens/InputScreen';
 import {ResultScreen} from '../src/screens/ResultScreen';
@@ -52,21 +51,37 @@ describe('Navigation Tests', () => {
   });
 
   describe('InputScreen', () => {
-    it('navigates to Result screen with classification params', () => {
+    it('navigates to Result screen with classification params', async () => {
       const navigation = createMockNavigation();
-      const {getByText} = render(
+      const {getByText, getByPlaceholderText} = render(
         <InputScreen navigation={navigation as any} route={{} as any} />,
       );
 
-      fireEvent.press(getByText('Submit (Mock)'));
-      expect(navigation.navigate).toHaveBeenCalledWith('Result', {
-        classification: 'primary',
-        primary: 'Pleiades',
-        percentage: 67.5,
-        allies: [
-          {system: 'Sirius', percentage: 18.2},
-          {system: 'Arcturus', percentage: 14.3},
-        ],
+      // Fill in form fields
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(
+        getByPlaceholderText('HH:MM AM/PM'),
+        '03:30 PM',
+      );
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'San Francisco, CA',
+      );
+
+      // Submit form
+      fireEvent.press(getByText('Calculate'));
+
+      // Wait for async navigation
+      await waitFor(() => {
+        expect(navigation.navigate).toHaveBeenCalledWith('Result', {
+          classification: 'primary',
+          primary: 'Pleiades',
+          percentage: 67.5,
+          allies: [
+            {system: 'Sirius', percentage: 18.2},
+            {system: 'Arcturus', percentage: 14.3},
+          ],
+        });
       });
     });
   });

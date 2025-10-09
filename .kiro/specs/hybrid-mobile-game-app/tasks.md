@@ -335,7 +335,7 @@ Before deployment:
     - Apply StyleSheet styling from design tokens
     - _Requirements: 1.3, 1.6_
 
-  - [ ] 7.2 Create Input screen
+  - [x] 7.2 Create Input screen
 
     - Write Input.tsx with form for birth data
     - Use react-hook-form with zodResolver for validation
