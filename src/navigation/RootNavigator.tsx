@@ -6,6 +6,7 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {RootStackParamList} from './types';
+import {useNavigationGuards} from './guards';
 
 // Import screens (will be created in task 7.x)
 // For now, we'll use placeholder screens
@@ -31,6 +32,9 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
  * Configures all app screens with native-stack for optimal performance
  */
 export function RootNavigator() {
+  // Apply navigation guards
+  useNavigationGuards();
+
   return (
     <Stack.Navigator
       initialRouteName="Onboarding"

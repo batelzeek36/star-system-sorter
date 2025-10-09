@@ -1,102 +1,178 @@
-# Navigation Setup
+# Navigation System
 
 ## Overview
 
-React Navigation is configured using native-stack navigator for optimal performance on both iOS and Android.
+Star System Sorter uses React Navigation with native-stack navigator for optimal performance. The navigation system includes route guards, error handling, and deep linking support.
 
-## Structure
+## Architecture
 
 ```
-src/navigation/
-├── types.ts           # TypeScript type definitions
-├── RootNavigator.tsx  # Main navigation stack
-├── linking.ts         # Deep linking configuration
-└── index.ts           # Public API
+App.tsx
+└── NavigationErrorBoundary
+    └── NavigationContainer
+        └── RootNavigator (native-stack)
+            ├── Onboarding
+            ├── Input
+            ├── Result
+            ├── Why
+            ├── Profile
+            ├── Settings
+            ├── GameHub
+            ├── TeamSelect
+            ├── Lobby
+            ├── SuperDash
+            ├── MatchResult
+            └── Leaderboard
 ```
 
-## Routes
+## Navigation Guards
 
-The app includes the following routes:
+Guards automatically validate route parameters and prevent navigation with invalid data.
 
-### Core Flow
-- **Onboarding** - Welcome screen (no header)
-- **Input** - Birth data entry form
-- **Result** - Star system classification results
-- **Why** - Explanation of classification reasoning
+**Protected Routes:**
+- `Result`: Requires classification, percentage, allies
+- `Why`: Requires contributorsPerSystem, percentages
+- `TeamSelect`: Requires eventId
+- `Lobby`: Requires eventId, teamId, seed
+- `SuperDash`: Requires eventId, teamId, seed
+- `MatchResult`: Requires score, validated, suspect, metrics
 
-### Profile & Settings
-- **Profile** - User profile display
-- **Settings** - App preferences
+**Usage:**
+```typescript
+// Guards are automatically applied
+// No additional setup needed in screens
+```
 
-### Game Flow
-- **GameHub** - Entry point to games and events
-- **TeamSelect** - Choose star system team
-- **Lobby** - Pre-game setup
-- **SuperDash** - Flutter game (landscape, no header)
-- **MatchResult** - Game results and validation
-- **Leaderboard** - Team rankings
+## Error Handling
+
+Navigation errors are caught by `NavigationErrorBoundary` and display a user-friendly fallback UI.
+
+**Features:**
+- Catches navigation tree errors
+- Shows error message with reset button
+- Dev-mode error details
+- Graceful recovery without crash
+
+## Deep Linking
+
+Supports URL schemes: `s3://` and `starsystemsorter://`
+
+**Examples:**
+- `s3://onboarding` → Onboarding screen
+- `s3://input` → Input screen
+- `s3://result` → Result screen
+- `s3://game` → GameHub screen
+- `s3://game/lobby` → Lobby screen
+- `s3://leaderboard` → Leaderboard screen
 
 ## Type Safety
 
-Navigation is fully typed using TypeScript. The `RootStackParamList` type defines all routes and their parameters.
-
-### Usage in Screens
-
-When implementing screens in later tasks, use the navigation and route props:
+All navigation is fully typed with TypeScript:
 
 ```typescript
-import {useNavigation, useRoute} from '@react-navigation/native';
 import type {ScreenProps} from '@/navigation';
 
 type Props = ScreenProps<'Result'>;
 
-export function ResultScreen() {
-  const navigation = useNavigation<Props['navigation']>();
-  const route = useRoute<Props['route']>();
+function ResultScreen({navigation, route}: Props) {
+  // route.params is fully typed
+  const {classification, percentage, allies} = route.params;
   
-  // Access params
-  const {classification, percentage} = route.params;
-  
-  // Navigate
-  navigation.navigate('Why', {contributorsPerSystem, percentages});
+  // navigation.navigate is type-safe
+  navigation.navigate('Why', {
+    contributorsPerSystem: {},
+    percentages: {},
+  });
 }
 ```
 
-## Deep Linking
+## Screen Options
 
-Deep linking is configured with the following URL schemes:
-- `s3://` - Custom scheme
-- `starsystemsorter://` - Alternative scheme
-
-### Examples
-- `s3://onboarding` - Opens onboarding screen
-- `s3://game/lobby` - Opens game lobby
-- `s3://result` - Opens result screen
-
-## Performance
-
-Native-stack navigator is used instead of stack navigator for:
-- Better performance (native animations)
-- Lower memory usage
-- Smoother transitions
-- Native gesture handling
-
-## Configuration
-
-### Screen Options
-
-Default screen options are set in `RootNavigator.tsx`:
+**Default Options:**
 - Header shown by default
 - Back button visible
 - Slide from right animation
 - White background
 
-Individual screens can override these options as needed.
+**Custom Options:**
+- `Onboarding`: No header
+- `Result`: No back button
+- `SuperDash`: No header, landscape orientation, fade animation
+- `MatchResult`: No back button
 
-### Orientation
+## Navigation Methods
 
-Most screens use portrait orientation. The SuperDash game screen is locked to landscape mode.
+**Navigate to screen:**
+```typescript
+navigation.navigate('ScreenName', {param: value});
+```
 
-## Next Steps
+**Go back:**
+```typescript
+navigation.goBack();
+```
 
-Placeholder screens have been created for all routes. These will be implemented in tasks 7.x and 8.x with full functionality.
+**Replace current screen:**
+```typescript
+navigation.replace('ScreenName', {param: value});
+```
+
+**Reset navigation stack:**
+```typescript
+navigation.reset({
+  index: 0,
+  routes: [{name: 'Onboarding'}],
+});
+```
+
+## Best Practices
+
+1. **Always pass required params**: Guards will warn if params are missing
+2. **Use type-safe navigation**: Import `ScreenProps` for full type safety
+3. **Handle navigation errors**: Error boundary catches errors automatically
+4. **Test navigation flows**: Verify params are passed correctly
+5. **Use guards for protection**: Extend guards for custom validation logic
+
+## Extending Guards
+
+Add custom validation in `src/navigation/guards.ts`:
+
+```typescript
+function validateRouteParams(routeName: string, params: any): boolean {
+  switch (routeName) {
+    case 'MyNewScreen':
+      if (!params?.requiredParam) {
+        console.warn('[Navigation] Invalid params');
+        return false;
+      }
+      break;
+  }
+  return true;
+}
+```
+
+## Troubleshooting
+
+**Issue: Navigation params are undefined**
+- Check that params are passed when navigating
+- Verify param names match type definitions
+- Check guards for validation warnings
+
+**Issue: Navigation error boundary shows**
+- Check console for error details (dev mode)
+- Verify screen components are imported correctly
+- Check for errors in screen render methods
+
+**Issue: Deep link not working**
+- Verify URL scheme is registered in native config
+- Check linking configuration in `src/navigation/linking.ts`
+- Test with `npx uri-scheme open s3://screen --ios`
+
+## Files
+
+- `src/navigation/RootNavigator.tsx` - Main navigator configuration
+- `src/navigation/types.ts` - TypeScript type definitions
+- `src/navigation/guards.ts` - Route validation guards
+- `src/navigation/ErrorBoundary.tsx` - Error handling component
+- `src/navigation/linking.ts` - Deep linking configuration
+- `src/navigation/index.ts` - Public API exports
