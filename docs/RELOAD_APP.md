@@ -163,3 +163,21 @@ The reload script is located at `scripts/reload-app.sh` and can be run directly:
 ./scripts/reload-app.sh both
 ./scripts/reload-app.sh both --clean
 ```
+
+### New Multi-Terminal Behavior
+
+The script now opens separate terminals for better monitoring:
+
+- **Current terminal**: Metro bundler runs here (foreground, see all Metro logs)
+- **New terminal 1**: iOS build and simulator logs (if iOS requested)
+- **New terminal 2**: Android build and emulator logs (if Android requested)
+
+This gives you three separate terminal windows to monitor different parts of the build process.
+
+**To stop Metro**: Press `Ctrl+C` in the terminal running Metro
+
+**Benefits**:
+- See Metro logs in real-time without scrolling through build output
+- Monitor iOS and Android builds separately
+- Easy to spot errors in each component
+- Keep Metro running while checking build logs

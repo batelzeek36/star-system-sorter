@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Reload React Native app on iOS and/or Android simulators
+# Opens Metro in current terminal, iOS and Android in separate terminals
 # Usage: 
 #   ./scripts/reload-app.sh ios
 #   ./scripts/reload-app.sh android
@@ -11,6 +12,7 @@ set -e
 
 PLATFORM=${1:-both}
 CLEAN_BUILD=${2:-}
+PROJECT_DIR=$(pwd)
 
 # Colors for output
 RED='\033[0;31m'
@@ -54,24 +56,17 @@ kill_metro() {
     fi
 }
 
-# Start Metro in background
-start_metro() {
-    print_step "Starting Metro bundler with cache reset..."
-    npm start -- --reset-cache > metro.log 2>&1 &
-    METRO_PID=$!
+# Open new Terminal window on macOS
+open_terminal() {
+    local title=$1
+    local command=$2
     
-    # Wait for Metro to be ready
-    print_step "Waiting for Metro to be ready..."
-    for i in {1..30}; do
-        if check_metro; then
-            print_success "Metro is ready (PID: $METRO_PID)"
-            return 0
-        fi
-        sleep 1
-    done
-    
-    print_error "Metro failed to start. Check metro.log for details."
-    return 1
+    osascript <<EOF
+tell application "Terminal"
+    do script "cd '$PROJECT_DIR' && echo '${title}' && ${command}"
+    activate
+end tell
+EOF
 }
 
 # Clean build for iOS
@@ -93,22 +88,26 @@ clean_android() {
     print_success "Android cleaned"
 }
 
-# Run iOS
+# Run iOS in new terminal
 run_ios() {
-    print_step "Building and running iOS app..."
-    npm run ios
+    print_step "Opening iOS build in new terminal..."
+    open_terminal "🍎 iOS Build" "npm run ios"
+    print_success "iOS terminal opened"
 }
 
-# Run Android
+# Run Android in new terminal
 run_android() {
-    print_step "Building and running Android app..."
-    npm run android
+    print_step "Opening Android build in new terminal..."
+    open_terminal "🤖 Android Build" "npm run android"
+    print_success "Android terminal opened"
 }
 
 # Main script
 main() {
     echo ""
     print_step "React Native App Reload Script"
+    print_warning "Metro will run in THIS terminal"
+    print_warning "iOS/Android will open in SEPARATE terminals"
     echo ""
     
     # Kill Metro
@@ -127,43 +126,20 @@ main() {
         fi
     fi
     
-    # Start Metro
-    if ! start_metro; then
-        exit 1
-    fi
-    
-    # Wait a bit for Metro to fully initialize
-    sleep 3
-    
-    # Run the app(s)
+    # Launch platform builds in separate terminals first
     case $PLATFORM in
         ios)
             run_ios
-            print_success "iOS app reloaded!"
             ;;
         android)
             run_android
-            print_success "Android app reloaded!"
             ;;
         both)
-            print_step "Running both platforms..."
-            
-            # Run iOS first
-            run_ios &
-            IOS_PID=$!
-            
-            # Wait a bit before starting Android
-            sleep 5
-            
-            # Run Android
-            run_android &
-            ANDROID_PID=$!
-            
-            # Wait for both to complete
-            wait $IOS_PID
-            wait $ANDROID_PID
-            
-            print_success "Both apps reloaded!"
+            print_step "Opening both platforms in separate terminals..."
+            run_ios
+            sleep 2
+            run_android
+            print_success "Both terminals opened!"
             ;;
         *)
             print_error "Invalid platform: $PLATFORM"
@@ -173,10 +149,12 @@ main() {
     esac
     
     echo ""
-    print_success "Done! Metro is running in the background."
-    print_warning "To stop Metro: lsof -ti:8081 | xargs kill -9"
-    print_warning "To view Metro logs: tail -f metro.log"
+    print_step "Starting Metro bundler in this terminal..."
+    print_warning "Press Ctrl+C to stop Metro"
     echo ""
+    
+    # Start Metro in foreground (this terminal)
+    npm start -- --reset-cache
 }
 
 # Run main function
