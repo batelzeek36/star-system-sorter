@@ -5,13 +5,13 @@
 
 import React from 'react';
 import {
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   View,
   useColorScheme,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';

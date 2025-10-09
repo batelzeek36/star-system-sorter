@@ -3,5 +3,5 @@
  * Public API for utility functions and helpers
  */
 
-// Export utilities here as they are created
-// Example: export { compress, decompress } from './compression';
+// Validation utilities (Zod as single source of truth)
+export { z, zodResolver } from './validation';

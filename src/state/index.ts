@@ -3,5 +3,5 @@
  * Public API for global state management (zustand)
  */
 
-// Export state store here as it is created
-// Example: export { useStore } from './store';
+// Global state stores (zustand - keep minimal, 2-3 atoms max)
+export { useUserSession, useGameState, useToast } from './store';

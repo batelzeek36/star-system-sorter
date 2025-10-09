@@ -111,12 +111,28 @@ TypeScript is configured in `tsconfig.json` with:
 
 ### Available Scripts
 
+**Development:**
 - `npm start` - Start Metro bundler
 - `npm run android` - Run on Android emulator/device
 - `npm run ios` - Run on iOS simulator/device
+
+**Testing:**
+- `npm test` - Run Jest unit tests
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run test:e2e:ios` - Run Detox E2E tests on iOS
+- `npm run test:e2e:android` - Run Detox E2E tests on Android
+
+**Code Quality:**
 - `npm run lint` - Run ESLint
-- `npm run test` - Run Jest tests
+- `npm run lint:graph` - Validate import graph (no cycles, no deep imports)
 - `npm run typecheck` - Run TypeScript type checking
+
+**Build & Rebuild:**
+- `npm run rebuild:ios` - Rebuild iOS native project
+- `npm run rebuild:android` - Rebuild Android native project
+- `npm run rebuild:all` - Rebuild both platforms
+- `npm run build:detox:ios` - Build app for Detox E2E tests (iOS)
+- `npm run build:detox:android` - Build app for Detox E2E tests (Android)
 
 ## Project Configuration
 
@@ -272,6 +288,65 @@ cd ..
 5. Implement scorer library
 6. Set up Flutter module integration
 7. Implement native bridge (MethodChannel/EventChannel)
+
+## Troubleshooting
+
+### Native Module Errors
+
+If you see errors like:
+```
+Invariant Violation: TurboModuleRegistry.getEnforcing(...): 
+'RNGestureHandlerModule' could not be found.
+```
+
+**Quick Fix:**
+```bash
+# For iOS
+npm run rebuild:ios
+
+# For Android
+npm run rebuild:android
+
+# Then restart Metro and rebuild
+npm start -- --reset-cache
+npm run ios  # or npm run android
+```
+
+See `FIX_NATIVE_MODULE_ERROR.md` for detailed instructions.
+
+### Common Issues
+
+- **Metro bundler won't start (EADDRINUSE)**: Port 8081 is already in use
+  ```bash
+  lsof -ti:8081 | xargs kill -9
+  npm start
+  ```
+
+- **Build fails after installing dependencies**: Rebuild native projects
+  ```bash
+  npm run rebuild:all
+  ```
+
+- **iOS build fails**: Clean and reinstall pods
+  ```bash
+  cd ios
+  rm -rf Pods Podfile.lock
+  bundle exec pod install
+  cd ..
+  npm run ios
+  ```
+
+- **Android build fails**: Clean gradle cache
+  ```bash
+  cd android
+  ./gradlew clean
+  cd ..
+  npm run android
+  ```
+
+For more troubleshooting, see:
+- `docs/TROUBLESHOOTING_NATIVE_MODULES.md`
+- `docs/DEV_DEPENDENCIES.md`
 
 ## Resources
 
