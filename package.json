@@ -18,6 +18,12 @@
     "rebuild:ios": "bash scripts/rebuild-native.sh ios",
     "rebuild:android": "bash scripts/rebuild-native.sh android",
     "rebuild:all": "bash scripts/rebuild-native.sh both",
+    "reload:ios": "bash scripts/reload-app.sh ios",
+    "reload:android": "bash scripts/reload-app.sh android",
+    "reload:both": "bash scripts/reload-app.sh both",
+    "reload:ios:clean": "bash scripts/reload-app.sh ios --clean",
+    "reload:android:clean": "bash scripts/reload-app.sh android --clean",
+    "reload:both:clean": "bash scripts/reload-app.sh both --clean",
     "postinstall": "cd ios && bundle exec pod install && cd .."
   },
   "dependencies": {

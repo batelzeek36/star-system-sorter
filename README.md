@@ -124,8 +124,16 @@ TypeScript is configured in `tsconfig.json` with:
 
 **Code Quality:**
 - `npm run lint` - Run ESLint
-- `npm run lint:graph` - Validate import graph (no cycles, no deep imports)
+- `npm run lint:graph` - Validate import graph (no cycles, no deep imports, layering)
 - `npm run typecheck` - Run TypeScript type checking
+
+**Reload & Restart:**
+- `npm run reload:ios` - Stop Metro, clear cache, restart iOS app
+- `npm run reload:android` - Stop Metro, clear cache, restart Android app
+- `npm run reload:both` - Reload both platforms
+- `npm run reload:ios:clean` - Clean rebuild and reload iOS
+- `npm run reload:android:clean` - Clean rebuild and reload Android
+- `npm run reload:both:clean` - Clean rebuild and reload both platforms
 
 **Build & Rebuild:**
 - `npm run rebuild:ios` - Rebuild iOS native project
@@ -278,6 +286,36 @@ cd ..
 - **Determinism**: PCG32 RNG, fixed timestep for reproducible gameplay
 - **Safety-first**: Comprehensive moderation across all user content
 - **Native-first**: React Native UI with Flutter native modules
+
+### Code Quality & Dependency Rules
+
+We enforce strict dependency rules to maintain code quality and architectural boundaries:
+
+- **No circular dependencies**: All imports must be acyclic
+- **No deep imports**: Only import from module `index.ts` files
+- **Layered architecture**: Screens → Components → Theme/Tokens → Utils
+
+Run `npm run lint:graph` to validate these rules. See `docs/DEPENDENCY_RULES.md` for detailed documentation.
+
+**Layering rules:**
+```
+Screens (top layer)
+  ↓ can import from
+Components
+  ↓ can import from
+Theme/Tokens
+  ↓ can import from
+Utils (lib, state)
+```
+
+**Module structure:**
+```
+src/scorer/
+├── types.ts          # TypeScript interfaces
+├── canon.ts          # Implementation
+├── score.ts          # Implementation
+└── index.ts          # Public API (import from here only)
+```
 
 ## Next Steps
 

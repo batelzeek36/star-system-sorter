@@ -72,7 +72,7 @@ Before deployment:
     - Configure MSW v2 with @mswjs/interceptors/fetch in Jest setup
     - _Requirements: 12.3, 12.7_
 
-  - [ ] 1.3 Configure dependency-cruiser rules
+  - [x] 1.3 Configure dependency-cruiser rules
 
     - Create .dependency-cruiser.js config
     - Enforce no import cycles
