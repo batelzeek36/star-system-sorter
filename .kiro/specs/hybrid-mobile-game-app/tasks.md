@@ -252,14 +252,14 @@ Before deployment:
     - Implement fallback for missing crests
     - _Requirements: 1.3, 1.15_
 
-  - [ ] 5.2 Create RadialChart component
+  - [x] 5.2 Create RadialChart component
 
     - Write RadialChart.tsx with percentage, label, color props
     - Implement SVG-based radial progress chart using react-native-svg
     - Add animation using Animated API
     - _Requirements: 1.3_
 
-  - [ ] 5.3 Create ScoreDisplay component
+  - [x] 5.3 Create ScoreDisplay component
 
     - Write ScoreDisplay.tsx using adapted Card and Badge components
     - Display primary system, percentage, and allies
@@ -345,7 +345,7 @@ Before deployment:
     - Validate inputs before submission
     - _Requirements: 1.3, 1.4, 12.1, 12.7_
 
-  - [ ] 7.3 Create Result screen
+  - [x] 7.3 Create Result screen
 
     - Write Result.tsx displaying classification result
     - Use ScoreDisplay, RadialChart, StarSystemCrest components
@@ -353,7 +353,7 @@ Before deployment:
     - Add "View Why" and "Generate Narrative" buttons
     - _Requirements: 1.3, 1.7, 1.10_
 
-  - [ ] 7.4 Create Why screen
+  - [x] 7.4 Create Why screen
 
     - Write Why.tsx explaining classification reasoning
     - Display contributors per system

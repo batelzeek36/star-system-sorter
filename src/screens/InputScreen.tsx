@@ -66,6 +66,16 @@ export function InputScreen({navigation}: Props) {
         {system: 'Sirius', percentage: 18.2},
         {system: 'Arcturus', percentage: 14.3},
       ],
+      contributorsPerSystem: {
+        Pleiades: ['type_manifestor', 'gate_1', 'gate_13', 'authority_emotional'],
+        Sirius: ['center_sacral', 'gate_5', 'profile_2/4'],
+        Arcturus: ['gate_34', 'channel_34-57'],
+      },
+      percentages: {
+        Pleiades: 67.5,
+        Sirius: 18.2,
+        Arcturus: 14.3,
+      },
     });
   };
 

@@ -18,6 +18,8 @@ export type RootStackParamList = {
     hybrid?: [string, string];
     percentage: number;
     allies: Array<{system: string; percentage: number}>;
+    contributorsPerSystem: Record<string, string[]>;
+    percentages: Record<string, number>;
   };
   Why: {
     contributorsPerSystem: Record<string, string[]>;

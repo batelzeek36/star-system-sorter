@@ -1,158 +1,189 @@
 /**
  * Result Screen
- * Display classification results
- * TODO: Implement full result display in task 7.3
+ * 
+ * Displays classification results with visual components.
+ * Shows star system crest, radial chart, score display, and action buttons.
+ * 
+ * Requirements: 1.3, 1.7, 1.10
  */
 
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
+import {
+  StarSystemCrest,
+  RadialChart,
+  ScoreDisplay,
+  type StarSystemName,
+} from '@/components';
 
 type Props = ScreenProps<'Result'>;
 
 export function ResultScreen({navigation, route}: Props) {
-  const {classification, primary, hybrid, percentage, allies} = route.params;
+  const {classification, primary, hybrid, percentage, allies, contributorsPerSystem, percentages} = route.params;
+
+  // Determine which system to display crest for
+  const displaySystem = (primary || (hybrid && hybrid[0])) as StarSystemName | undefined;
+  
+  // Get color for the primary/hybrid system
+  const systemColor = displaySystem ? getSystemColor(displaySystem) : '#4F46E5';
 
   const handleViewWhy = () => {
-    // TODO: Pass actual contributors data in task 7.3
     navigation.navigate('Why', {
-      contributorsPerSystem: {},
-      percentages: {},
+      contributorsPerSystem,
+      percentages,
     });
   };
 
-  const handleGoToProfile = () => {
+  const handleGenerateNarrative = () => {
+    // TODO: Implement narrative generation in future task
+    // For now, navigate to Profile as placeholder
     navigation.navigate('Profile');
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.placeholder}>Result Screen - Coming Soon</Text>
-
-      <View style={styles.resultCard}>
-        <Text style={styles.label}>Classification:</Text>
-        <Text style={styles.value}>{classification}</Text>
-
-        {primary && (
-          <>
-            <Text style={styles.label}>Primary System:</Text>
-            <Text style={styles.value}>{primary}</Text>
-          </>
-        )}
-
-        {hybrid && (
-          <>
-            <Text style={styles.label}>Hybrid Systems:</Text>
-            <Text style={styles.value}>{hybrid.join(' + ')}</Text>
-          </>
-        )}
-
-        <Text style={styles.label}>Percentage:</Text>
-        <Text style={styles.value}>{percentage.toFixed(1)}%</Text>
-
-        {allies.length > 0 && (
-          <>
-            <Text style={styles.label}>Allies:</Text>
-            {allies.map(ally => (
-              <Text key={ally.system} style={styles.allyText}>
-                {ally.system}: {ally.percentage.toFixed(1)}%
-              </Text>
-            ))}
-          </>
-        )}
+    <ScrollView 
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}>
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Your Classification</Text>
       </View>
 
-      <Text style={styles.disclaimer}>
-        For insight & entertainment. Not medical, financial, or legal advice.
-      </Text>
+      {/* Star System Crest */}
+      {displaySystem && (
+        <View style={styles.crestContainer}>
+          <StarSystemCrest
+            system={displaySystem}
+            size="lg"
+            variant="default"
+          />
+        </View>
+      )}
 
+      {/* Radial Chart */}
+      <View style={styles.chartContainer}>
+        <RadialChart
+          percentage={percentage}
+          label={displaySystem || 'System'}
+          color={systemColor}
+          size={160}
+          strokeWidth={12}
+        />
+      </View>
+
+      {/* Score Display Card */}
+      <View style={styles.scoreContainer}>
+        <ScoreDisplay
+          classification={classification}
+          primary={primary}
+          hybrid={hybrid}
+          percentage={percentage}
+          allies={allies}
+        />
+      </View>
+
+      {/* Action Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={styles.button}
+          style={styles.primaryButton}
           onPress={handleViewWhy}
-          accessibilityLabel="View Why"
-          accessibilityRole="button">
-          <Text style={styles.buttonText}>View Why</Text>
+          accessibilityLabel="View Why - See detailed explanation"
+          accessibilityRole="button"
+          accessibilityHint="Opens explanation of your classification">
+          <Text style={styles.primaryButtonText}>View Why</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.secondaryButton]}
-          onPress={handleGoToProfile}
-          accessibilityLabel="Go to Profile"
-          accessibilityRole="button">
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-            Go to Profile
-          </Text>
+          style={styles.secondaryButton}
+          onPress={handleGenerateNarrative}
+          accessibilityLabel="Generate Narrative"
+          accessibilityRole="button"
+          accessibilityHint="Creates a personalized narrative">
+          <Text style={styles.secondaryButtonText}>Generate Narrative</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
 
+/**
+ * Get color for a star system
+ */
+function getSystemColor(system: StarSystemName): string {
+  const colors: Record<StarSystemName, string> = {
+    Pleiades: '#4A90E2',
+    Sirius: '#50E3C2',
+    Arcturus: '#F5A623',
+    Andromeda: '#BD10E0',
+    Lyra: '#7ED321',
+    Orion: '#D0021B',
+  };
+  return colors[system] || '#4F46E5';
+}
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F9FAFB',
   },
-  placeholder: {
-    fontSize: 16,
-    color: '#888888',
-    textAlign: 'center',
+  header: {
     marginBottom: 24,
+    alignItems: 'center',
   },
-  resultCard: {
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666666',
-    marginTop: 12,
-    marginBottom: 4,
-  },
-  value: {
-    fontSize: 18,
+  title: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#111827',
   },
-  allyText: {
-    fontSize: 16,
-    color: '#333333',
-    marginTop: 4,
+  crestContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
   },
-  disclaimer: {
-    fontSize: 12,
-    color: '#888888',
-    textAlign: 'center',
-    fontStyle: 'italic',
+  chartContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  scoreContainer: {
     marginBottom: 24,
   },
   buttonContainer: {
     gap: 12,
+    marginBottom: 32,
   },
-  button: {
-    backgroundColor: '#000000',
+  primaryButton: {
+    backgroundColor: '#4F46E5',
     paddingVertical: 16,
     paddingHorizontal: 32,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     minHeight: 44,
+    shadowColor: '#4F46E5',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  buttonText: {
-    color: '#ffffff',
+  primaryButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
   secondaryButton: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#000000',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+    minHeight: 44,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
   },
   secondaryButtonText: {
-    color: '#000000',
+    color: '#374151',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

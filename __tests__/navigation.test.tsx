@@ -81,6 +81,8 @@ describe('Navigation Tests', () => {
             {system: 'Sirius', percentage: 18.2},
             {system: 'Arcturus', percentage: 14.3},
           ],
+          contributorsPerSystem: expect.any(Object),
+          percentages: expect.any(Object),
         });
       });
     });
@@ -96,21 +98,33 @@ describe('Navigation Tests', () => {
           {system: 'Sirius', percentage: 18.2},
           {system: 'Arcturus', percentage: 14.3},
         ],
+        contributorsPerSystem: {
+          Pleiades: ['type_manifestor', 'gate_1'],
+          Sirius: ['authority_emotional'],
+        },
+        percentages: {
+          Pleiades: 67.5,
+          Sirius: 18.2,
+          Arcturus: 14.3,
+        },
       },
     };
 
     it('displays classification results', () => {
       const navigation = createMockNavigation();
-      const {getByText} = render(
+      const {getByText, getAllByText} = render(
         <ResultScreen
           navigation={navigation as any}
           route={mockRoute as any}
         />,
       );
 
-      expect(getByText('primary')).toBeTruthy();
-      expect(getByText('Pleiades')).toBeTruthy();
-      expect(getByText('67.5%')).toBeTruthy();
+      expect(getByText('Your Classification')).toBeTruthy();
+      expect(getAllByText('Pleiades').length).toBeGreaterThan(0);
+      expect(getAllByText('67.5%').length).toBeGreaterThan(0);
+      expect(getByText('Primary System')).toBeTruthy();
+      expect(getByText('Allied Systems')).toBeTruthy();
+      expect(getByText('Alignment')).toBeTruthy();
     });
 
     it('navigates to Why screen when View Why is pressed', () => {
@@ -124,12 +138,19 @@ describe('Navigation Tests', () => {
 
       fireEvent.press(getByText('View Why'));
       expect(navigation.navigate).toHaveBeenCalledWith('Why', {
-        contributorsPerSystem: {},
-        percentages: {},
+        contributorsPerSystem: {
+          Pleiades: ['type_manifestor', 'gate_1'],
+          Sirius: ['authority_emotional'],
+        },
+        percentages: {
+          Pleiades: 67.5,
+          Sirius: 18.2,
+          Arcturus: 14.3,
+        },
       });
     });
 
-    it('navigates to Profile when Go to Profile is pressed', () => {
+    it('navigates to Profile when Generate Narrative is pressed', () => {
       const navigation = createMockNavigation();
       const {getByText} = render(
         <ResultScreen
@@ -138,7 +159,7 @@ describe('Navigation Tests', () => {
         />,
       );
 
-      fireEvent.press(getByText('Go to Profile'));
+      fireEvent.press(getByText('Generate Narrative'));
       expect(navigation.navigate).toHaveBeenCalledWith('Profile');
     });
 

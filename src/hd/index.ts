@@ -3,9 +3,8 @@
  * Public API for HD calculations using hdkit
  */
 
-// Export HD functions here as they are created
-// Example: export { computeHDExtract } from './hdkit-adapter';
-// Example: export type { HDExtract } from './types';
+export { computeHDExtract } from './hdkit-adapter';
+export type { HDExtract, BirthData } from './types';
 
 /**
  * Usage example for importing from hdkit:
