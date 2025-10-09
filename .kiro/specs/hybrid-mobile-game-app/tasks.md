@@ -105,13 +105,13 @@ Before deployment:
     - Document hdkit API surface in comments
     - _Requirements: 4.1_
 
-  - [ ] 2.1 Configure hdkit path alias
+  - [x] 2.1 Configure hdkit path alias
 
     - Add path alias in tsconfig.json: `@hdkit/*` → `hdkit/*`
     - Add to metro.config.js: watchFolders for repo root, resolver extraNodeModules
     - Ensure Metro can see hdkit/ at repo root
     - Add minimal ambient types if needed (no new deps)
-    - Test import works: `import { ... } from '@hdkit/hdkit'`
+    - Test import works: `import { ... } from '@hdkit/index'`
     - _Requirements: 12.10_
 
   - [ ] 2.2 Create hdkit adapter
