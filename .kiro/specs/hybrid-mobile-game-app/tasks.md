@@ -114,7 +114,7 @@ Before deployment:
     - Test import works: `import { ... } from '@hdkit/index'`
     - _Requirements: 12.10_
 
-  - [ ] 2.2 Create hdkit adapter
+  - [x] 2.2 Create hdkit adapter
 
     - Write src/hd/hdkit-adapter.ts (≤120 LOC)
     - Export `computeHDExtract({ dateISO, time, timeZone, lat?, lon? }): Promise<HDExtract>`
@@ -158,7 +158,7 @@ Before deployment:
 
 - [ ] 3. Implement scorer library with deterministic classification
 
-  - [ ] 3.1 Create scorer types and interfaces
+  - [x] 3.1 Create scorer types and interfaces
 
     - Write TypeScript interfaces for HDExtract, Canon, ScorerResult, TiePolicy
     - Define SystemWeights and contributor types
@@ -185,7 +185,7 @@ Before deployment:
     - Return primary, hybrid, or unresolved classification
     - _Requirements: 4.4, 4.5, 4.6_
 
-  - [ ] 3.5 Create scorer public API
+  - [x] 3.5 Create scorer public API
 
     - Write index.ts with exported classify() function
     - Include meta information (canonVersion, canonChecksum)
