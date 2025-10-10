@@ -10,6 +10,7 @@
  */
 
 import type { HDExtract, BirthData } from './types';
+import { lookupKnownChart } from './known-charts';
 
 /**
  * Convert local wall time + IANA timezone to UTC timestamp
@@ -55,6 +56,11 @@ function toUTC(dateISO: string, time: string, timeZone: string): Date {
  * 
  * This is deterministic: same inputs always produce same outputs.
  * 
+ * Strategy:
+ * 1. Check known charts lookup (for verified test data)
+ * 2. Call HD chart API (TODO: integrate MyBodyGraph or similar)
+ * 3. Fall back to mock data for development
+ * 
  * @param birthData - Birth date, time, timezone, and optional location
  * @returns HDExtract with type, authority, profile, centers, channels, gates
  */
@@ -63,14 +69,36 @@ export async function computeHDExtract(
 ): Promise<HDExtract> {
   const { dateISO, time, timeZone, lat, lon } = birthData;
   
-  // Convert to UTC for ephemeris calculations
+  console.log('[hdkit-adapter] Computing HD extract for:', {
+    dateISO,
+    time,
+    timeZone,
+    lat,
+    lon,
+  });
+  
+  // Strategy 1: Check known charts lookup
+  const knownChart = lookupKnownChart(dateISO, time, timeZone);
+  if (knownChart) {
+    console.log('[hdkit-adapter] Using known chart data:', knownChart);
+    return knownChart;
+  }
+  
+  // Strategy 2: Call HD chart API
+  // TODO: Integrate with MyBodyGraph API or similar
+  // const apiResult = await callHDChartAPI(dateISO, time, timeZone, lat, lon);
+  // if (apiResult) return apiResult;
+  
+  // Strategy 3: Fall back to mock data for development
+  console.warn('[hdkit-adapter] No known chart found, using mock data. Consider adding this chart to known-charts.ts or integrating an HD API.');
+  
   const utcDate = toUTC(dateISO, time, timeZone);
-  
-  // TODO: Replace with real ephemeris calculations
-  // For now, return deterministic mock data based on input hash
   const hash = hashInput(dateISO, time, timeZone);
+  const extract = computeMockExtract(hash, utcDate, lat, lon);
   
-  return computeMockExtract(hash, utcDate, lat, lon);
+  console.log('[hdkit-adapter] Generated mock HD extract:', extract);
+  
+  return extract;
 }
 
 /**

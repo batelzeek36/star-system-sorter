@@ -274,11 +274,53 @@ cd ..
 ### Technology Stack
 
 - **Frontend**: React Native 0.82+ with TypeScript
-- **Navigation**: React Navigation (to be added)
+- **Navigation**: React Navigation (native stack)
 - **State Management**: zustand (minimal, 2-3 atoms)
 - **Forms**: react-hook-form + Zod validation
 - **Game Module**: Flutter/Flame (Super Dash)
-- **Backend**: Node.js server (separate repository)
+- **Backend**: Node.js server (see `apps/server/`)
+
+### Server (Node.js)
+
+The server provides API endpoints for the mobile app, including a proxy to the BodyGraph Chart API.
+
+**Location:** `apps/server/`
+
+**Features:**
+- BodyGraph Chart API proxy with 30-day caching
+- In-memory storage (no database for MVP)
+- Clean error mapping for upstream failures
+- CORS support for development
+
+**Quick Start:**
+```bash
+# Install server dependencies
+npm install --prefix ./apps/server
+
+# Start development server (auto-reload)
+npm run dev --prefix ./apps/server
+
+# Run tests
+npm test --prefix ./apps/server
+```
+
+**Endpoints:**
+- `POST /internal/hd` - BodyGraph Chart API proxy
+- `GET /health` - Health check
+
+**Environment Variables:**
+```bash
+# Required in .env file at project root
+BODYGRAPH_API_KEY=your-api-key-here
+PORT=3000
+```
+
+**API Access:**
+- iOS simulator: `http://localhost:3000`
+- Android emulator: `http://10.0.2.2:3000`
+- Physical devices: `http://<YOUR_LAN_IP>:3000`
+
+See `apps/server/README.md` for detailed documentation.
 
 ### Design Principles
 
