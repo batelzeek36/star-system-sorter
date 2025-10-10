@@ -135,7 +135,7 @@ Before deployment:
     - Add 2-3 fixtures with known date/time/location → expected HDExtract
     - _Requirements: 10.1_
 
-  - [ ] 2.5 Docs
+  - [x] 2.5 Docs
     - Create docs/BODYGRAPH_API.md
     - Document payload format, sample response
     - Document field mapping to HDExtract
