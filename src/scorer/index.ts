@@ -24,10 +24,10 @@ export type {
   ClassificationOptions,
 } from './types';
 
-// Import dependencies (to be implemented in tasks 3.2-3.4)
-// import { loadCanon } from './canon';
-// import { computeScore } from './score';
-// import { resolveTies } from './tie';
+// Import dependencies
+import { loadCanon, computeCanonChecksum, getCanonWithChecksum } from './canon';
+import { computeScores } from './score';
+import { resolveTies } from './tie';
 
 import type { HDExtract, ScorerResult, ClassificationOptions } from './types';
 
@@ -63,19 +63,56 @@ export async function classify(
   extract: HDExtract,
   options?: ClassificationOptions
 ): Promise<ScorerResult> {
-  // TODO: Implement in task 3.2-3.4
   // 1. Load canon and compute checksum (task 3.2)
-  // 2. Compute scores for all systems (task 3.3)
-  // 3. Apply tie-breaking logic (task 3.4)
-  // 4. Return result with meta information
+  const { canon, checksum } = await getCanonWithChecksum();
   
-  throw new Error(
-    'classify() not yet implemented. Complete tasks 3.2-3.4 first: ' +
-    'canon loading (3.2), scoring algorithm (3.3), and tie-breaking (3.4)'
-  );
+  // 2. Compute scores for all systems (task 3.3)
+  const systemScores = computeScores(extract, canon);
+  
+  // 3. Apply tie-breaking logic (task 3.4)
+  const tieBreakResult = resolveTies(systemScores, options?.tiePolicy);
+  
+  // 4. Build result with meta information
+  const percentages: Record<string, number> = {};
+  const contributorsPerSystem: Record<string, string[]> = {};
+  
+  systemScores.forEach(score => {
+    percentages[score.system] = score.percentage;
+    contributorsPerSystem[score.system] = score.contributors.map(c => c.key);
+  });
+  
+  // Build allies list (all systems except primary/hybrid, sorted by percentage)
+  const alliesSet = new Set(systemScores.map(s => s.system));
+  if (tieBreakResult.primary) {
+    alliesSet.delete(tieBreakResult.primary);
+  }
+  if (tieBreakResult.hybrid) {
+    tieBreakResult.hybrid.forEach(sys => alliesSet.delete(sys));
+  }
+  
+  const allies = systemScores
+    .filter(s => alliesSet.has(s.system))
+    .map(s => ({ system: s.system, percentage: s.percentage }));
+  
+  return {
+    classification: tieBreakResult.classification,
+    primary: tieBreakResult.primary,
+    hybrid: tieBreakResult.hybrid,
+    allies,
+    percentages,
+    contributorsPerSystem,
+    meta: {
+      canonVersion: canon.version,
+      canonChecksum: checksum,
+    },
+  };
 }
 
-// Future exports (to be implemented in subsequent tasks):
-// export { loadCanon } from './canon';
-// export { computeScore } from './score';
-// export { resolveTies } from './tie';
+// Canon exports (task 3.2 complete)
+export { loadCanon, computeCanonChecksum, getCanonWithChecksum } from './canon';
+
+// Score exports (task 3.3 complete)
+export { computeScores } from './score';
+
+// Tie-breaking exports (task 3.4 complete)
+export { resolveTies } from './tie';

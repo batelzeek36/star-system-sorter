@@ -3,7 +3,7 @@
  * Birth data entry form with validation
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -13,12 +13,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import type {ScreenProps} from '@/navigation/types';
 import {TimeZonePicker} from '@/components/TimeZonePicker';
+import {computeHDExtract} from '@/hd';
+import {classify} from '@/scorer';
 
 type Props = ScreenProps<'Input'>;
 
@@ -39,10 +42,12 @@ const birthDataSchema = z.object({
 type BirthDataForm = z.infer<typeof birthDataSchema>;
 
 export function InputScreen({navigation}: Props) {
+  const [isProcessing, setIsProcessing] = useState(false);
+  
   const {
     control,
     handleSubmit,
-    formState: {errors, isSubmitting},
+    formState: {errors},
   } = useForm<BirthDataForm>({
     resolver: zodResolver(birthDataSchema),
     defaultValues: {
@@ -54,29 +59,155 @@ export function InputScreen({navigation}: Props) {
   });
 
   const onSubmit = async (data: BirthDataForm) => {
-    // TODO: Wire to hdkit adapter in task 2.4
-    // For now, navigate with mock data
-    console.log('Form data:', data);
-
-    navigation.navigate('Result', {
-      classification: 'primary',
-      primary: 'Pleiades',
-      percentage: 67.5,
-      allies: [
-        {system: 'Sirius', percentage: 18.2},
-        {system: 'Arcturus', percentage: 14.3},
-      ],
-      contributorsPerSystem: {
-        Pleiades: ['type_manifestor', 'gate_1', 'gate_13', 'authority_emotional'],
-        Sirius: ['center_sacral', 'gate_5', 'profile_2/4'],
-        Arcturus: ['gate_34', 'channel_34-57'],
-      },
-      percentages: {
-        Pleiades: 67.5,
-        Sirius: 18.2,
-        Arcturus: 14.3,
-      },
-    });
+    setIsProcessing(true);
+    
+    try {
+      // Parse date from MM/DD/YYYY to YYYY-MM-DD (ISO format)
+      const [month, day, year] = data.date.split('/');
+      const dateISO = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      
+      // Parse time from HH:MM AM/PM to 24-hour HH:mm format
+      const timeMatch = data.time.match(/^(\d{2}):(\d{2}) (AM|PM)$/);
+      if (!timeMatch) {
+        throw new Error('Invalid time format');
+      }
+      
+      let hours = parseInt(timeMatch[1], 10);
+      const minutes = timeMatch[2];
+      const period = timeMatch[3];
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      const time24 = `${String(hours).padStart(2, '0')}:${minutes}`;
+      
+      console.log('[InputScreen] Processing birth data:', {
+        dateISO,
+        time24,
+        timeZone: data.timeZone,
+        location: data.location,
+      });
+      
+      // Step 1: Compute HD extract from birth data
+      const hdExtract = await computeHDExtract({
+        dateISO,
+        time: time24,
+        timeZone: data.timeZone,
+        // Note: lat/lon would come from geocoding the location
+        // For MVP, we skip geocoding and pass undefined
+      });
+      
+      console.log('[InputScreen] HD Extract computed:', hdExtract);
+      
+      // Step 2: Classify the HD extract into star system
+      // Note: classify() will throw until tasks 3.2-3.4 are complete
+      // For now, we'll catch and show a helpful message
+      try {
+        const result = await classify(hdExtract);
+        
+        console.log('[InputScreen] Classification result:', result);
+        
+        // Step 3: Navigate to Result screen with classification
+        navigation.navigate('Result', {
+          classification: result.classification,
+          primary: result.primary,
+          hybrid: result.hybrid,
+          percentage: result.primary 
+            ? result.percentages[result.primary] 
+            : result.hybrid 
+            ? Math.max(result.percentages[result.hybrid[0]], result.percentages[result.hybrid[1]])
+            : 0,
+          allies: result.allies,
+          contributorsPerSystem: result.contributorsPerSystem,
+          percentages: result.percentages,
+        });
+      } catch (classifyError) {
+        // Scorer not yet implemented (tasks 3.2-3.4)
+        // Show user-friendly message and navigate with mock data for testing
+        console.warn('Scorer not yet implemented:', classifyError);
+        
+        Alert.alert(
+          'Development Mode',
+          'The scoring system is not yet implemented. Showing sample results for testing.',
+          [{text: 'OK'}]
+        );
+        
+        // Navigate with mock data based on HD extract
+        navigation.navigate('Result', {
+          classification: 'primary',
+          primary: 'Pleiades',
+          percentage: 67.5,
+          allies: [
+            {system: 'Sirius', percentage: 18.2},
+            {system: 'Arcturus', percentage: 14.3},
+          ],
+          contributorsPerSystem: {
+            Pleiades: [`type_${hdExtract.type.toLowerCase()}`, ...hdExtract.gates.slice(0, 3).map(g => `gate_${g}`)],
+            Sirius: hdExtract.centers.slice(0, 2).map(c => `center_${c.toLowerCase()}`),
+            Arcturus: hdExtract.channels.slice(0, 2).map(ch => `channel_${ch}`),
+          },
+          percentages: {
+            Pleiades: 67.5,
+            Sirius: 18.2,
+            Arcturus: 14.3,
+          },
+        });
+      }
+    } catch (error) {
+      // Handle errors gracefully with user-friendly messages
+      console.error('Error processing birth data:', error);
+      
+      let errorTitle = 'Error';
+      let errorMessage = 'Unable to process your birth data. Please check your inputs and try again.';
+      
+      if (error instanceof Error) {
+        // Network errors (offline, airplane mode)
+        if (error.message.includes('No internet connection')) {
+          errorTitle = 'No Internet Connection';
+          errorMessage = 'Please check your network and try again.';
+        }
+        // Server errors
+        else if (error.message.includes('Server error')) {
+          errorTitle = 'Service Unavailable';
+          errorMessage = 'The service is temporarily unavailable. Please try again later.';
+        }
+        // Rate limiting
+        else if (error.message.includes('Rate limit')) {
+          errorTitle = 'Too Many Requests';
+          errorMessage = 'Please wait a moment before trying again.';
+        }
+        // Invalid input
+        else if (error.message.includes('Invalid input')) {
+          errorTitle = 'Invalid Data';
+          errorMessage = 'Please check your birth date, time, and timezone.';
+        }
+        // Server misconfiguration
+        else if (error.message.includes('Server misconfiguration')) {
+          errorTitle = 'Service Error';
+          errorMessage = 'There is a configuration issue. Please contact support.';
+        }
+        // Format errors
+        else if (error.message.includes('Invalid time format')) {
+          errorMessage = 'Invalid time format. Please use HH:MM AM/PM format.';
+        } else if (error.message.includes('Invalid date')) {
+          errorMessage = 'Invalid date. Please use MM/DD/YYYY format.';
+        } else if (error.message.includes('timezone')) {
+          errorMessage = 'Invalid timezone. Please select a valid timezone.';
+        }
+      }
+      
+      Alert.alert(
+        errorTitle,
+        errorMessage,
+        [{text: 'OK'}]
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -206,14 +337,14 @@ export function InputScreen({navigation}: Props) {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.button, isSubmitting && styles.buttonDisabled]}
+            style={[styles.button, isProcessing && styles.buttonDisabled]}
             onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
+            disabled={isProcessing}
             accessibilityLabel="Calculate classification"
             accessibilityRole="button"
             accessibilityHint="Submit form to calculate your star system classification">
             <Text style={styles.buttonText}>
-              {isSubmitting ? 'Processing...' : 'Calculate'}
+              {isProcessing ? 'Processing...' : 'Calculate'}
             </Text>
           </TouchableOpacity>
         </View>

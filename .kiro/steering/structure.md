@@ -34,11 +34,13 @@ src/
 ## Module Organization
 
 Each module should have:
+
 - `types.ts` - TypeScript interfaces and types
 - `index.ts` - Public API exports (only import from here)
 - Implementation files (≤150 LOC each)
 
 **Example (scorer module):**
+
 ```
 src/scorer/
 ├── types.ts             # HDExtract, Canon, ScorerResult interfaces
@@ -63,6 +65,7 @@ components/
 ```
 
 **New components go in `src/components/`:**
+
 ```
 src/components/
 ├── StarSystemCrest.tsx  # SVG crest renderer
@@ -173,6 +176,7 @@ docs/
 Use TS paths and Metro to reach local folders (e.g., `hdkit/` in repo root).
 
 **tsconfig.json (excerpt):**
+
 ```json
 {
   "compilerOptions": {
@@ -188,24 +192,29 @@ Use TS paths and Metro to reach local folders (e.g., `hdkit/` in repo root).
 ```
 
 **babel.config.js (excerpt):**
+
 ```javascript
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
-    ['module-resolver', {
-      root: ['./'],
-      alias: {
-        '@': './src',
-        '@hdkit': './hdkit',
-        '@components': './components',
+    [
+      'module-resolver',
+      {
+        root: ['./'],
+        alias: {
+          '@': './src',
+          '@hdkit': './hdkit',
+          '@components': './components',
+        },
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
       },
-      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
-    }]
-  ]
+    ],
+  ],
 };
 ```
 
 **metro.config.js (excerpt):**
+
 ```javascript
 const path = require('path');
 

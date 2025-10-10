@@ -48,7 +48,7 @@ describe('Scorer Public API', () => {
       expect(typeof classify).toBe('function');
     });
 
-    it('should return a Promise that rejects with pending implementation error', async () => {
+    it('should return a Promise that resolves to ScorerResult', async () => {
       const hdExtract: HDExtract = {
         type: 'Manifestor',
         authority: 'Emotional',
@@ -61,9 +61,11 @@ describe('Scorer Public API', () => {
       const result = classify(hdExtract);
       expect(result).toBeInstanceOf(Promise);
       
-      await expect(result).rejects.toThrow(
-        /not yet implemented.*tasks 3\.2-3\.4/i
-      );
+      const scorerResult = await result;
+      expect(scorerResult).toBeDefined();
+      expect(scorerResult.classification).toMatch(/^(primary|hybrid|unresolved)$/);
+      expect(scorerResult.meta).toBeDefined();
+      expect(scorerResult.percentages).toBeDefined();
     });
 
     it('should accept optional ClassificationOptions', async () => {
@@ -81,7 +83,9 @@ describe('Scorer Public API', () => {
         includeContributors: false,
       };
       
-      await expect(classify(hdExtract, options)).rejects.toThrow();
+      const result = await classify(hdExtract, options);
+      expect(result).toBeDefined();
+      expect(result.classification).toMatch(/^(primary|hybrid|unresolved)$/);
     });
   });
 
@@ -96,8 +100,7 @@ describe('Scorer Public API', () => {
     });
 
     it('should return ScorerResult type (verified by TypeScript)', async () => {
-      // This test verifies the return type at compile time
-      // Runtime verification will be added when implementation is complete
+      // This test verifies the return type at compile time and runtime
       
       const hdExtract: HDExtract = {
         type: 'Projector',
@@ -108,21 +111,19 @@ describe('Scorer Public API', () => {
         gates: [3, 7],
       };
       
-      try {
-        const result: ScorerResult = await classify(hdExtract);
-        // This won't execute until implementation is complete
-        expect(result).toBeDefined();
-      } catch (error) {
-        // Expected until tasks 3.2-3.4 are complete
-        expect(error).toBeDefined();
-      }
+      const result: ScorerResult = await classify(hdExtract);
+      expect(result).toBeDefined();
+      expect(result.classification).toMatch(/^(primary|hybrid|unresolved)$/);
+      expect(result.allies).toBeInstanceOf(Array);
+      expect(result.percentages).toBeDefined();
+      expect(result.contributorsPerSystem).toBeDefined();
+      expect(result.meta).toBeDefined();
     });
   });
 
   describe('Meta Information Requirements', () => {
-    it('should include canonVersion in result (when implemented)', async () => {
-      // Placeholder test for requirement 4.7
-      // Will be updated when implementation is complete
+    it('should include canonVersion in result', async () => {
+      // Test for requirement 4.7
       
       const hdExtract: HDExtract = {
         type: 'Reflector',
@@ -133,19 +134,14 @@ describe('Scorer Public API', () => {
         gates: [11, 56],
       };
       
-      try {
-        const result = await classify(hdExtract);
-        expect(result.meta.canonVersion).toBeDefined();
-        expect(typeof result.meta.canonVersion).toBe('string');
-      } catch (error) {
-        // Expected until implementation complete
-        expect(error).toBeDefined();
-      }
+      const result = await classify(hdExtract);
+      expect(result.meta.canonVersion).toBeDefined();
+      expect(typeof result.meta.canonVersion).toBe('string');
+      expect(result.meta.canonVersion).toMatch(/^\d+\.\d+\.\d+$/); // Semver format
     });
 
-    it('should include canonChecksum in result (when implemented)', async () => {
-      // Placeholder test for requirement 4.9
-      // Will be updated when implementation is complete
+    it('should include canonChecksum in result', async () => {
+      // Test for requirement 4.9
       
       const hdExtract: HDExtract = {
         type: 'Generator',
@@ -156,15 +152,10 @@ describe('Scorer Public API', () => {
         gates: [5, 15],
       };
       
-      try {
-        const result = await classify(hdExtract);
-        expect(result.meta.canonChecksum).toBeDefined();
-        expect(typeof result.meta.canonChecksum).toBe('string');
-        expect(result.meta.canonChecksum).toMatch(/^[a-f0-9]{64}$/); // SHA256 format
-      } catch (error) {
-        // Expected until implementation complete
-        expect(error).toBeDefined();
-      }
+      const result = await classify(hdExtract);
+      expect(result.meta.canonChecksum).toBeDefined();
+      expect(typeof result.meta.canonChecksum).toBe('string');
+      expect(result.meta.canonChecksum).toMatch(/^[a-f0-9]{64}$/); // SHA256 format
     });
   });
 });

@@ -27,8 +27,6 @@ Before deployment:
 - [ ] App runs on Android mid-tier devices (≤2.5s launch, ≥55 FPS)
 - [ ] App runs on iOS A-series devices (≤1.8s launch, ≥55 FPS)
 - [ ] Flutter module size ≤25MB (compressed)
-- [ ] BodyGraph proxy with caching working
-- [ ] Secrets not present in mobile bundle (API key only on server)
 
 ## Task List
 
@@ -97,50 +95,66 @@ Before deployment:
     - Configure deep linking if needed
     - _Requirements: 1.7_
 
-- [ ] 2. Human Design via BodyGraph Chart API
+- [ ] 2. Integrate hdkit for Human Design data generation
 
-  - [x] 2.1 Client API integration (BodyGraph)
+  - [x] 2.0 Inspect and integrate local hdkit
 
-    - Write src/hd/api-client.ts (≤120 LOC)
+    - Inspect hdkit/ at repo root: hdkit.js, constants.js, bodygraph-data.js, sample-apps/v1/
+    - Find utilities that yield type, authority, profile, centers, channels, gates from date/time/location
+    - Identify pure/offline computation path (no API keys)
+    - Document hdkit API surface in comments
+    - _Requirements: 4.1_
+
+  - [x] 2.1 Configure hdkit path alias
+
+    - Add path alias in tsconfig.json: `@hdkit/*` → `hdkit/*`
+    - Add to metro.config.js: watchFolders for repo root, resolver extraNodeModules
+    - Ensure Metro can see hdkit/ at repo root
+    - Add minimal ambient types if needed (no new deps)
+    - Test import works: `import { ... } from '@hdkit/index'`
+    - _Requirements: 12.10_
+
+  - [x] 2.2 Create hdkit adapter
+
+    - Write src/hd/hdkit-adapter.ts (≤120 LOC)
     - Export `computeHDExtract({ dateISO, time, timeZone, lat?, lon? }): Promise<HDExtract>`
-    - Format local wall time + IANA TZ → UTC → YYYY-MM-DD HH:mm
-    - Call server proxy POST /internal/hd (not the public API)
-    - Transform response → HDExtract { type, authority, profile, centers[], channels[], gates[] }
-    - Normalize authority names (e.g., "Emotional – Solar Plexus" → "Emotional")
-    - Derive/normalize centers/channels if needed with lookup tables
-    - Status-aware errors: 400 (input), 401 (misconfig), 429 (rate limit), 5xx (server)
+    - Call hdkit internally and map to HDExtract shape (type, authority, profile, centers[], channels[], gates[])
+    - Convert local wall time + IANA timeZone to UTC using platform APIs (no new time libs)
+    - Keep computation deterministic (same inputs → same outputs)
     - Functions ≤40 LOC each
     - _Requirements: 4.1, 11.1, 11.3_
 
-  - [ ] 2.2 Client caching
+  - [x] 2.3 Add timezone selection to Input screen
 
-    - Implement in-memory + AsyncStorage cache keyed by {utcTimestamp, lat, lon} (TTL 30d)
-    - Coalesce in-flight identical requests
-    - Add cache hit/miss logging for debugging
-    - _Requirements: 4.1, 11.3_
+    - Add Time Zone select with IANA IDs to Input form
+    - Default to `Intl.DateTimeFormat().resolvedOptions().timeZone`
+    - No geocoder or timezone libraries
+    - Use react-hook-form + Zod validation
+    - _Requirements: 1.3, 12.10_
 
-  - [ ] 2.3 Feature flag
+  - [x] 2.4 Wire Input screen to hdkit adapter
 
-    - Set useBodyGraph = true (remove hdkit)
-    - No fallback provider
-    - _Requirements: 4.1_
+    - On form submit: validate with Zod + react-hook-form
+    - Call `computeHDExtract(...)` with form data
+    - Pass result to `classify()` from scorer
+    - Navigate to Result/Why screens with classification
+    - Handle errors gracefully with user-friendly messages
+    - _Requirements: 4.1, 4.10_
 
-  - [ ] 2.4 Tests (REQUIRED)
+  - [x] 2.5 Add hdkit licensing
 
-    - Create **tests**/api-client.test.ts
-    - MSW v2 handlers for /internal/hd (200/400/429/500)
-    - Test TZ conversion correctness
-    - Test error mapping (400, 401, 429, 5xx)
-    - Test caching (one network hit for identical requests)
+    - Copy hdkit/LICENSE to third_party/hdkit-LICENSE
+    - Add entry in NOTICE.md or Attributions.md
+    - Document hdkit usage and attribution
+    - _Requirements: 1.14, 12.10_
+
+  - [x] 2.6 Write hdkit adapter tests (REQUIRED)
+    - Create tests/hdkit-adapter.test.ts
     - Add 2-3 fixtures with known date/time/location → expected HDExtract
+    - Assert full, typed HDExtract returned
+    - Test timezone conversion correctness
+    - Light integration test: Input → adapter → classify() path (can stub scorer)
     - _Requirements: 10.1_
-
-  - [ ] 2.5 Docs
-    - Create docs/BODYGRAPH_API.md
-    - Document payload format, sample response
-    - Document field mapping to HDExtract
-    - Document error codes and handling
-    - _Requirements: 11.1_
 
 - [ ] 3. Implement scorer library with deterministic classification
 
@@ -504,16 +518,6 @@ Before deployment:
 
 - [ ] 10. Implement server API
 
-  - [x] 10.0 BodyGraph proxy (REQUIRED)
-
-    - Write apps/server/src/routes/hd.ts
-    - Endpoint: POST /internal/hd → forwards to https://api.bodygraphchart.com/v221006/hd-data
-    - Read API key from env BODYGRAPH_API_KEY (do NOT hardcode)
-    - Zod-validate request; whitelist fields; map upstream 4xx/5xx → clean errors
-    - Add in-memory cache (key {utcTimestamp, lat, lon}, TTL 30d); log cache hits
-    - Tests: happy path, 400, 401 (missing/invalid key), 429, 5xx, caching
-    - _Requirements: 4.1, 6.12_
-
   - [ ] 10.1 Create HTTP server setup
 
     - Write apps/server/src/http.ts with node:http
@@ -587,7 +591,7 @@ Before deployment:
   - [ ] 10.10 Wire all routes to HTTP server
 
     - Update apps/server/src/index.ts
-    - Add route handlers for all endpoints (including /internal/hd)
+    - Add route handlers for all endpoints
     - Start server on configured PORT
     - _Requirements: 6.12_
 
@@ -680,7 +684,6 @@ Before deployment:
     - Test native bridge: ready → start → result path
     - Test deterministic behavior (same seed → same result)
     - Test leaderboard viewing and filtering
-    - Mock /internal/hd endpoint (not hdkit)
     - Test on both Android and iOS
     - _Requirements: 10.5, 10.6, 10.12_
 
@@ -730,16 +733,3 @@ Before deployment:
 - Zod is the runtime source of truth; JSON Schemas are generated for docs
 - FlutterEngine must be cached and warmed before first game launch
 - Use MethodChannel for commands, EventChannel for events
-- BodyGraph API via server proxy; no hdkit
-- API key only on server (never in mobile bundle)
-
-## Next Up
-
-Recommended implementation order:
-
-1. **10.0** - BodyGraph proxy (server-side)
-2. **2.1** - Client API integration
-3. **2.2** - Client caching
-4. **2.4** - Tests
-5. **2.5** - Documentation
-6. Continue with **0.2**, **6.x**, **9.1-9.2**
