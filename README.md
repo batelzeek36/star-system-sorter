@@ -17,7 +17,6 @@ A hybrid mobile application combining React Native for UI with an embedded Flutt
 │   ├── hd/              # Human Design integration
 │   └── lib/             # Utilities and helpers
 ├── components/          # Existing shadcn/ui components (to be adapted)
-├── hdkit/              # Human Design calculation library
 ├── super_dash/         # Flutter/Flame game module
 ├── __tests__/          # Test files
 └── package.json        # Dependencies and scripts
@@ -105,7 +104,7 @@ The Metro bundler is configured in `metro.config.js`. Key features:
 ### TypeScript Configuration
 
 TypeScript is configured in `tsconfig.json` with:
-- Path aliases for cleaner imports (`@/*`, `@hdkit/*`, `@components/*`)
+- Path aliases for cleaner imports (`@/*`, `@components/*`)
 - Strict type checking enabled
 - Support for React Native and React JSX
 

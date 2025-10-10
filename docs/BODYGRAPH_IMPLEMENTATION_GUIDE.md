@@ -54,7 +54,7 @@ const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 async function fetchFromBodyGraph(
   params: { date: string; timezone: string },
-  apiKey: string
+  apiKey: string,
 ): Promise<unknown> {
   const url = new URL('https://api.bodygraphchart.com/v221006/hd-data');
   url.searchParams.set('api_key', apiKey);
@@ -73,7 +73,7 @@ async function fetchFromBodyGraph(
 
 export async function handleHDRequest(
   req: IncomingMessage,
-  res: ServerResponse
+  res: ServerResponse,
 ): Promise<void> {
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
@@ -111,7 +111,9 @@ export async function handleHDRequest(
   } catch (error) {
     const status = error instanceof z.ZodError ? 400 : 500;
     res.writeHead(status, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: error.message || 'Internal server error' }));
+    res.end(
+      JSON.stringify({ error: error.message || 'Internal server error' }),
+    );
   }
 }
 ```

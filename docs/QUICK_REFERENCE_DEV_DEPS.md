@@ -58,7 +58,6 @@ describe('My Test', () => {
 ```typescript
 // Available in all TypeScript/JavaScript files
 import { something } from '@/lib/utils';
-import { hdkitFunction } from '@hdkit/hdkit';
 import { Button } from '@components/ui/button';
 ```
 

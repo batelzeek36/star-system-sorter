@@ -7,16 +7,13 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/e2e/',
-    '/hdkit/sample-apps/',
     '/super_dash/',
   ],
   modulePathIgnorePatterns: [
-    '<rootDir>/hdkit/sample-apps/',
     '<rootDir>/super_dash/',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@hdkit/(.*)$': '<rootDir>/hdkit/$1',
     '^@components/(.*)$': '<rootDir>/components/$1',
   },
 };

@@ -38,7 +38,6 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@hdkit/(.*)$': '<rootDir>/hdkit/$1',
     '^@components/(.*)$': '<rootDir>/components/$1',
   },
 };
@@ -74,7 +73,6 @@ Enforces:
 
 Includes module-resolver plugin for path aliases:
 - `@/*` → `src/*`
-- `@hdkit/*` → `hdkit/*`
 - `@components/*` → `components/*`
 
 ## Available Scripts

@@ -3,7 +3,7 @@
  * Select component for IANA timezone IDs
  */
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -34,21 +34,21 @@ const TIMEZONES = [
   'America/Cancun', // EST - Cancun
   'America/Monterrey', // CST - Monterrey
   'America/Tijuana', // PST/PDT - Tijuana
-  
+
   // Americas - Caribbean
   'America/Puerto_Rico', // AST - Puerto Rico, US Virgin Islands
   'America/Jamaica', // EST - Jamaica
   'America/Havana', // CST/CDT - Cuba
   'America/Santo_Domingo', // AST - Dominican Republic
   'America/Port_of_Spain', // AST - Trinidad and Tobago
-  
+
   // Americas - Central America
   'America/Guatemala', // CST - Guatemala
   'America/Belize', // CST - Belize
   'America/San_Jose', // CST - Costa Rica
   'America/Panama', // EST - Panama
   'America/Managua', // CST - Nicaragua
-  
+
   // Americas - South America
   'America/Bogota', // COT - Colombia
   'America/Lima', // PET - Peru
@@ -62,7 +62,7 @@ const TIMEZONES = [
   'America/Montevideo', // UYT - Uruguay
   'America/Asuncion', // PYT/PYST - Paraguay
   'America/Guayaquil', // ECT - Ecuador
-  
+
   // Europe - Western
   'Europe/London', // GMT/BST - UK, Ireland
   'Europe/Dublin', // GMT/IST - Ireland
@@ -73,7 +73,7 @@ const TIMEZONES = [
   'Europe/Amsterdam', // CET/CEST - Netherlands
   'Europe/Luxembourg', // CET/CEST - Luxembourg
   'Europe/Zurich', // CET/CEST - Switzerland
-  
+
   // Europe - Central
   'Europe/Berlin', // CET/CEST - Germany
   'Europe/Vienna', // CET/CEST - Austria
@@ -84,7 +84,7 @@ const TIMEZONES = [
   'Europe/Copenhagen', // CET/CEST - Denmark
   'Europe/Stockholm', // CET/CEST - Sweden
   'Europe/Oslo', // CET/CEST - Norway
-  
+
   // Europe - Eastern
   'Europe/Athens', // EET/EEST - Greece
   'Europe/Bucharest', // EET/EEST - Romania
@@ -96,7 +96,7 @@ const TIMEZONES = [
   'Europe/Kiev', // EET/EEST - Ukraine
   'Europe/Moscow', // MSK - Russia (Moscow)
   'Europe/Istanbul', // TRT - Turkey
-  
+
   // Asia - Middle East
   'Asia/Dubai', // GST - UAE
   'Asia/Riyadh', // AST - Saudi Arabia
@@ -109,14 +109,14 @@ const TIMEZONES = [
   'Asia/Damascus', // EET/EEST - Syria
   'Asia/Baghdad', // AST - Iraq
   'Asia/Tehran', // IRST/IRDT - Iran
-  
+
   // Asia - South Asia
   'Asia/Karachi', // PKT - Pakistan
   'Asia/Kolkata', // IST - India
   'Asia/Colombo', // IST - Sri Lanka
   'Asia/Dhaka', // BST - Bangladesh
   'Asia/Kathmandu', // NPT - Nepal
-  
+
   // Asia - Southeast Asia
   'Asia/Bangkok', // ICT - Thailand
   'Asia/Ho_Chi_Minh', // ICT - Vietnam
@@ -127,7 +127,7 @@ const TIMEZONES = [
   'Asia/Yangon', // MMT - Myanmar
   'Asia/Phnom_Penh', // ICT - Cambodia
   'Asia/Vientiane', // ICT - Laos
-  
+
   // Asia - East Asia
   'Asia/Hong_Kong', // HKT - Hong Kong
   'Asia/Shanghai', // CST - China
@@ -136,7 +136,7 @@ const TIMEZONES = [
   'Asia/Seoul', // KST - South Korea
   'Asia/Pyongyang', // KST - North Korea
   'Asia/Ulaanbaatar', // ULAT - Mongolia
-  
+
   // Pacific - Australia
   'Australia/Sydney', // AEDT/AEST - Sydney, Melbourne
   'Australia/Melbourne', // AEDT/AEST - Melbourne
@@ -145,7 +145,7 @@ const TIMEZONES = [
   'Australia/Adelaide', // ACDT/ACST - Adelaide
   'Australia/Darwin', // ACST - Darwin
   'Australia/Hobart', // AEDT/AEST - Tasmania
-  
+
   // Pacific - New Zealand & Islands
   'Pacific/Auckland', // NZDT/NZST - New Zealand
   'Pacific/Fiji', // FJT - Fiji
@@ -154,33 +154,33 @@ const TIMEZONES = [
   'Pacific/Pago_Pago', // SST - American Samoa
   'Pacific/Tahiti', // TAHT - French Polynesia
   'Pacific/Port_Moresby', // PGT - Papua New Guinea
-  
+
   // Africa - North
   'Africa/Cairo', // EET - Egypt
   'Africa/Casablanca', // WET - Morocco
   'Africa/Algiers', // CET - Algeria
   'Africa/Tunis', // CET - Tunisia
   'Africa/Tripoli', // EET - Libya
-  
+
   // Africa - West
   'Africa/Lagos', // WAT - Nigeria
   'Africa/Accra', // GMT - Ghana
   'Africa/Dakar', // GMT - Senegal
   'Africa/Abidjan', // GMT - Ivory Coast
-  
+
   // Africa - East
   'Africa/Nairobi', // EAT - Kenya
   'Africa/Addis_Ababa', // EAT - Ethiopia
   'Africa/Dar_es_Salaam', // EAT - Tanzania
   'Africa/Kampala', // EAT - Uganda
   'Africa/Khartoum', // CAT - Sudan
-  
+
   // Africa - South
   'Africa/Johannesburg', // SAST - South Africa
   'Africa/Maputo', // CAT - Mozambique
   'Africa/Harare', // CAT - Zimbabwe
   'Africa/Lusaka', // CAT - Zambia
-  
+
   // Atlantic
   'Atlantic/Reykjavik', // GMT - Iceland
   'Atlantic/Azores', // AZOT/AZOST - Azores
@@ -194,7 +194,11 @@ interface TimeZonePickerProps {
   error?: boolean;
 }
 
-export function TimeZonePicker({value, onChange, error}: TimeZonePickerProps) {
+export function TimeZonePicker({
+  value,
+  onChange,
+  error,
+}: TimeZonePickerProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -215,7 +219,8 @@ export function TimeZonePicker({value, onChange, error}: TimeZonePickerProps) {
         onPress={() => setModalVisible(true)}
         accessibilityLabel="Select time zone"
         accessibilityRole="button"
-        accessibilityHint="Opens time zone picker">
+        accessibilityHint="Opens time zone picker"
+      >
         <Text style={[styles.pickerText, !value && styles.placeholder]}>
           {value || 'Select time zone'}
         </Text>
@@ -226,7 +231,8 @@ export function TimeZonePicker({value, onChange, error}: TimeZonePickerProps) {
         visible={modalVisible}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setModalVisible(false)}>
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
@@ -234,7 +240,8 @@ export function TimeZonePicker({value, onChange, error}: TimeZonePickerProps) {
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
                 accessibilityLabel="Close"
-                accessibilityRole="button">
+                accessibilityRole="button"
+              >
                 <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -251,7 +258,7 @@ export function TimeZonePicker({value, onChange, error}: TimeZonePickerProps) {
             <FlatList
               data={filteredTimezones}
               keyExtractor={item => item}
-              renderItem={({item}) => (
+              renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[
                     styles.timezoneItem,
@@ -259,12 +266,14 @@ export function TimeZonePicker({value, onChange, error}: TimeZonePickerProps) {
                   ]}
                   onPress={() => handleSelect(item)}
                   accessibilityLabel={item}
-                  accessibilityRole="button">
+                  accessibilityRole="button"
+                >
                   <Text
                     style={[
                       styles.timezoneText,
                       item === value && styles.timezoneTextSelected,
-                    ]}>
+                    ]}
+                  >
                     {item}
                   </Text>
                 </TouchableOpacity>

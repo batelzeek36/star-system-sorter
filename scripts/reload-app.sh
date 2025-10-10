@@ -7,6 +7,7 @@
 #   ./scripts/reload-app.sh android
 #   ./scripts/reload-app.sh both
 #   ./scripts/reload-app.sh both --clean
+#   npm start --prefix ./apps/server          -- for API
 
 set -e
 
