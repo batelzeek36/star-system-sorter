@@ -17,6 +17,11 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+# Flutter module integration (DISABLED until Task 9.0)
+# TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
+# flutter_application_path = '../super_dash'
+# load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
+
 target 'S3App' do
   config = use_native_modules!
 
@@ -26,6 +31,10 @@ target 'S3App' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Install Flutter module pods (DISABLED until Task 9.0)
+  # TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
+  # install_all_flutter_pods(flutter_application_path)
+
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -33,5 +42,9 @@ target 'S3App' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    
+    # Flutter post-install hook (DISABLED until Task 9.0)
+    # TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
+    # flutter_post_install(installer) if defined?(flutter_post_install)
   end
 end

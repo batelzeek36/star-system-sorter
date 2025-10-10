@@ -30,7 +30,7 @@ A hybrid mobile application combining React Native for UI with an embedded Flutt
 - **Android Studio**: For Android development
 - **Xcode**: For iOS development (macOS only)
 - **CocoaPods**: For iOS dependencies (macOS only)
-- **Flutter SDK**: For Super Dash game module integration
+- **Flutter SDK**: >= 3.16.0 (for Super Dash game module integration)
 
 ## Getting Started
 
@@ -42,16 +42,38 @@ npm install
 yarn install
 ```
 
-### 2. iOS Setup (macOS only)
+### 2. Flutter Module Setup
 
-Install CocoaPods dependencies:
+Set up the Super Dash Flutter module integration:
 
 ```bash
+./scripts/setup-flutter-module.sh
+```
+
+This script will:
+- Install Flutter dependencies
+- Build the Flutter module for Android (AAR)
+- Build the Flutter module for iOS (Framework)
+- Install iOS CocoaPods dependencies
+
+**Manual Setup (if script fails):**
+
+```bash
+# Navigate to Flutter module
+cd super_dash
+flutter pub get
+flutter build aar --release
+flutter build ios-framework --release
+cd ..
+
+# Install iOS pods
 cd ios
 bundle install
 bundle exec pod install
 cd ..
 ```
+
+See [docs/FLUTTER_MODULE_INTEGRATION.md](docs/FLUTTER_MODULE_INTEGRATION.md) for detailed integration documentation.
 
 ### 3. Start Metro Bundler
 

@@ -116,4 +116,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // Flutter module integration (DISABLED until Task 9.0)
+    // TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
+    // implementation project(':flutter')
 }
