@@ -112,7 +112,7 @@ Before deployment:
     - Functions ≤40 LOC each
     - _Requirements: 4.1, 11.1, 11.3_
 
-  - [ ] 2.2 Client caching
+  - [x] 2.2 Client caching
 
     - Implement in-memory + AsyncStorage cache keyed by {utcTimestamp, lat, lon} (TTL 30d)
     - Coalesce in-flight identical requests
@@ -125,7 +125,7 @@ Before deployment:
     - No fallback provider
     - _Requirements: 4.1_
 
-  - [ ] 2.4 Tests (REQUIRED)
+  - [x] 2.4 Tests (REQUIRED)
 
     - Create **tests**/api-client.test.ts
     - MSW v2 handlers for /internal/hd (200/400/429/500)

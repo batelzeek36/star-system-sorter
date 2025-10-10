@@ -6,7 +6,7 @@
 .
 ├── src/                  # React Native source code
 ├── components/           # Existing shadcn/ui components (to be adapted)
-├── hdkit/               # Human Design calculation library (submodule)
+├── apps/                # Backend services (Node.js server with BodyGraph proxy)
 ├── super_dash/          # Flutter/Flame game module (submodule)
 ├── android/             # Android native project
 ├── ios/                 # iOS native project
@@ -26,7 +26,7 @@ src/
 ├── scorer/              # Scoring library (HD → star system)
 ├── moderation/          # Moderation system
 ├── bridge/              # Native game bridge (RN ↔ Flutter)
-├── hd/                  # Human Design integration
+├── hd/                  # Human Design integration (BodyGraph API client)
 ├── state/               # Global state (zustand atoms)
 └── lib/                 # Utilities and helpers
 ```
@@ -173,7 +173,7 @@ docs/
 
 ## Path Aliases & Metro
 
-Use TS paths and Metro to reach local folders (e.g., `hdkit/` in repo root).
+Use TS paths and Metro to reach local folders.
 
 **tsconfig.json (excerpt):**
 
@@ -183,7 +183,6 @@ Use TS paths and Metro to reach local folders (e.g., `hdkit/` in repo root).
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@hdkit/*": ["hdkit/*"],
       "@components/*": ["components/*"]
     },
     "strict": true
@@ -203,7 +202,6 @@ module.exports = {
         root: ['./'],
         alias: {
           '@': './src',
-          '@hdkit': './hdkit',
           '@components': './components',
         },
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
@@ -222,7 +220,6 @@ module.exports = {
   watchFolders: [path.resolve(__dirname)],
   resolver: {
     extraNodeModules: {
-      '@hdkit': path.resolve(__dirname, 'hdkit'),
       '@components': path.resolve(__dirname, 'components'),
       '@': path.resolve(__dirname, 'src'),
     },

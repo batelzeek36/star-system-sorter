@@ -8,7 +8,6 @@ module.exports = {
         root: ['./'],
         alias: {
           '@': './src',
-          '@hdkit': './hdkit',
           '@components': './components',
         },
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],

@@ -93,7 +93,6 @@ cd ios && xcodebuild clean && cd ..           # Clean iOS
 
 ```typescript
 "@/*"          → "src/*"
-"@hdkit/*"     → "hdkit/*"
 "@components/*" → "components/*"
 ```
 

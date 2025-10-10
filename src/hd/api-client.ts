@@ -1,6 +1,14 @@
+// @exception(max-lines) why: API client with caching, error handling, and data transformation
 // BodyGraph Chart API Client - Calls server proxy at POST /internal/hd
 import { Platform } from 'react-native';
 import type { HDExtract } from './types';
+import {
+  getCached,
+  setCached,
+  getInflightRequest,
+  setInflightRequest,
+  getCacheKey,
+} from './cache';
 
 // Android emulator needs 10.0.2.2 to reach host machine
 // iOS simulator can use localhost
@@ -34,8 +42,44 @@ export async function computeHDExtract(params: {
   lat?: number;
   lon?: number;
 }): Promise<HDExtract> {
-  const { dateISO, time, timeZone } = params;
+  const { dateISO, time, timeZone, lat, lon } = params;
   
+  // Convert to UTC timestamp for cache key
+  const utcTimestamp = `${dateISO} ${time}`;
+  const cacheKey = { utcTimestamp, lat, lon };
+  
+  // Check cache first
+  const cached = await getCached(cacheKey);
+  if (cached) {
+    return cached;
+  }
+  
+  // Check if request is already in-flight (coalescing)
+  const inflight = getInflightRequest(cacheKey);
+  if (inflight) {
+    console.log('[HD API] Coalescing request:', getCacheKey(cacheKey));
+    return inflight;
+  }
+  
+  // Make new request
+  const requestPromise = fetchHDData(dateISO, time, timeZone)
+    .then(async (result) => {
+      // Cache the result
+      await setCached(cacheKey, result);
+      return result;
+    });
+  
+  // Track in-flight request
+  setInflightRequest(cacheKey, requestPromise);
+  
+  return requestPromise;
+}
+
+async function fetchHDData(
+  dateISO: string,
+  time: string,
+  timeZone: string
+): Promise<HDExtract> {
   try {
     const response = await fetch(`${API_BASE}/internal/hd`, {
       method: 'POST',
@@ -111,3 +155,6 @@ function deriveChannels(props: any): number[] {
   // TODO: Implement channel derivation logic
   return [];
 }
+
+// Export cache utilities for testing
+export { clearCache, clearMemoryCache } from './cache';

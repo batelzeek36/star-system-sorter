@@ -91,3 +91,34 @@ afterAll(() => {
 
 // Mock React Native modules that may not be available in Jest
 // Note: React Native 0.82+ handles most mocks automatically
+
+// Mock AsyncStorage for Jest with in-memory storage
+const mockStorage = new Map();
+
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  __esModule: true,
+  default: {
+    setItem: jest.fn((key, value) => {
+      mockStorage.set(key, value);
+      return Promise.resolve();
+    }),
+    getItem: jest.fn((key) => {
+      return Promise.resolve(mockStorage.get(key) || null);
+    }),
+    removeItem: jest.fn((key) => {
+      mockStorage.delete(key);
+      return Promise.resolve();
+    }),
+    getAllKeys: jest.fn(() => {
+      return Promise.resolve(Array.from(mockStorage.keys()));
+    }),
+    multiRemove: jest.fn((keys) => {
+      keys.forEach(key => mockStorage.delete(key));
+      return Promise.resolve();
+    }),
+    clear: jest.fn(() => {
+      mockStorage.clear();
+      return Promise.resolve();
+    }),
+  },
+}));

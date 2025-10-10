@@ -11,13 +11,10 @@ const config = {
   watchFolders: [path.resolve(__dirname)],
   resolver: {
     extraNodeModules: {
-      '@hdkit': path.resolve(__dirname, 'hdkit'),
       '@components': path.resolve(__dirname, 'components'),
       '@': path.resolve(__dirname, 'src'),
     },
     blockList: [
-      // Exclude hdkit sample apps to avoid haste collisions
-      /hdkit\/sample-apps\/.*/,
       // Exclude super_dash to avoid conflicts (will be integrated as Flutter module)
       /super_dash\/.*/,
     ],

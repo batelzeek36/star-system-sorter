@@ -36,4 +36,4 @@
 - Use "star system" (never "house").
 - Do not store birth data in logs; hash user IDs in any metrics.
 - Age gating default 18+; under-18 limited to abstract crest avatars; DMs disabled.
-- Attribute third-party assets (hdkit license in `third_party/` and Attributions.md).
+- Attribute third-party assets and APIs (BodyGraph API usage in `third_party/` and Attributions.md).
