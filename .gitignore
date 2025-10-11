@@ -58,6 +58,11 @@ yarn-error.log
 
 # Metro bundler logs
 metro.log
+logs/
+
+# Android build artifacts
+android/bugreport-*.zip
+android/.kotlin/
 
 # Environment
 .env
