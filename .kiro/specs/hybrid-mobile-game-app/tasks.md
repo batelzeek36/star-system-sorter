@@ -412,7 +412,7 @@ Before deployment:
 
   - [ ] 9.0 Convert Super Dash to Flutter module
 
-    - Copy existing Super Dash from `/Users/kingkamehameha/Documents/Kiro/GF App/super_dash`
+    - Copy existing Super Dash from `/Users/kingkamehameha/Documents/Kiro/GF_App/super_dash`
     - Convert to Flutter module structure (flutter create --template=module)
     - Update pubspec.yaml for module configuration
     - Document integration in README.md
