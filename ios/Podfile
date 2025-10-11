@@ -1,6 +1,9 @@
 # Use git source instead of CDN to avoid FFI issues
 source 'https://github.com/CocoaPods/Specs.git'
 
+ENV['RCT_USE_PREBUILT_RNCORE'] = '1'
+ENV['RCT_USE_RN_DEP'] = '1'
+
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
@@ -46,5 +49,10 @@ target 'S3App' do
     # Flutter post-install hook (DISABLED until Task 9.0)
     # TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
     # flutter_post_install(installer) if defined?(flutter_post_install)
+
+    installer.pods_project.targets.each do |target|
+      next unless %w[glog Flipper-Glog].include?(target.name)
+      raise "Blocked pod '#{target.name}' detected during install. Remove glog-related dependencies."
+    end
   end
 end
