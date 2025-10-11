@@ -102,7 +102,7 @@ describe('BodyGraph Proxy', () => {
       expect(getStatus()).toBe(200);
       expect(JSON.parse(getBody())).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('https://api.bodygraphchart.com/latest/hd-data'),
+        expect.stringContaining('https://api.bodygraphchart.com/v221006/hd-data'),
         expect.objectContaining({
           method: 'GET',
         })
