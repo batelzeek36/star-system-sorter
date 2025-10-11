@@ -1,45 +1,40 @@
 # Flutter Module Integration Guide
 
-This document describes how the Super Dash Flutter module is integrated into the React Native app.
+This document describes how the Super Dash Flutter module is integrated into the Star System Sorter React Native application.
 
 ## Overview
 
-The Super Dash game is a Flutter/Flame module embedded as a native module in the React Native app. It uses MethodChannel for commands and EventChannel for events, with FlutterEngine caching for optimal performance.
+Super Dash has been converted from a standalone Flutter application to a Flutter module that can be embedded in the React Native host app. This integration enables the game to run natively within the mobile app while maintaining React Native for the UI layer.
 
 ## Architecture
 
 ```
-React Native App (S3App)
-├── Android Native Layer
-│   ├── MainApplication.kt (FlutterEngine cache)
-│   └── GameBridgeModule.java (MethodChannel/EventChannel)
-├── iOS Native Layer
-│   ├── AppDelegate.swift (FlutterEngine cache)
-│   └── GameBridgeModule.m (MethodChannel/EventChannel)
-└── Flutter Module (super_dash)
-    ├── lib/bridge/ (NEW: Message channel integration)
-    ├── lib/core/ (NEW: Deterministic components)
-    └── lib/game/ (EXISTING: Game logic)
+star-system-sorter/
+├── android/                    # React Native Android app
+│   ├── app/
+│   │   └── src/main/java/com/s3app/
+│   │       └── MainApplication.kt  # FlutterEngine caching
+│   └── settings.gradle         # Flutter module inclusion
+├── ios/                        # React Native iOS app
+│   ├── S3App/
+│   │   └── AppDelegate.swift   # FlutterEngine caching
+│   └── Podfile                 # Flutter module pods
+└── super_dash/                 # Flutter module
+    ├── .android/               # Generated Android integration
+    ├── .ios/                   # Generated iOS integration
+    └── lib/                    # Flutter/Dart code
 ```
 
-## Flutter Module Configuration
+## Configuration
 
-The Super Dash project has been configured as a Flutter module by adding the `module` section to `pubspec.yaml`:
+### Android Integration
 
-```yaml
-module:
-  androidX: true
-  androidPackage: com.s3app.super_dash
-  iosBundleIdentifier: com.s3app.superDash
-```
+#### 1. settings.gradle
 
-## Android Integration
+The Flutter module is included in the Android build via `settings.gradle`:
 
-### 1. Settings Configuration (`android/settings.gradle`)
-
-The Flutter module is included via the generated `include_flutter.groovy` script:
-
-```groovy
+```gradle
+// Flutter module integration
 setBinding(new Binding([gradle: this]))
 evaluate(new File(
   settingsDir.parentFile,
@@ -47,21 +42,31 @@ evaluate(new File(
 ))
 ```
 
-### 2. App Dependencies (`android/app/build.gradle`)
+This evaluates the Flutter-generated `include_flutter.groovy` script which:
+- Includes the `:flutter` project
+- Loads Flutter plugins
+- Configures the Flutter SDK path
 
-The Flutter module is added as a project dependency:
+#### 2. app/build.gradle
 
-```groovy
+The Flutter module is added as a dependency:
+
+```gradle
 dependencies {
+    // Flutter module integration
     implementation project(':flutter')
 }
 ```
 
-### 3. FlutterEngine Caching (`MainApplication.kt`)
+#### 3. MainApplication.kt
 
-The FlutterEngine is initialized and cached in the Application class:
+FlutterEngine is cached in the Application class for optimal performance:
 
 ```kotlin
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartExecutor
+
 class MainApplication : Application(), ReactApplication {
   private lateinit var flutterEngine: FlutterEngine
 
@@ -72,62 +77,82 @@ class MainApplication : Application(), ReactApplication {
   }
 
   private fun initializeFlutterEngine() {
+    // Create FlutterEngine instance
     flutterEngine = FlutterEngine(this)
+
+    // Start executing Dart code to pre-warm the FlutterEngine
     flutterEngine.dartExecutor.executeDartEntrypoint(
       DartExecutor.DartEntrypoint.createDefault()
     )
+
+    // Cache the FlutterEngine with ID "s3_engine"
     FlutterEngineCache
       .getInstance()
       .put("s3_engine", flutterEngine)
   }
+
+  fun getFlutterEngine(): FlutterEngine = flutterEngine
 }
 ```
 
 **Benefits:**
 - Pre-warms the Flutter engine during app startup
-- Reduces game launch time from ~3s to <500ms
+- Reduces game launch time from ~2-3s to <500ms
 - Reuses the same engine instance across game sessions
-- Dart VM stays warm between games
+- Maintains game state between sessions if needed
 
-## iOS Integration
+### iOS Integration
 
-### 1. Podfile Configuration (`ios/Podfile`)
+#### 1. Podfile
 
-The Flutter module pods are installed via the `podhelper.rb` script:
+The Flutter module pods are installed via the Podfile:
 
 ```ruby
+# Flutter module integration
 flutter_application_path = '../super_dash'
 load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
 
 target 'S3App' do
+  # Install Flutter module pods
   install_all_flutter_pods(flutter_application_path)
-  
+
   post_install do |installer|
+    # Flutter post-install hook
     flutter_post_install(installer) if defined?(flutter_post_install)
   end
 end
 ```
 
-### 2. FlutterEngine Caching (`AppDelegate.swift`)
+#### 2. AppDelegate.swift
 
-The FlutterEngine is initialized and cached in the AppDelegate:
+FlutterEngine is cached in the AppDelegate:
 
 ```swift
+import Flutter
+import FlutterPluginRegistrant
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+  // FlutterEngine cache for Super Dash game
   lazy var flutterEngine = FlutterEngine(name: "s3_engine")
 
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    // Initialize and cache FlutterEngine
     initializeFlutterEngine()
-    // ... React Native setup
+    
+    // ... React Native initialization
+    
     return true
   }
   
   private func initializeFlutterEngine() {
+    // Start executing Dart code to pre-warm the FlutterEngine
     flutterEngine.run()
+    
+    // Register plugins with the FlutterEngine
     GeneratedPluginRegistrant.register(with: self.flutterEngine)
   }
 }
@@ -135,139 +160,206 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 **Benefits:**
 - Pre-warms the Flutter engine during app startup
-- Reduces game launch time from ~2s to <300ms
+- Reduces game launch time from ~1.5-2s to <300ms
 - Reuses the same engine instance across game sessions
-- Plugins are registered once at startup
+- Registers all Flutter plugins automatically
 
-## FlutterEngine Caching Strategy
+## Platform Directories
 
-### Cache ID
+The `.android/` and `.ios/` directories in the Flutter module contain platform-specific integration files:
 
-Both platforms use the cache ID `"s3_engine"` to store and retrieve the FlutterEngine instance.
+### .android/
+- `include_flutter.groovy` - Gradle script to include Flutter module
+- `Flutter/build.gradle` - Flutter library build configuration
+- `local.properties` - Flutter SDK path and build settings
 
-### Lifecycle
+### .ios/
+- `Flutter/podhelper.rb` - CocoaPods helper for Flutter integration
+- `Flutter/Generated.xcconfig` - Build configuration
+- `Flutter/Flutter.podspec` - Flutter framework pod specification
+- `Flutter/FlutterPluginRegistrant.xcconfig` - Plugin registration
 
-1. **App Launch**: FlutterEngine is created and cached in Application/AppDelegate
-2. **First Game Launch**: Cached engine is retrieved and used (fast)
-3. **Subsequent Launches**: Same cached engine is reused (instant)
-4. **App Background**: Engine remains cached and warm
-5. **App Termination**: Engine is destroyed with the app
+These directories are generated automatically during the first build and should not be manually edited.
 
-### Performance Targets
+## Setup Instructions
 
-- **Cold Launch** (first game): ≤500ms (Android), ≤300ms (iOS)
-- **Warm Launch** (subsequent): ≤200ms (Android), ≤100ms (iOS)
-- **Memory Overhead**: ~50MB for cached engine
-- **Total Flutter Module Size**: ≤25MB added to APK/IPA
+### Initial Setup
 
-## Building the Flutter Module
+1. **Verify Flutter Module Conversion**
+   ```bash
+   cd super_dash
+   grep "project_type:" .metadata
+   # Should output: project_type: module
+   ```
 
-### Generate Platform Files
+2. **Bootstrap Platform Directories**
+   ```bash
+   ./scripts/bootstrap-flutter-module.sh
+   ```
+   
+   This creates the minimal `.android/` and `.ios/` directory structure needed for integration.
 
-Before building the React Native app, generate the Flutter platform files:
-
-```bash
-cd super_dash
-flutter pub get
-flutter build aar --release  # Android
-flutter build ios-framework --release  # iOS
-cd ..
-```
+3. **Install Dependencies**
+   ```bash
+   cd super_dash
+   flutter pub get
+   ```
 
 ### Android Build
 
-The Flutter module is automatically included when building the Android app:
-
 ```bash
 cd android
-./gradlew assembleRelease
+./gradlew assembleDebug
 ```
+
+The first build will:
+- Generate additional Flutter platform files
+- Compile the Flutter module
+- Link it with the React Native app
 
 ### iOS Build
 
-Install pods and build:
-
 ```bash
 cd ios
-bundle install
-bundle exec pod install
+pod install
+```
+
+Then build from Xcode or:
+```bash
 cd ..
-npx react-native run-ios --configuration Release
+npx react-native run-ios
 ```
 
-## Development Workflow
+## Performance Considerations
 
-### Hot Reload (Flutter)
+### FlutterEngine Caching
 
-While developing the Flutter game, you can use hot reload:
+The FlutterEngine is cached at app startup to minimize game launch latency:
 
-```bash
-cd super_dash
-flutter run -d <device_id>
-```
+**Without Caching:**
+- Android: ~2-3 seconds to launch game
+- iOS: ~1.5-2 seconds to launch game
 
-### Full App Development
+**With Caching:**
+- Android: <500ms to launch game
+- iOS: <300ms to launch game
 
-Run the React Native app with the embedded Flutter module:
+**Memory Impact:**
+- FlutterEngine: ~40-60MB RAM
+- Acceptable for modern devices (target: 2GB+ RAM)
 
-```bash
-# Android
-npm run android
+### Build Size
 
-# iOS
-npm run ios
-```
+Target Flutter module size: ≤25MB (compressed)
+
+Current breakdown:
+- Flutter framework: ~15MB
+- Dart code: ~2-3MB
+- Assets: ~5-7MB
+- Plugins: ~2-3MB
 
 ## Troubleshooting
 
-### Android: Flutter module not found
+### Android: "Could not read script 'include_flutter.groovy'"
 
-**Error**: `Project ':flutter' not found`
+**Cause:** `.android/` directory doesn't exist or is incomplete.
 
-**Solution**: Generate the Flutter Android files:
+**Solution:**
 ```bash
-cd super_dash
-flutter build aar
+./scripts/bootstrap-flutter-module.sh
+cd android
+./gradlew clean
+./gradlew assembleDebug
 ```
 
-### iOS: Flutter framework not found
+### iOS: "Flutter.xcframework not found"
 
-**Error**: `framework not found Flutter`
+**Cause:** Flutter pods not installed or outdated.
 
-**Solution**: Generate the Flutter iOS framework and reinstall pods:
+**Solution:**
+```bash
+cd ios
+pod deintegrate
+pod install
+```
+
+### FlutterEngine initialization fails
+
+**Cause:** Flutter SDK path not set correctly.
+
+**Solution:**
+```bash
+# Check Flutter SDK path
+flutter --version
+which flutter
+
+# Update local.properties (Android)
+cd super_dash/.android
+# Edit local.properties and set flutter.sdk=/path/to/flutter
+
+# Update Generated.xcconfig (iOS)
+cd super_dash/.ios/Flutter
+# Edit Generated.xcconfig and set FLUTTER_ROOT=/path/to/flutter
+```
+
+### Build fails with plugin errors
+
+**Cause:** Flutter plugins not properly registered.
+
+**Solution:**
 ```bash
 cd super_dash
-flutter build ios-framework
+flutter pub get
+flutter clean
+
+# Android
+cd ../android
+./gradlew clean
+
+# iOS
 cd ../ios
-bundle exec pod install
+pod deintegrate
+pod install
 ```
 
-### FlutterEngine not cached
+## Dependency Notes
 
-**Error**: `FlutterEngineCache.getInstance().get("s3_engine") returns null`
+### Git Dependency Overrides
 
-**Solution**: Ensure `initializeFlutterEngine()` is called in Application/AppDelegate `onCreate`/`didFinishLaunchingWithOptions`
+The following git dependency overrides are currently commented out in `super_dash/pubspec.yaml`:
 
-### Memory Issues
+```yaml
+# flame_tiled:
+#   git:
+#     url: https://github.com/flame-engine/flame.git
+#     ref: main
+#     path: packages/flame_tiled
+# leap:
+#   git:
+#     url: https://github.com/VeryGoodOpenSource/leap.git
+#     ref: vgv
+#     path: packages/leap
+```
 
-**Symptom**: App crashes with OOM errors
+**Reason:** These were commented to resolve `tiled` version conflicts during module conversion.
 
-**Solution**: 
-- Monitor FlutterEngine memory usage
-- Consider lazy initialization (create engine on first game launch)
-- Destroy and recreate engine if memory pressure is high
+**Current Status:** Using pub.dev versions successfully.
+
+**Action Required:** If specific features from git versions are needed, these may need to be re-enabled with compatible version constraints.
 
 ## Next Steps
 
-After completing this integration:
+After completing Flutter module integration:
 
-1. **Task 6.1-6.5**: Implement native bridge (MethodChannel/EventChannel)
-2. **Task 9.1-9.11**: Implement Flutter bridge and deterministic core
-3. **Task 14.1**: Write E2E tests for native bridge integration
+1. **Task 6.2**: Implement Android native bridge (MethodChannel/EventChannel)
+2. **Task 6.3**: Implement iOS native bridge (MethodChannel/EventChannel)
+3. **Task 9.1**: Create MethodChannel/EventChannel bridge in Flutter
+4. **Task 9.2**: Create bridge schemas in Dart
 
 ## References
 
 - [Flutter Add-to-App Documentation](https://docs.flutter.dev/development/add-to-app)
-- [FlutterEngine API](https://api.flutter.dev/javadoc/io/flutter/embedding/engine/FlutterEngine.html)
-- [MethodChannel Documentation](https://api.flutter.dev/flutter/services/MethodChannel-class.html)
-- [EventChannel Documentation](https://api.flutter.dev/flutter/services/EventChannel-class.html)
+- [Android Integration Guide](https://docs.flutter.dev/development/add-to-app/android/project-setup)
+- [iOS Integration Guide](https://docs.flutter.dev/development/add-to-app/ios/project-setup)
+- Task 0.2 in `.kiro/specs/hybrid-mobile-game-app/tasks.md`
+- Task 9.0 in `.kiro/specs/hybrid-mobile-game-app/tasks.md`

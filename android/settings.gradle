@@ -5,10 +5,9 @@ rootProject.name = 'S3App'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
-// Flutter module integration (DISABLED until Task 9.0)
-// TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
-// setBinding(new Binding([gradle: this]))
-// evaluate(new File(
-//   settingsDir.parentFile,
-//   'super_dash/.android/include_flutter.groovy'
-// ))
+// Flutter module integration
+setBinding(new Binding([gradle: this]))
+evaluate(new File(
+  settingsDir.parentFile,
+  'super_dash/.android/include_flutter.groovy'
+))

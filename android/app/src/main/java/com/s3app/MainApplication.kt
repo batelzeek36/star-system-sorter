@@ -6,10 +6,9 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
-// TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
-// import io.flutter.embedding.engine.FlutterEngine
-// import io.flutter.embedding.engine.FlutterEngineCache
-// import io.flutter.embedding.engine.dart.DartExecutor
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartExecutor
 
 class MainApplication : Application(), ReactApplication {
 
@@ -24,34 +23,31 @@ class MainApplication : Application(), ReactApplication {
     )
   }
 
-  // FlutterEngine cache for Super Dash game (DISABLED until Task 9.0)
-  // TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
-  // private lateinit var flutterEngine: FlutterEngine
+  // FlutterEngine cache for Super Dash game
+  private lateinit var flutterEngine: FlutterEngine
 
   override fun onCreate() {
     super.onCreate()
     loadReactNative(this)
     
-    // Initialize and cache FlutterEngine for Super Dash (DISABLED until Task 9.0)
-    // TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
-    // initializeFlutterEngine()
+    // Initialize and cache FlutterEngine for Super Dash
+    initializeFlutterEngine()
   }
 
-  // TODO: Uncomment when Super Dash is converted to Flutter module in Task 9.0
-  // private fun initializeFlutterEngine() {
-  //   // Create FlutterEngine instance
-  //   flutterEngine = FlutterEngine(this)
-  //
-  //   // Start executing Dart code to pre-warm the FlutterEngine
-  //   flutterEngine.dartExecutor.executeDartEntrypoint(
-  //     DartExecutor.DartEntrypoint.createDefault()
-  //   )
-  //
-  //   // Cache the FlutterEngine with ID "s3_engine"
-  //   FlutterEngineCache
-  //     .getInstance()
-  //     .put("s3_engine", flutterEngine)
-  // }
-  //
-  // fun getFlutterEngine(): FlutterEngine = flutterEngine
+  private fun initializeFlutterEngine() {
+    // Create FlutterEngine instance
+    flutterEngine = FlutterEngine(this)
+
+    // Start executing Dart code to pre-warm the FlutterEngine
+    flutterEngine.dartExecutor.executeDartEntrypoint(
+      DartExecutor.DartEntrypoint.createDefault()
+    )
+
+    // Cache the FlutterEngine with ID "s3_engine"
+    FlutterEngineCache
+      .getInstance()
+      .put("s3_engine", flutterEngine)
+  }
+
+  fun getFlutterEngine(): FlutterEngine = flutterEngine
 }

@@ -42,7 +42,7 @@ Before deployment:
     - Document in README.md
     - _Requirements: 1.1, 1.2, 9.1_
 
-  - [ ] 0.2 Configure Flutter module integration
+  - [x] 0.2 Configure Flutter module integration
     - Verify Super Dash is converted to Flutter module (task 9.0)
     - Configure Android build.gradle to include Flutter module from `super_dash/.android/`
     - Configure iOS Podfile to include Flutter module from `super_dash/.ios/`
