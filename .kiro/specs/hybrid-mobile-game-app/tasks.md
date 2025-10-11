@@ -42,11 +42,15 @@ Before deployment:
     - Document in README.md
     - _Requirements: 1.1, 1.2, 9.1_
 
-  - [x] 0.2 Configure Flutter module integration
-    - Create Flutter module structure for Super Dash
-    - Configure Android build.gradle to include Flutter module
-    - Configure iOS Podfile to include Flutter module
-    - Set up FlutterEngine caching strategy
+  - [ ] 0.2 Configure Flutter module integration
+    - Verify Super Dash is converted to Flutter module (task 9.0)
+    - Configure Android build.gradle to include Flutter module from `super_dash/.android/`
+    - Configure iOS Podfile to include Flutter module from `super_dash/.ios/`
+    - Set up FlutterEngine caching in Android Application class
+    - Set up FlutterEngine caching in iOS AppDelegate
+    - Note: `.android/` and `.ios/` directories are generated when module is first integrated into host app
+    - Note: If git dependency overrides were commented out in super_dash/pubspec.yaml, verify if they need to be re-enabled for specific features
+    - Test module integration on both Android and iOS
     - _Requirements: 2.1, 3.1, 3.2, 3.11_
 
 - [ ] 1. Set up React Native project and dependencies
