@@ -87,7 +87,7 @@ Before deployment:
     - Add to CI pipeline
     - _Requirements: 11.6, 11.7_
 
-  - [ ] 1.4 Adapt existing shadcn/ui components for React Native
+  - [x] 1.4 Adapt existing shadcn/ui components for React Native
 
     - Review components/ui folder
     - Create React Native equivalents using react-native primitives
@@ -123,7 +123,7 @@ Before deployment:
     - Add cache hit/miss logging for debugging
     - _Requirements: 4.1, 11.3_
 
-  - [ ] 2.3 Feature flag
+  - [x] 2.3 Feature flag
 
     - Set useBodyGraph = true (remove hdkit)
     - No fallback provider
@@ -736,14 +736,3 @@ Before deployment:
 - Use MethodChannel for commands, EventChannel for events
 - BodyGraph API via server proxy; no hdkit
 - API key only on server (never in mobile bundle)
-
-## Next Up
-
-Recommended implementation order:
-
-1. **10.0** - BodyGraph proxy (server-side)
-2. **2.1** - Client API integration
-3. **2.2** - Client caching
-4. **2.4** - Tests
-5. **2.5** - Documentation
-6. Continue with **0.2**, **6.x**, **9.1-9.2**

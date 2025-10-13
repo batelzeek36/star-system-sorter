@@ -43,6 +43,7 @@ module.exports = {
           '^src/state/[^/]+$',
           '^src/lib/[^/]+$',
           '^src/components/[^/]+$',
+          '^src/components/ui/', // Allow deep imports within ui subdirectory
           '^src/screens/[^/]+$',
           // Allow test files to import anything
           '__tests__/',

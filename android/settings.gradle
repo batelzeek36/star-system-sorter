@@ -5,9 +5,10 @@ rootProject.name = 'S3App'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
-// Flutter module integration
-setBinding(new Binding([gradle: this]))
-evaluate(new File(
-  settingsDir.parentFile,
-  'super_dash/.android/include_flutter.groovy'
-))
+// Flutter module integration (TEMPORARILY DISABLED FOR TESTING)
+// Uncomment when Flutter module is ready (task 9.1+)
+// setBinding(new Binding([gradle: this]))
+// evaluate(new File(
+//   settingsDir.parentFile,
+//   'super_dash/.android/include_flutter.groovy'
+// ))
