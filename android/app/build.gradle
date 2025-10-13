@@ -117,6 +117,6 @@ dependencies {
         implementation jscFlavor
     }
 
-    // Flutter module integration
-    implementation project(':flutter')
+    // Flutter module integration (TEMPORARILY DISABLED FOR TESTING)
+    // implementation project(':flutter')
 }
