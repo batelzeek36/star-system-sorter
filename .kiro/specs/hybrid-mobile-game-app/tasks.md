@@ -227,7 +227,7 @@ Before deployment:
 
 - [ ] 5. Create UI components and utilities
 
-  - [ ] 5.0 Set up global state with zustand
+  - [x] 5.0 Set up global state with zustand
 
     - Create src/state/store.ts with zustand store
     - Define 2-3 atoms: userSession, gameState, toastNotifications
