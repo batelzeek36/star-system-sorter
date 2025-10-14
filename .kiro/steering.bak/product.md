@@ -20,7 +20,7 @@ Star System Sorter (S³) is a hybrid mobile application that combines React Nati
 - **Determinism**: PCG32 RNG with fixed timestep for reproducible gameplay
 - **Safety-First**: Comprehensive moderation across all user content
 - **Native-First**: React Native UI with Flutter native modules for game
-- **Modularity**: Small, focused files (60-120 LOC preferred, ≤150 LOC max)
+- **Modularity**: Focused files (target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC)
 
 ## Terminology
 

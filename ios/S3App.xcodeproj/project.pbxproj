@@ -12,6 +12,8 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BF8F65F3FAF501297D626497 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		FAD67F662E9DEF4F008E8ECF /* GameBridgeModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD67F642E9DEF4F008E8ECF /* GameBridgeModule.swift */; };
+		FAD67F672E9DEF4F008E8ECF /* GameBridgeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = FAD67F632E9DEF4F008E8ECF /* GameBridgeModule.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,10 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = S3App/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = S3App/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FAD67F622E9DEC64008E8ECF /* S3App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "S3App-Bridging-Header.h"; sourceTree = "<group>"; };
+		FAD67F632E9DEF4F008E8ECF /* GameBridgeModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GameBridgeModule.m; path = S3App/GameBridgeModule.m; sourceTree = "<group>"; };
+		FAD67F642E9DEF4F008E8ECF /* GameBridgeModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GameBridgeModule.swift; path = S3App/GameBridgeModule.swift; sourceTree = "<group>"; };
+		FAD67F652E9DEF4F008E8ECF /* S3App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "S3App-Bridging-Header.h"; path = "S3App/S3App-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,11 +76,15 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				FAD67F632E9DEF4F008E8ECF /* GameBridgeModule.m */,
+				FAD67F642E9DEF4F008E8ECF /* GameBridgeModule.swift */,
+				FAD67F652E9DEF4F008E8ECF /* S3App-Bridging-Header.h */,
 				13B07FAE1A68108700A75B9A /* S3App */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				FAD67F622E9DEC64008E8ECF /* S3App-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -131,7 +141,7 @@
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 2600;
 					};
 				};
 			};
@@ -246,6 +256,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAD67F662E9DEF4F008E8ECF /* GameBridgeModule.swift in Sources */,
+				FAD67F672E9DEF4F008E8ECF /* GameBridgeModule.m in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,6 +273,17 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/React-Core-prebuilt\"",
+					"\"${PODS_ROOT}/ReactNativeDependencies/framework/packages/react-native\"",
+					"\"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/universal\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built\"",
+					"/opt/homebrew/share/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64_x86_64-simulator",
+					"/opt/homebrew/share/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64",
+				);
 				INFOPLIST_FILE = S3App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -275,6 +298,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = S3App;
+				SWIFT_OBJC_BRIDGING_HEADER = "S3App/S3App-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -288,6 +312,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/React-Core-prebuilt\"",
+					"\"${PODS_ROOT}/ReactNativeDependencies/framework/packages/react-native\"",
+					"\"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/universal\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built\"",
+					"/opt/homebrew/share/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64_x86_64-simulator",
+					"/opt/homebrew/share/flutter/bin/cache/artifacts/engine/ios/Flutter.xcframework/ios-arm64",
+				);
 				INFOPLIST_FILE = S3App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -302,6 +337,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = S3App;
+				SWIFT_OBJC_BRIDGING_HEADER = "S3App/S3App-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

@@ -6,9 +6,8 @@ include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
 // Flutter module integration
-// TEMPORARILY COMMENTED OUT - uncomment after implementing native bridges (Tasks 6.2/6.3)
-// setBinding(new Binding([gradle: this]))
-// evaluate(new File(
-//   settingsDir.parentFile,
-//   'super_dash/.android/include_flutter.groovy'
-// ))
+setBinding(new Binding([gradle: this]))
+evaluate(new File(
+  settingsDir.parentFile,
+  'super_dash/.android/include_flutter.groovy'
+))

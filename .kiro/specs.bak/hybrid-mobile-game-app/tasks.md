@@ -275,7 +275,7 @@ Before deployment:
     - Generate JSON Schemas via zod-to-json-schema for docs/clients
     - _Requirements: 3.5, 2.9_
 
-  - [ ] 6.2 Implement Android native bridge
+  - [x] 6.2 Implement Android native bridge
 
     - **IMPORTANT**: Before starting, re-enable Flutter integration in Android files using docs/!!!FLUTTER_TOGGLE_REFERENCE.md
     - Uncomment Flutter integration in: android/settings.gradle, android/app/build.gradle, android/app/src/main/java/com/s3app/MainApplication.kt
@@ -288,7 +288,7 @@ Before deployment:
     - Verify Flutter integration is fully enabled per docs/!!!FLUTTER_TOGGLE_REFERENCE.md
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 6.3 Implement iOS native bridge
+  - [x] 6.3 Implement iOS native bridge
 
     - **IMPORTANT**: Before starting, re-enable Flutter integration in iOS files using docs/!!!FLUTTER_TOGGLE_REFERENCE.md
     - Uncomment Flutter integration in: ios/Podfile, ios/S3App/AppDelegate.swift

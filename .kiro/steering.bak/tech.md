@@ -187,7 +187,8 @@ PORT=3000
 - `npm run typecheck` (TS strict) & ESLint clean
 - Unit tests green; MSW v2 wired in Jest only
 - `npm run lint:graph` passes (no cycles/deep imports; layering ok)
-- File/func size limits respected or `@exception` noted
+- File size limits respected (target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC)
+- Function size limits respected (≤40 LOC, cyclomatic ≤10)
 - App boots Android **and** iOS (Onboarding→Input→Result smoke)
 - Update docs when schemas/bridge/contracts change
 
@@ -195,7 +196,7 @@ PORT=3000
 
 - New dependency, native permission, or RNG/time usage in logic
 - Schema/bridge contract changes or breaking API changes
-- Any file >150 LOC without `@exception` rationale
+- Any file >500 LOC (hard limit—must be refactored into modular files)
 
 ## Troubleshooting
 

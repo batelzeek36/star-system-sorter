@@ -118,6 +118,5 @@ dependencies {
     }
 
     // Flutter module integration
-    // TEMPORARILY COMMENTED OUT - uncomment after implementing native bridges (Tasks 6.2/6.3)
-    // implementation project(':flutter')
+    implementation project(':flutter')
 }

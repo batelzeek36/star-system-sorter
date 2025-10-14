@@ -11,7 +11,6 @@
 import Foundation
 import React
 import Flutter
-import FlutterPluginRegistrant
 
 @objc(GameBridge)
 class GameBridgeModule: RCTEventEmitter {
@@ -159,7 +158,7 @@ class GameBridgeModule: RCTEventEmitter {
     channel.invokeMethod("sendCommand", arguments: commandJson) { result in
       if let error = result as? FlutterError {
         reject(error.code, error.message, error.details as? NSError)
-      } else if result is FlutterMethodNotImplemented {
+      } else if (result as? NSObject) == FlutterMethodNotImplemented {
         reject("NOT_IMPLEMENTED", "Method not implemented in Flutter", nil)
       } else {
         resolve(nil)

@@ -54,7 +54,7 @@ Utils (lib, state)
 - Only import from module `index.ts` files (no deep imports)
 - No circular dependencies allowed
 - Acyclic: No circular dependencies across folders/packages
-- Size: Files ≤150 LOC (prefer 60–120). If exceeded, add `// @exception(max-lines) why:<reason>`
+- Size: Target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC (see File Size Guidelines)
 - Functions: ≤40 LOC, cyclomatic ≤10
 
 ## Source of Truth
@@ -316,9 +316,22 @@ module.exports = {
 
 ## File Size Guidelines
 
-- **Preferred**: 60-120 lines of code
-- **Maximum**: 150 lines of code
-- **Rationale**: Modularity and maintainability
+- **Target**: 100-200 lines of code (sweet spot for readability)
+- **Soft Limit**: 300 lines of code (review and consider refactoring)
+- **Hard Limit**: 500 lines of code (must split into multiple modular files)
+- **Rationale**: Files over 300 LOC are a signal to refactor into smaller, focused modules
+
+**When approaching the soft limit (300 LOC):**
+- Extract reusable components into separate files
+- Split complex logic into helper functions/modules
+- Move type definitions to dedicated `types.ts` files
+- Consider if the file is doing too much (violating single responsibility)
+
+**When hitting the hard limit (500 LOC):**
+- File must be split into multiple modular files
+- Create a module directory with `index.ts` for public API
+- Break down by feature, responsibility, or logical grouping
+- Example: `InputScreen.tsx` → `InputScreen/index.tsx`, `InputScreen/FormFields.tsx`, `InputScreen/validation.ts`
 
 ## Naming Conventions
 
