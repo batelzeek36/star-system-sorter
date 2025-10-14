@@ -433,21 +433,23 @@ Before deployment:
 - [ ] 9. Implement simple Flutter runner game (replaces Super Dash)
 
   **Note:** Original Super Dash (Flutter 3.16.0) incompatible with Gradle 9.0.0. Using simple runner game with Flutter 3.35.x stable instead.
-  
-  - [ ] 9.1 Backup and set up Flutter stable
-  
-    - [ ] 9.1.1 Backup old super_dash module
-      - Move `super_dash/` to `super_dash.backup/`
-      - Add `super_dash.backup/` to .gitignore
+
+  - [ ] 9.1 Delete old super_dash and set up Flutter stable
+
+    - [x] 9.1.1 Delete old super_dash module
+
+      - Delete `super_dash/` directory completely
+      - Old code preserved in git history if needed
       - _Requirements: 2.1_
-    
-    - [ ] 9.1.2 Install Flutter stable
+
+    - [x] 9.1.2 Install Flutter stable
+
       - Run `fvm install stable`
       - Run `fvm use stable --force`
       - Update `.flutter-version` to `stable`
       - Run `fvm flutter doctor -v`
       - _Requirements: 2.1, 9.6_
-    
+
     - [ ] 9.1.3 Document toolchain matrix
       - Create `docs/ANDROID_TOOLCHAIN_MATRIX.md`
       - Document: `runner_game/.android`: Gradle 8.x + AGP 8.x + JDK 17 (from Flutter template)
@@ -456,38 +458,42 @@ Before deployment:
       - _Requirements: 2.1, 9.6_
 
   - [ ] 9.2 Create new Flutter module
-  
+
     - [ ] 9.2.1 Generate runner_game module
+
       - Run `fvm flutter create --template=module --org com.starsystemsorter runner_game`
       - Verify `.android/` and `.ios/` directories exist
       - _Requirements: 2.1_
-    
+
     - [ ] 9.2.2 Add Flame dependency
       - Add `flame: ^1.32.0` to `runner_game/pubspec.yaml`
       - Run `fvm flutter pub get`
       - _Requirements: 2.1_
 
   - [ ] 9.3 Implement runner game
-  
+
     - [ ] 9.3.1 Create main game file
+
       - Replace `runner_game/lib/main.dart` with runner game code
       - Implement tap-to-jump mechanic
       - Add obstacle spawning and collision detection
       - Keep under 150 lines
       - _Requirements: 2.5, 2.6_
-    
+
     - [ ] 9.3.2 Add team theming
+
       - Add team color parameter
       - Map team names to colors (Manifestor=red, Generator=orange, etc.)
       - Apply color to player square
       - _Requirements: 2.10_
-    
+
     - [ ] 9.3.3 Add deterministic scoring
+
       - Track distance traveled as score
       - Use fixed timestep (16.6667ms)
       - Implement seeded RNG for obstacles
       - _Requirements: 2.6, 2.7, 2.12_
-    
+
     - [ ] 9.3.4 Add debug instrumentation
       - Expose frame counter + delta in HUD for debugging
       - Log seed, game_core_version, and clientHash to console in debug mode
@@ -495,8 +501,9 @@ Before deployment:
       - _Requirements: 2.7, 2.9, 2.12_
 
   - [ ] 9.4 Implement bridge integration
-  
+
     - [ ] 9.4.1 Create bridge schema and constants
+
       - Create `runner_game/lib/bridge/schema.dart`
       - Define GameCommand and GameEvent types
       - Keep simple (START, PAUSE, RESUME, QUIT)
@@ -505,13 +512,14 @@ Before deployment:
         - `S3_EVT_CHANNEL = "s3/game/events"`
       - Export constants for use in RN/Android/iOS/Flutter (no fat-fingering strings)
       - _Requirements: 2.1, 2.2, 3.5_
-    
+
     - [ ] 9.4.2 Implement MethodChannel bridge
+
       - Create `runner_game/lib/bridge/method_channel_bridge.dart`
       - Use S3_CMD_CHANNEL and S3_EVT_CHANNEL constants
       - Handle commands and send events
       - _Requirements: 2.1, 2.2, 3.2_
-    
+
     - [ ] 9.4.3 Wire bridge to main.dart
       - Initialize bridge in main()
       - Listen for START command with seed and team
@@ -520,40 +528,44 @@ Before deployment:
       - _Requirements: 2.1, 2.2, 2.5, 2.9, 3.8_
 
   - [ ] 9.5 Update React Native integration
-  
+
     - [ ] 9.5.0 Choose integration strategy (GATE)
+
       - [ ] **Option B**: Prebuilt AAR consumption (`flutter build aar` → publish to mavenLocal() and depend from RN)
       - Note: Option B decouples host's Gradle/AGP from Flutter's and avoids version conflicts
       - Document choice in `docs/ANDROID_TOOLCHAIN_MATRIX.md`
       - _Requirements: 3.1_
-    
+
     - [ ] 9.5.1 Update Android integration
+
       - Change path in `android/settings.gradle` from `super_dash/.android/` to `runner_game/.android/`
       - Verify include_flutter.groovy path
       - If using Option B (AAR), configure mavenLocal() dependency instead
       - _Requirements: 3.1_
-    
+
     - [ ] 9.5.2 Update iOS integration
       - Change flutter_application_path in `ios/Podfile` from `../super_dash` to `../runner_game`
       - Run `cd ios && pod install`
       - _Requirements: 3.1_
 
   - [ ] 9.6 Test builds and integration
-  
+
     - [ ] 9.6.1 Test Android
+
       - Run `cd android && ./gradlew clean && ./gradlew assembleDebug`
       - Run `npm run android`
       - Test bridge commands in BridgeTestScreen
       - Verify frame counter and delta display in HUD
       - _Requirements: 3.1, 3.3, 3.4_
-    
+
     - [ ] 9.6.2 Test iOS
+
       - Run `cd ios && pod install && cd ..`
       - Run `npm run ios`
       - Test bridge commands in BridgeTestScreen
       - Verify frame counter and delta display in HUD
       - _Requirements: 3.1, 3.3, 3.4_
-    
+
     - [ ] 9.6.3 Test end-to-end game flow
       - Launch game from React Native
       - Verify team theming applies
@@ -565,7 +577,7 @@ Before deployment:
       - _Requirements: 2.5, 2.6, 2.7, 2.10, 3.7, 3.8_
 
   - [ ] 9.7 Update documentation and create toggle reference
-  
+
     - Update `docs/FLUTTER_MODULE_INTEGRATION.md` with runner_game specifics
     - Create `runner_game/README.md` with game mechanics and bridge usage
     - Update `PROJECT_STATUS.md` with current status

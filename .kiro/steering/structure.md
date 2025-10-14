@@ -3,6 +3,7 @@
 ## Repository Location
 
 **IMPORTANT**: The main git repository is located at:
+
 - **Local path**: `/Users/kingkamehameha/Documents/Kiro/GF_App/star-system-sorter/`
 - **Remote**: `https://github.com/batelzeek36/star-system-sorter.git`
 - **Current branch**: `feature/phase-4-native-modules`
@@ -88,10 +89,10 @@ src/scorer/
 
 ```typescript
 // ❌ Bad: Deep import
-import { computeScore } from '@/scorer/score';
+import { computeScore } from "@/scorer/score";
 
 // ✅ Good: Import from index.ts
-import { computeScore } from '@/scorer';
+import { computeScore } from "@/scorer";
 ```
 
 ## Key Directories
@@ -288,17 +289,17 @@ Use TS paths and Metro to reach local folders.
 
 ```javascript
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
+  presets: ["module:@react-native/babel-preset"],
   plugins: [
     [
-      'module-resolver',
+      "module-resolver",
       {
-        root: ['./'],
+        root: ["./"],
         alias: {
-          '@': './src',
-          '@components': './components',
+          "@": "./src",
+          "@components": "./components",
         },
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+        extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
       },
     ],
   ],
@@ -308,14 +309,14 @@ module.exports = {
 **metro.config.js (excerpt):**
 
 ```javascript
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   watchFolders: [path.resolve(__dirname)],
   resolver: {
     extraNodeModules: {
-      '@components': path.resolve(__dirname, 'components'),
-      '@': path.resolve(__dirname, 'src'),
+      "@components": path.resolve(__dirname, "components"),
+      "@": path.resolve(__dirname, "src"),
     },
   },
 };
@@ -331,12 +332,14 @@ module.exports = {
 - **Rationale**: Files over 300 LOC are a signal to refactor into smaller, focused modules
 
 **When approaching the soft limit (300 LOC):**
+
 - Extract reusable components into separate files
 - Split complex logic into helper functions/modules
 - Move type definitions to dedicated `types.ts` files
 - Consider if the file is doing too much (violating single responsibility)
 
 **When hitting the hard limit (500 LOC):**
+
 - File must be split into multiple modular files
 - Create a module directory with `index.ts` for public API
 - Break down by feature, responsibility, or logical grouping
@@ -364,9 +367,9 @@ Each module must have an `index.ts` that exports its public API:
 
 ```typescript
 // src/scorer/index.ts
-export { computeScore } from './score';
-export { loadCanon } from './canon';
-export type { ScorerResult, HDExtract } from './types';
+export { computeScore } from "./score";
+export { loadCanon } from "./canon";
+export type { ScorerResult, HDExtract } from "./types";
 
 // Internal functions are NOT exported
 ```

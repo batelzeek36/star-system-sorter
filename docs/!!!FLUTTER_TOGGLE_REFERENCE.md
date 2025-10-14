@@ -7,9 +7,11 @@ This document lists all files where Flutter integration can be enabled/disabled 
 ### Android (3 files)
 
 #### 1. `android/settings.gradle`
+
 **Location:** Lines 8-12
 
 **Disabled:**
+
 ```groovy
 // Flutter module integration (TEMPORARILY DISABLED FOR TESTING)
 // Uncomment when Flutter module is ready (task 9.1+)
@@ -21,6 +23,7 @@ This document lists all files where Flutter integration can be enabled/disabled 
 ```
 
 **Enabled:**
+
 ```groovy
 // Flutter module integration
 setBinding(new Binding([gradle: this]))
@@ -33,15 +36,18 @@ evaluate(new File(
 ---
 
 #### 2. `android/app/build.gradle`
+
 **Location:** Around line 121 (in dependencies block)
 
 **Disabled:**
+
 ```groovy
     // Flutter module integration (TEMPORARILY DISABLED FOR TESTING)
     // implementation project(':flutter')
 ```
 
 **Enabled:**
+
 ```groovy
     // Flutter module integration
     implementation project(':flutter')
@@ -50,9 +56,11 @@ evaluate(new File(
 ---
 
 #### 3. `android/app/src/main/java/com/s3app/MainApplication.kt`
+
 **Location:** Lines 9-11 (imports) and lines 27-52 (initialization)
 
 **Disabled:**
+
 ```kotlin
 // TEMPORARILY DISABLED FOR TESTING - Uncomment when Flutter module is ready (task 9.1+)
 // import io.flutter.embedding.engine.FlutterEngine
@@ -61,7 +69,7 @@ evaluate(new File(
 
 class MainApplication : Application(), ReactApplication {
   // ...
-  
+
   // TEMPORARILY DISABLED FOR TESTING - Uncomment when Flutter module is ready (task 9.1+)
   // FlutterEngine cache for Super Dash game
   // private lateinit var flutterEngine: FlutterEngine
@@ -69,7 +77,7 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     loadReactNative(this)
-    
+
     // TEMPORARILY DISABLED FOR TESTING - Uncomment when Flutter module is ready (task 9.1+)
     // Initialize and cache FlutterEngine for Super Dash
     // initializeFlutterEngine()
@@ -96,6 +104,7 @@ class MainApplication : Application(), ReactApplication {
 ```
 
 **Enabled:**
+
 ```kotlin
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
@@ -103,14 +112,14 @@ import io.flutter.embedding.engine.dart.DartExecutor
 
 class MainApplication : Application(), ReactApplication {
   // ...
-  
+
   // FlutterEngine cache for Super Dash game
   private lateinit var flutterEngine: FlutterEngine
 
   override fun onCreate() {
     super.onCreate()
     loadReactNative(this)
-    
+
     // Initialize and cache FlutterEngine for Super Dash
     initializeFlutterEngine()
   }
@@ -139,9 +148,11 @@ class MainApplication : Application(), ReactApplication {
 ### iOS (2 files)
 
 #### 4. `ios/Podfile`
+
 **Location:** Lines 23-25, 35-36, 45-46
 
 **Disabled:**
+
 ```ruby
 # Flutter module integration (TEMPORARILY DISABLED FOR TESTING)
 # Uncomment when Flutter module is ready (task 9.1+)
@@ -150,13 +161,13 @@ class MainApplication : Application(), ReactApplication {
 
 target 'S3App' do
   # ...
-  
+
   # Install Flutter module pods (TEMPORARILY DISABLED FOR TESTING)
   # install_all_flutter_pods(flutter_application_path)
 
   post_install do |installer|
     # ...
-    
+
     # Flutter post-install hook (TEMPORARILY DISABLED FOR TESTING)
     # flutter_post_install(installer) if defined?(flutter_post_install)
   end
@@ -164,6 +175,7 @@ end
 ```
 
 **Enabled:**
+
 ```ruby
 # Flutter module integration
 flutter_application_path = '../super_dash'
@@ -171,13 +183,13 @@ load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
 
 target 'S3App' do
   # ...
-  
+
   # Install Flutter module pods
   install_all_flutter_pods(flutter_application_path)
 
   post_install do |installer|
     # ...
-    
+
     # Flutter post-install hook
     flutter_post_install(installer) if defined?(flutter_post_install)
   end
@@ -187,9 +199,11 @@ end
 ---
 
 #### 5. `ios/S3App/AppDelegate.swift`
+
 **Location:** Lines 4-5 (imports), lines 13-15 (property), lines 21-23 (initialization), lines 42-49 (method)
 
 **Disabled:**
+
 ```swift
 import UIKit
 import React
@@ -205,7 +219,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
-  
+
   // TEMPORARILY DISABLED FOR TESTING - Uncomment when Flutter module is ready (task 9.1+)
   // FlutterEngine cache for Super Dash game
   // lazy var flutterEngine = FlutterEngine(name: "s3_engine")
@@ -217,17 +231,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // TEMPORARILY DISABLED FOR TESTING - Uncomment when Flutter module is ready (task 9.1+)
     // Initialize and cache FlutterEngine
     // initializeFlutterEngine()
-    
+
     // ... rest of initialization
-    
+
     return true
   }
-  
+
   // TEMPORARILY DISABLED FOR TESTING - Uncomment when Flutter module is ready (task 9.1+)
   // private func initializeFlutterEngine() {
   //   // Start executing Dart code to pre-warm the FlutterEngine
   //   flutterEngine.run()
-  //   
+  //
   //   // Register plugins with the FlutterEngine
   //   GeneratedPluginRegistrant.register(with: self.flutterEngine)
   // }
@@ -235,6 +249,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 ```
 
 **Enabled:**
+
 ```swift
 import UIKit
 import React
@@ -249,7 +264,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
-  
+
   // FlutterEngine cache for Super Dash game
   lazy var flutterEngine = FlutterEngine(name: "s3_engine")
 
@@ -259,16 +274,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
     // Initialize and cache FlutterEngine
     initializeFlutterEngine()
-    
+
     // ... rest of initialization
-    
+
     return true
   }
-  
+
   private func initializeFlutterEngine() {
     // Start executing Dart code to pre-warm the FlutterEngine
     flutterEngine.run()
-    
+
     // Register plugins with the FlutterEngine
     GeneratedPluginRegistrant.register(with: self.flutterEngine)
   }
@@ -284,10 +299,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 1. Comment out all code blocks marked above in all 5 files
 2. Add clear comments indicating temporary disable
 3. Run clean builds:
+
    ```bash
    # Android
    cd android && ./gradlew clean && cd ..
-   
+
    # iOS
    cd ios && pod install && cd ..
    ```
@@ -297,10 +313,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 1. Uncomment all code blocks in all 5 files
 2. Remove temporary disable comments
 3. Run clean builds:
+
    ```bash
    # Android
    cd android && ./gradlew clean && cd ..
-   
+
    # iOS
    cd ios && pod install && cd ..
    ```
