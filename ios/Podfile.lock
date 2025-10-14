@@ -1,6 +1,5 @@
 PODS:
   - FBLazyVector (0.82.0)
-  - Flutter (1.0.0)
   - hermes-engine (0.82.0):
     - hermes-engine/Pre-built (= 0.82.0)
   - hermes-engine/Pre-built (0.82.0)
@@ -1892,7 +1891,6 @@ PODS:
 
 DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
-  - Flutter (from `../super_dash/.ios/Flutter`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -1971,8 +1969,6 @@ DEPENDENCIES:
 EXTERNAL SOURCES:
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
-  Flutter:
-    :path: "../super_dash/.ios/Flutter"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-09-01-RNv0.82.0-265ef62ff3eb7289d17e366664ac0da82303e101
@@ -2123,7 +2119,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FBLazyVector: 29edfec67fa1c03cb022a4d9891782c3ee86055b
-  Flutter: 90194f5882b909bfca96b8acb4ec12eb6808e1ee
   hermes-engine: 8642d8f14a548ab718ec112e9bebdfdd154138b5
   RCTDeprecation: f4041d4bf5adb181d7d9a14982539a83726165a7
   RCTRequired: 89f3ec1cf8e1a9b8f5cb9a833790d89c26ef3256
@@ -2198,6 +2193,6 @@ SPEC CHECKSUMS:
   RNSVG: b6cd287233b7f08ec04841a8dd11dae95b654438
   Yoga: bd0e8154719df276d35c96367c96fbf4bbfc24fb
 
-PODFILE CHECKSUM: dc31ed98f9a6a90844dfdf88471b787fc143e3fb
+PODFILE CHECKSUM: 26d92472cd708e589d88dbcdd01b9117069b2351
 
 COCOAPODS: 1.15.2
