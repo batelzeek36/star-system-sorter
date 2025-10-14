@@ -1,177 +1,262 @@
 # Project Structure
 
-## Root Organization
+## Root Directory Layout
 
 ```
-.
+star-system-sorter/
+├── android/              # Android native project
+├── ios/                  # iOS native project
 ├── src/                  # React Native source code
-├── components/           # Existing shadcn/ui components (to be adapted)
-├── apps/                # Backend services (Node.js server with BodyGraph proxy)
-├── super_dash/          # Flutter/Flame game module (submodule)
-├── android/             # Android native project
-├── ios/                 # iOS native project
+├── components/           # shadcn/ui components (to be adapted)
+├── super_dash/          # Flutter/Flame game module
+├── apps/                # Backend services
+│   └── server/          # Node.js API server
+├── __tests__/           # Test files
 ├── scripts/             # Build and setup scripts
 ├── docs/                # Documentation
-├── __tests__/           # Test files
-├── App.tsx              # Main app entry point
-└── index.js             # React Native entry point
+└── schemas/             # JSON schemas for bridge types
 ```
 
-## Source Directory (`src/`)
+## Source Code Structure (`src/`)
 
 ```
 src/
-├── screens/             # Screen components (one per route)
+├── screens/             # Screen components (top layer)
 ├── components/          # Reusable UI components
-├── scorer/              # Scoring library (HD → star system)
-├── moderation/          # Moderation system
-├── bridge/              # Native game bridge (RN ↔ Flutter)
-├── hd/                  # Human Design integration (BodyGraph API client)
-├── state/               # Global state (zustand atoms)
-└── lib/                 # Utilities and helpers
+├── navigation/          # Navigation configuration
+├── bridge/              # Native game bridge (MethodChannel/EventChannel)
+├── scorer/              # Scoring library (deterministic)
+├── hd/                  # Human Design API integration
+├── moderation/          # Content moderation system
+├── state/               # Zustand state management
+└── lib/                 # Utilities and helpers (bottom layer)
 ```
 
-## Module Organization
+## Layered Architecture
 
-Each module should have:
+The codebase follows strict layering enforced by dependency-cruiser:
 
-- `types.ts` - TypeScript interfaces and types
-- `index.ts` - Public API exports (only import from here)
-- Implementation files (≤150 LOC each)
+```
+Screens (top layer)
+  ↓ can import from
+Components
+  ↓ can import from
+Theme/Tokens
+  ↓ can import from
+Utils (lib, state)
+```
 
-**Example (scorer module):**
+**Rules:**
+
+- Lower layers CANNOT import from higher layers
+- Components cannot import from Screens
+- Utils (lib/state) cannot import from Components or Screens
+- Only import from module `index.ts` files (no deep imports)
+- No circular dependencies allowed
+- Acyclic: No circular dependencies across folders/packages
+- Size: Files ≤150 LOC (prefer 60–120). If exceeded, add `// @exception(max-lines) why:<reason>`
+- Functions: ≤40 LOC, cyclomatic ≤10
+
+## Source of Truth
+
+- Zod schemas define all validation (forms + API)
+- Public APIs per module via index.ts only
+
+## Module Structure Pattern
+
+Each module follows this structure:
 
 ```
 src/scorer/
-├── types.ts             # HDExtract, Canon, ScorerResult interfaces
-├── canon.ts             # Load and validate canon YAML
-├── score.ts             # Core scoring algorithm
-├── tie.ts               # Tie-breaking logic
-├── checksum.ts          # Canon checksum computation
-└── index.ts             # Public API: { computeScore, loadCanon }
+├── types.ts          # TypeScript interfaces and types
+├── canon.ts          # Implementation file
+├── score.ts          # Implementation file
+├── tie.ts            # Implementation file
+└── index.ts          # Public API exports (ONLY import from here)
 ```
 
-## Component Organization
+**Import Rules:**
 
-```
-components/
-├── ui/                  # Existing shadcn/ui components
-│   ├── button.tsx
-│   ├── card.tsx
-│   ├── input.tsx
-│   └── ... (40+ components)
-└── figma/               # Figma-exported components
-    └── ImageWithFallback.tsx
+```typescript
+// ❌ Bad: Deep import
+import { computeScore } from '@/scorer/score';
+
+// ✅ Good: Import from index.ts
+import { computeScore } from '@/scorer';
 ```
 
-**New components go in `src/components/`:**
+## Key Directories
 
-```
-src/components/
-├── StarSystemCrest.tsx  # SVG crest renderer
-├── RadialChart.tsx      # Radial progress chart
-├── ScoreDisplay.tsx     # Score result display
-└── index.ts             # Public exports
-```
+### `src/screens/`
 
-## Native Bridge Structure
+Screen components for navigation. Each screen is a top-level view.
 
-```
-src/bridge/
-├── GameBridge.ts        # RN module wrapper
-├── types.ts             # GameCommand, GameEvent types
-├── protocol.ts          # Message validation
-└── index.ts             # Public API
+**Files:**
 
-android/app/src/main/java/com/s3/
-├── GameBridgeModule.java    # Native module
-├── GameBridgePackage.java   # Package registration
-└── MainActivity.java        # FlutterEngine caching
+- `InputScreen.tsx` - Birth data input
+- `ResultScreen.tsx` - Star system classification results
+- `WhyScreen.tsx` - Explanation of results
+- `GameHubScreen.tsx` - Game lobby and team selection
+- `SuperDashScreen.tsx` - Flutter game integration
+- `LeaderboardScreen.tsx` - Competition rankings
+- `ProfileScreen.tsx` - User profile
+- `SettingsScreen.tsx` - App settings
 
-ios/StarSystemSorter/
-├── GameBridgeModule.m       # Native module
-└── AppDelegate.mm           # FlutterEngine caching
-```
+### `src/components/`
 
-## Super Dash Integration
+Reusable UI components used across screens.
+
+**Files:**
+
+- `RadialChart.tsx` - Radial chart visualization
+- `ScoreDisplay.tsx` - Score display component
+- `StarSystemCrest.tsx` - Star system visual representation
+- `TimeZonePicker.tsx` - Time zone selection
+
+### `src/navigation/`
+
+React Navigation configuration and routing.
+
+**Files:**
+
+- `RootNavigator.tsx` - Main navigation stack
+- `types.ts` - Navigation type definitions
+- `linking.ts` - Deep linking configuration
+- `guards.ts` - Navigation guards
+- `ErrorBoundary.tsx` - Error boundary for navigation
+
+### `src/bridge/`
+
+Bridge between React Native and Flutter game module.
+
+**Files:**
+
+- `GameBridge.ts` - Main bridge implementation
+- `types.ts` - Bridge type definitions
+- `generate-schemas.ts` - JSON schema generator
+- `GAMEBRIDGE_USAGE.md` - Usage documentation
+
+**Schemas:** JSON schemas in `schemas/` directory for type validation.
+
+### `src/scorer/`
+
+Deterministic scoring system based on Human Design.
+
+**Files:**
+
+- `canon.ts` - Canonical scoring rules
+- `score.ts` - Score computation
+- `tie.ts` - Tie-breaking logic
+- `types.ts` - Scorer type definitions
+- `canon.mock.yaml` - Mock data for testing
+
+### `src/hd/`
+
+Human Design API integration (BodyGraph Chart API).
+
+**Files:**
+
+- `api-client.ts` - API client with caching
+- `cache.ts` - 30-day cache implementation
+- `types.ts` - HD type definitions
+
+### `src/state/`
+
+Zustand state management (minimal, 2-3 atoms).
+
+**Files:**
+
+- `store.ts` - Main state store
+- `__tests__/store.test.ts` - Store tests
+
+### `src/lib/`
+
+Utilities and helper functions (bottom layer).
+
+**Files:**
+
+- `validation.ts` - Validation utilities
+
+## Flutter Module (`super_dash/`)
 
 ```
 super_dash/
-├── lib/
-│   ├── bridge/              # NEW: Message channel integration
-│   │   ├── method_channel_bridge.dart
-│   │   └── schema.dart
-│   ├── core/                # NEW: Deterministic components
-│   │   ├── seeded_rng.dart
-│   │   ├── fixed_timestep.dart
-│   │   ├── fixed_point.dart
-│   │   └── input_recorder.dart
-│   ├── theming/             # NEW: Team visual themes
-│   │   └── team_theme.dart
-│   ├── adapter/             # NEW: Dependency injection
-│   │   └── game_adapter.dart
-│   └── game/                # EXISTING: Game logic (minimal changes)
-└── main.dart                # MODIFY: Add bridge initialization
+├── lib/                 # Dart source code
+│   ├── game/           # Flame game implementation
+│   ├── bridge/         # MethodChannel/EventChannel bridge
+│   ├── audio/          # Audio system
+│   └── main.dart       # Entry point
+├── assets/             # Game assets (images, audio, maps)
+├── test/               # Flutter tests
+└── pubspec.yaml        # Flutter dependencies
 ```
 
-## File Size Guidelines
+**Module Configuration:**
 
-- **Target**: 60-120 LOC per file
-- **Maximum**: 150 LOC (hard limit)
-- **Exception**: Requires comment `// @exception(max-lines) why:<reason>`
-- **Allowlist**: App root, router config only
+- Project type: `module` (not standalone app)
+- Android package: `com.starsystemsorter.super_dash`
+- iOS bundle ID: `com.starsystemsorter.superDash`
 
-## Testing Structure
-
-```
-__tests__/
-├── scorer.test.ts           # Scorer unit tests + golden fixtures
-├── moderation.test.ts       # Moderation tests
-├── bridge.contract.test.ts  # Bridge message contract tests
-└── integration/             # Integration tests
-    ├── game-flow.test.ts
-    └── api.test.ts
-```
-
-## Documentation
+## Backend Server (`apps/server/`)
 
 ```
-docs/
-├── DEPENDENCIES.md          # Dependency rationale
-├── USAGE_EXAMPLES.md        # Code examples
-└── TASK_*.md               # Task summaries
+apps/server/
+├── src/
+│   ├── index.ts        # Server entry point
+│   ├── http.ts         # HTTP server setup
+│   └── routes/         # API routes
+├── __tests__/          # Server tests
+└── package.json        # Server dependencies
 ```
+
+## Test Files (`__tests__/`)
+
+Test files mirror the source structure:
+
+- `*.test.ts` - Unit tests
+- `*.test.tsx` - Component tests
+- Test files are exempt from dependency rules
+
+## Scripts (`scripts/`)
+
+Build and setup automation:
+
+- `setup-flutter-module.sh` - Initial Flutter setup
+- `build-flutter-module.sh` - Build Flutter module
+- `rebuild-native.sh` - Rebuild native projects
+- `reload-app.sh` - Reload app with cache clearing
+- `verify-*.sh` - Verification scripts
+
+## Documentation (`docs/`)
+
+Technical documentation:
+
+- `FLUTTER_MODULE_INTEGRATION.md` - Flutter integration guide
+- `DEPENDENCY_RULES.md` - Dependency graph rules
+- `BODYGRAPH_API.md` - BodyGraph API documentation
+- `NAVIGATION.md` - Navigation patterns
+- `DEBUGGING_GUIDE.md` - Debugging tips
 
 ## Configuration Files
 
-- `tsconfig.json` - TypeScript config with path aliases
-- `babel.config.js` - Babel preset for React Native
-- `metro.config.js` - Metro bundler config
-- `jest.config.js` - Jest test config
-- `.eslintrc.js` - ESLint rules
-- `.prettierrc.js` - Prettier formatting
+### Root Level
 
-## Key Principles
+- `package.json` - Dependencies and scripts
+- `tsconfig.json` - TypeScript configuration
+- `babel.config.js` - Babel configuration
+- `metro.config.js` - Metro bundler configuration
+- `jest.config.js` - Jest test configuration
+- `.eslintrc.js` - ESLint configuration
+- `.dependency-cruiser.js` - Dependency rules
+- `.env` - Environment variables
 
-1. **Small files**: Break large files into focused modules
-2. **Clear boundaries**: Each module has single responsibility
-3. **Public APIs**: Import only from index.ts
-4. **No cycles**: Enforce acyclic dependency graph
-5. **Composition**: Favor composition over inheritance
+### Platform Specific
 
-## Layering & Import Rules
+- `android/build.gradle` - Android build configuration
+- `ios/Podfile` - iOS dependencies
+- `super_dash/pubspec.yaml` - Flutter dependencies
 
-**Allowed dependency flow:** `Screens → Components → Theme/Tokens → Utils` (no reverse deps)
-
-**Imports:** Only from each module's `index.ts`. No deep imports.
-
-**Acyclic:** No circular dependencies across folders/packages.
-
-**Size:** Files ≤150 LOC (prefer 60–120). If exceeded, add `// @exception(max-lines) why:<reason>`.
-
-**Functions:** ≤40 LOC, cyclomatic ≤10.
-
-## Path Aliases & Metro
+## Path Aliases & Metro Configuration
 
 Use TS paths and Metro to reach local folders.
 
@@ -229,7 +314,37 @@ module.exports = {
 
 > Use `babel-plugin-module-resolver` for runtime path resolution. Keep tsconfig paths in sync.
 
-## Source of Truth
+## File Size Guidelines
 
-- Zod schemas define all validation (forms + API).
-- Public APIs per module via index.ts only.
+- **Preferred**: 60-120 lines of code
+- **Maximum**: 150 lines of code
+- **Rationale**: Modularity and maintainability
+
+## Naming Conventions
+
+- **Files**: PascalCase for components (`RadialChart.tsx`), camelCase for utilities (`validation.ts`)
+- **Directories**: kebab-case or lowercase
+- **Components**: PascalCase
+- **Functions**: camelCase
+- **Types/Interfaces**: PascalCase
+- **Constants**: UPPER_SNAKE_CASE
+
+## Import Order
+
+1. External dependencies (React, React Native, etc.)
+2. Internal absolute imports (`@/...`)
+3. Relative imports (`./...`)
+4. Type imports (if separate)
+
+## Module Exports
+
+Each module must have an `index.ts` that exports its public API:
+
+```typescript
+// src/scorer/index.ts
+export { computeScore } from './score';
+export { loadCanon } from './canon';
+export type { ScorerResult, HDExtract } from './types';
+
+// Internal functions are NOT exported
+```
