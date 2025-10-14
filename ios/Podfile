@@ -21,8 +21,9 @@ if linkage != nil
 end
 
 # Flutter module integration
-flutter_application_path = '../super_dash'
-load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
+# TEMPORARILY COMMENTED OUT - uncomment after implementing native bridges (Tasks 6.2/6.3)
+# flutter_application_path = '../super_dash'
+# load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
 
 target 'S3App' do
   config = use_native_modules!
@@ -34,7 +35,8 @@ target 'S3App' do
   )
 
   # Install Flutter module pods
-  install_all_flutter_pods(flutter_application_path)
+  # TEMPORARILY COMMENTED OUT - uncomment after implementing native bridges (Tasks 6.2/6.3)
+  # install_all_flutter_pods(flutter_application_path)
 
   post_install do |installer|
     react_native_post_install(
@@ -45,7 +47,8 @@ target 'S3App' do
     )
     
     # Flutter post-install hook
-    flutter_post_install(installer) if defined?(flutter_post_install)
+    # TEMPORARILY COMMENTED OUT - uncomment after implementing native bridges (Tasks 6.2/6.3)
+    # flutter_post_install(installer) if defined?(flutter_post_install)
 
     installer.pods_project.targets.each do |target|
       next unless %w[glog Flipper-Glog].include?(target.name)

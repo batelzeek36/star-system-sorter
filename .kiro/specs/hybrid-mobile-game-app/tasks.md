@@ -265,6 +265,8 @@ Before deployment:
 
 - [ ] 6. Implement native game bridge
 
+  - **NOTE**: Flutter integration is currently DISABLED for testing. Before implementing tasks 6.2 or 6.3, you MUST re-enable Flutter integration using the instructions in `docs/!!!FLUTTER_TOGGLE_REFERENCE.md`. This involves uncommenting code in 5 files (3 Android, 2 iOS).
+
   - [x] 6.1 Create bridge types and schemas
 
     - Write types.ts with GameCommand and GameEvent types
@@ -275,22 +277,29 @@ Before deployment:
 
   - [ ] 6.2 Implement Android native bridge
 
+    - **IMPORTANT**: Before starting, re-enable Flutter integration in Android files using docs/!!!FLUTTER_TOGGLE_REFERENCE.md
+    - Uncomment Flutter integration in: android/settings.gradle, android/app/build.gradle, android/app/src/main/java/com/s3app/MainApplication.kt
     - Write GameBridgeModule.java with MethodChannel and EventChannel
     - Cache FlutterEngine in Application class as "s3_engine"
     - Implement open() method to launch Flutter activity
     - Implement sendCommand() method for MethodChannel
     - Set up EventChannel for game events
     - Register module in GameBridgePackage.java
+    - Verify Flutter integration is fully enabled per docs/!!!FLUTTER_TOGGLE_REFERENCE.md
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
   - [ ] 6.3 Implement iOS native bridge
 
+    - **IMPORTANT**: Before starting, re-enable Flutter integration in iOS files using docs/!!!FLUTTER_TOGGLE_REFERENCE.md
+    - Uncomment Flutter integration in: ios/Podfile, ios/S3App/AppDelegate.swift
+    - Run `cd ios && bundle exec pod install` after uncommenting
     - Write GameBridgeModule.m with MethodChannel and EventChannel
     - Cache FlutterEngine in AppDelegate
     - Implement open() method to present Flutter view controller
     - Implement sendCommand() method for MethodChannel
     - Set up EventChannel for game events
     - Register module in RCTBridgeModule
+    - Verify Flutter integration is fully enabled per docs/!!!FLUTTER_TOGGLE_REFERENCE.md
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
   - [ ] 6.4 Wire React Native to native bridge
@@ -497,7 +506,7 @@ Before deployment:
     - Toggle via command from React Native
     - _Requirements: 2.11_
 
-  - [ ] 9.11 Wire adapter to main.dart
+  - [x] 9.11 Wire adapter to main.dart
     - Modify lib/main.dart to initialize MethodChannel/EventChannel bridge
     - Handle start command: apply seed, inject adapter, apply theme
     - Handle pause/resume/quit commands via MethodChannel
