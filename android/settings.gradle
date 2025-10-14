@@ -9,5 +9,5 @@ includeBuild('../node_modules/@react-native/gradle-plugin')
 // setBinding(new Binding([gradle: this]))
 // evaluate(new File(
 //   settingsDir.parentFile,
-//   'super_dash/.android/include_flutter.groovy'
+//   'runner_game/.android/include_flutter.groovy'
 // ))

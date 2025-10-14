@@ -118,5 +118,7 @@ dependencies {
     }
 
     // Flutter module integration (DISABLED - old super_dash removed, will be replaced with runner_game)
-    // implementation project(':flutter')
+    // Option A (Direct Include): implementation project(':flutter')
+    // Option B (AAR): implementation 'com.starsystemsorter.runner_game:flutter_debug:1.0'
+    //                 (requires: flutter build aar && publish to mavenLocal())
 }

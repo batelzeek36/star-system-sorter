@@ -536,7 +536,7 @@ Before deployment:
       - Document choice in `docs/ANDROID_TOOLCHAIN_MATRIX.md`
       - _Requirements: 3.1_
 
-    - [ ] 9.5.1 Update Android integration
+    - [x] 9.5.1 Update Android integration
 
       - Change path in `android/settings.gradle` from `super_dash/.android/` to `runner_game/.android/`
       - Verify include_flutter.groovy path
