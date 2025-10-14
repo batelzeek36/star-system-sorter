@@ -256,7 +256,7 @@ Before deployment:
     - Show disclaimer text
     - _Requirements: 1.7, 1.10_
 
-  - [ ] 5.4 Create GameBridge module wrapper
+  - [x] 5.4 Create GameBridge module wrapper
     - Write GameBridge.ts wrapping NativeModules.GameBridge
     - Implement timeout logic (expect ready within 5000ms)
     - Handle DeviceEventEmitter for game events
@@ -265,7 +265,7 @@ Before deployment:
 
 - [ ] 6. Implement native game bridge
 
-  - [ ] 6.1 Create bridge types and schemas
+  - [x] 6.1 Create bridge types and schemas
 
     - Write types.ts with GameCommand and GameEvent types
     - Define GameResult interface with clientHash and game_core_version

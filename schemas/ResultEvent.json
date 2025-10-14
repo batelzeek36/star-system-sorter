@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResultEvent",
+  "description": "Event sent when game completes with final score and validation data",
+  "type": "object",
+  "required": [
+    "type",
+    "score",
+    "metrics",
+    "clientHash",
+    "game_core_version",
+    "inputs"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "result"
+    },
+    "score": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "distance",
+        "time",
+        "enemiesDefeated",
+        "coinsCollected"
+      ],
+      "properties": {
+        "distance": {
+          "type": "number",
+          "minimum": 0
+        },
+        "time": {
+          "type": "number",
+          "minimum": 0,
+          "description": "milliseconds"
+        },
+        "enemiesDefeated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coinsCollected": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "clientHash": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$",
+      "description": "Must be SHA256 hex string"
+    },
+    "game_core_version": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "string",
+      "description": "RLE/delta compressed input timeline"
+    }
+  }
+}

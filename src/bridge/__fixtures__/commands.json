@@ -1,0 +1,37 @@
+{
+  "startCommand": {
+    "type": "start",
+    "seed": "0123456789abcdef",
+    "team": "Manifestor",
+    "eventId": "event-001",
+    "musicEnabled": true
+  },
+  "startCommandWithGhost": {
+    "type": "start",
+    "seed": "0123456789abcdef",
+    "team": "Generator",
+    "eventId": "event-002",
+    "musicEnabled": false,
+    "ghostData": {
+      "seed": "fedcba9876543210",
+      "inputs": "R5L3D2U1R10L5"
+    }
+  },
+  "pauseCommand": {
+    "type": "pause"
+  },
+  "resumeCommand": {
+    "type": "resume"
+  },
+  "quitCommand": {
+    "type": "quit"
+  },
+  "setMusicCommandEnabled": {
+    "type": "set-music",
+    "enabled": true
+  },
+  "setMusicCommandDisabled": {
+    "type": "set-music",
+    "enabled": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "readyEvent": {
+    "type": "ready",
+    "game_core_version": "1.0.0"
+  },
+  "stateEventPlaying": {
+    "type": "state",
+    "state": "playing",
+    "progress": 0.75
+  },
+  "stateEventPaused": {
+    "type": "state",
+    "state": "paused"
+  },
+  "stateEventLoading": {
+    "type": "state",
+    "state": "loading",
+    "progress": 0.33
+  },
+  "resultEvent": {
+    "type": "result",
+    "score": 15420,
+    "metrics": {
+      "distance": 1250.75,
+      "time": 125000,
+      "enemiesDefeated": 42,
+      "coinsCollected": 87
+    },
+    "clientHash": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    "game_core_version": "1.0.0",
+    "inputs": "R5L3D2U1R10L5D8U3R15L2D5U7R20"
+  },
+  "errorEventGameCrash": {
+    "type": "error",
+    "code": "GAME_CRASH",
+    "message": "Unexpected null pointer exception in game loop"
+  },
+  "errorEventInvalidSeed": {
+    "type": "error",
+    "code": "INVALID_SEED",
+    "message": "Seed format validation failed"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "gameResultHighScore": {
+    "score": 25680,
+    "metrics": {
+      "distance": 2150.5,
+      "time": 180000,
+      "enemiesDefeated": 68,
+      "coinsCollected": 142
+    },
+    "clientHash": "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+    "game_core_version": "1.0.0",
+    "inputs": "R5L3D2U1R10L5D8U3R15L2D5U7R20L8D3U5R12L4D6U2R18",
+    "seed": "0123456789abcdef",
+    "team": "Manifestor",
+    "eventId": "event-001"
+  },
+  "gameResultLowScore": {
+    "score": 500,
+    "metrics": {
+      "distance": 125.25,
+      "time": 15000,
+      "enemiesDefeated": 2,
+      "coinsCollected": 8
+    },
+    "clientHash": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    "game_core_version": "1.0.0",
+    "inputs": "R3L2D1U1R5",
+    "seed": "abcdef0123456789",
+    "team": "Generator",
+    "eventId": "event-002"
+  },
+  "gameResultPerfectRun": {
+    "score": 50000,
+    "metrics": {
+      "distance": 5000.0,
+      "time": 300000,
+      "enemiesDefeated": 150,
+      "coinsCollected": 300
+    },
+    "clientHash": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+    "game_core_version": "1.0.1",
+    "inputs": "R10L8D5U7R15L12D9U11R20L18D15U13R25L22D19U17R30",
+    "seed": "fedcba9876543210",
+    "team": "Projector",
+    "eventId": "event-003"
+  }
+}

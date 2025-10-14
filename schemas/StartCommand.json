@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StartCommand",
+  "description": "Command to start a new game session with seed and configuration",
+  "type": "object",
+  "required": [
+    "type",
+    "seed",
+    "team",
+    "eventId"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "start"
+    },
+    "seed": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{16}$",
+      "description": "Seed must be 16-character hex string"
+    },
+    "team": {
+      "type": "string",
+      "minLength": 1
+    },
+    "eventId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "musicEnabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "ghostData": {
+      "type": "object",
+      "required": [
+        "seed",
+        "inputs"
+      ],
+      "properties": {
+        "seed": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "string",
+          "description": "RLE/delta compressed input timeline"
+        }
+      }
+    }
+  }
+}

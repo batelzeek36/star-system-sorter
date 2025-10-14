@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SetMusicCommand",
+  "description": "Command to update music enabled state during gameplay",
+  "type": "object",
+  "required": [
+    "type",
+    "enabled"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "set-music"
+    },
+    "enabled": {
+      "type": "boolean"
+    }
+  }
+}

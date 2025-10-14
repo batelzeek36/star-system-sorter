@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReadyEvent",
+  "description": "Event sent when Flutter engine is initialized and ready",
+  "type": "object",
+  "required": [
+    "type",
+    "game_core_version"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "ready"
+    },
+    "game_core_version": {
+      "type": "string"
+    }
+  }
+}

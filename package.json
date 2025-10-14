@@ -24,6 +24,7 @@
     "reload:ios:clean": "bash scripts/reload-app.sh ios --clean",
     "reload:android:clean": "bash scripts/reload-app.sh android --clean",
     "reload:both:clean": "bash scripts/reload-app.sh both --clean",
+    "generate:schemas": "tsx src/bridge/generate-schemas.ts",
     "postinstall": "cd ios && bundle exec pod install && cd .."
   },
   "dependencies": {
@@ -70,6 +71,7 @@
     "msw": "^2.11.4",
     "prettier": "2.8.8",
     "react-test-renderer": "19.1.1",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "zod-to-json-schema": "^3.24.6"
   },
