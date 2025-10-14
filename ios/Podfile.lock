@@ -1,5 +1,8 @@
 PODS:
   - FBLazyVector (0.82.0)
+  - Flutter (1.0.0)
+  - FlutterPluginRegistrant (0.0.1):
+    - Flutter
   - hermes-engine (0.82.0):
     - hermes-engine/Pre-built (= 0.82.0)
   - hermes-engine/Pre-built (0.82.0)
@@ -1891,6 +1894,8 @@ PODS:
 
 DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
+  - Flutter (from `../runner_game/.ios/Flutter`)
+  - FlutterPluginRegistrant (from `../runner_game/.ios/Flutter/FlutterPluginRegistrant`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -1969,6 +1974,10 @@ DEPENDENCIES:
 EXTERNAL SOURCES:
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
+  Flutter:
+    :path: "../runner_game/.ios/Flutter"
+  FlutterPluginRegistrant:
+    :path: "../runner_game/.ios/Flutter/FlutterPluginRegistrant"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-09-01-RNv0.82.0-265ef62ff3eb7289d17e366664ac0da82303e101
@@ -2119,6 +2128,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FBLazyVector: 29edfec67fa1c03cb022a4d9891782c3ee86055b
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  FlutterPluginRegistrant: 33eb8033675f887eba735b6409cd8503f377aa87
   hermes-engine: 8642d8f14a548ab718ec112e9bebdfdd154138b5
   RCTDeprecation: f4041d4bf5adb181d7d9a14982539a83726165a7
   RCTRequired: 89f3ec1cf8e1a9b8f5cb9a833790d89c26ef3256
@@ -2193,6 +2204,6 @@ SPEC CHECKSUMS:
   RNSVG: b6cd287233b7f08ec04841a8dd11dae95b654438
   Yoga: bd0e8154719df276d35c96367c96fbf4bbfc24fb
 
-PODFILE CHECKSUM: 26d92472cd708e589d88dbcdd01b9117069b2351
+PODFILE CHECKSUM: 7fa687ad3dad335345238675fa8b02695f0563dc
 
 COCOAPODS: 1.15.2

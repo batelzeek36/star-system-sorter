@@ -18,7 +18,7 @@ star-system-sorter/
 ├── ios/                  # iOS native project
 ├── src/                  # React Native source code
 ├── components/           # shadcn/ui components (to be adapted)
-├── super_dash/          # Flutter/Flame game module
+├── runner_game/         # Flutter/Flame game module
 ├── apps/                # Backend services
 │   └── server/          # Node.js API server
 ├── __tests__/           # Test files
@@ -187,10 +187,10 @@ Utilities and helper functions (bottom layer).
 
 - `validation.ts` - Validation utilities
 
-## Flutter Module (`super_dash/`)
+## Flutter Module (`runner_game/`)
 
 ```
-super_dash/
+runner_game/
 ├── lib/                 # Dart source code
 │   ├── game/           # Flame game implementation
 │   ├── bridge/         # MethodChannel/EventChannel bridge
@@ -204,8 +204,8 @@ super_dash/
 **Module Configuration:**
 
 - Project type: `module` (not standalone app)
-- Android package: `com.starsystemsorter.super_dash`
-- iOS bundle ID: `com.starsystemsorter.superDash`
+- Android package: `com.starsystemsorter.runner_game`
+- iOS bundle ID: `com.starsystemsorter.runnerGame`
 
 ## Backend Server (`apps/server/`)
 
@@ -264,7 +264,7 @@ Technical documentation:
 
 - `android/build.gradle` - Android build configuration
 - `ios/Podfile` - iOS dependencies
-- `super_dash/pubspec.yaml` - Flutter dependencies
+- `runner_game/pubspec.yaml` - Flutter dependencies
 
 ## Path Aliases & Metro Configuration
 

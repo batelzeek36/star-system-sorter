@@ -543,7 +543,7 @@ Before deployment:
       - If using Option B (AAR), configure mavenLocal() dependency instead
       - _Requirements: 3.1_
 
-    - [ ] 9.5.2 Update iOS integration
+    - [x] 9.5.2 Update iOS integration
       - Change flutter_application_path in `ios/Podfile` from `../super_dash` to `../runner_game`
       - Run `cd ios && pod install`
       - _Requirements: 3.1_

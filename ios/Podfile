@@ -20,9 +20,9 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-# Flutter module integration (DISABLED - old super_dash removed, will be replaced with runner_game)
-# flutter_application_path = '../super_dash'
-# load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
+# Flutter module integration
+flutter_application_path = '../runner_game'
+load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
 
 target 'S3App' do
   config = use_native_modules!
@@ -33,8 +33,8 @@ target 'S3App' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # Install Flutter module pods (DISABLED - old super_dash removed)
-  # install_all_flutter_pods(flutter_application_path)
+  # Install Flutter module pods
+  install_all_flutter_pods(flutter_application_path)
 
   post_install do |installer|
     react_native_post_install(
@@ -44,8 +44,8 @@ target 'S3App' do
       # :ccache_enabled => true
     )
     
-    # Flutter post-install hook (DISABLED - old super_dash removed)
-    # flutter_post_install(installer) if defined?(flutter_post_install)
+    # Flutter post-install hook
+    flutter_post_install(installer) if defined?(flutter_post_install)
 
     installer.pods_project.targets.each do |target|
       next unless %w[glog Flipper-Glog].include?(target.name)
