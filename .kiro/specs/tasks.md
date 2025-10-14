@@ -450,7 +450,7 @@ Before deployment:
       - Run `fvm flutter doctor -v`
       - _Requirements: 2.1, 9.6_
 
-    - [ ] 9.1.3 Document toolchain matrix
+    - [x] 9.1.3 Document toolchain matrix
       - Create `docs/ANDROID_TOOLCHAIN_MATRIX.md`
       - Document: `runner_game/.android`: Gradle 8.x + AGP 8.x + JDK 17 (from Flutter template)
       - Document: RN host stays on Gradle 9.x (decoupled until integration strategy chosen)
@@ -465,7 +465,7 @@ Before deployment:
       - Verify `.android/` and `.ios/` directories exist
       - _Requirements: 2.1_
 
-    - [ ] 9.2.2 Add Flame dependency
+    - [x] 9.2.2 Add Flame dependency
       - Add `flame: ^1.32.0` to `runner_game/pubspec.yaml`
       - Run `fvm flutter pub get`
       - _Requirements: 2.1_
