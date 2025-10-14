@@ -459,7 +459,7 @@ Before deployment:
 
   - [ ] 9.2 Create new Flutter module
 
-    - [ ] 9.2.1 Generate runner_game module
+    - [x] 9.2.1 Generate runner_game module
 
       - Run `fvm flutter create --template=module --org com.starsystemsorter runner_game`
       - Verify `.android/` and `.ios/` directories exist
