@@ -422,7 +422,7 @@ Before deployment:
     - Document integration in README.md
     - _Requirements: 2.1, 9.6_
 
-  - [ ] 9.1 Create MethodChannel/EventChannel bridge in Flutter
+  - [x] 9.1 Create MethodChannel/EventChannel bridge in Flutter
 
     - Write lib/bridge/method_channel_bridge.dart
     - Set up MethodChannel `s3/game/cmd` for commands
@@ -431,7 +431,7 @@ Before deployment:
     - Implement event sender (ready/state/result/error)
     - _Requirements: 2.1, 2.2, 3.2_
 
-  - [ ] 9.2 Create bridge schemas in Dart
+  - [x] 9.2 Create bridge schemas in Dart
 
     - Write lib/bridge/schema.dart with command/event classes
     - Implement JSON serialization/deserialization
