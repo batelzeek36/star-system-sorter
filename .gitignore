@@ -83,3 +83,4 @@ android/.kotlin/
 ios/Flutter/
 android/app/src/main/java/io/flutter/
 android/app/src/main/java/com/starsystemsorter/super_dash/
+android/app/libs/*.aar

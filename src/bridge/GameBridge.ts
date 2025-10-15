@@ -4,10 +4,10 @@
  * Wraps NativeModules.GameBridge and provides typed API for React Native ↔ Flutter communication.
  * Handles timeout logic, event listening, and command validation.
  * 
- * Requirements: 3.3, 3.4, 3.10, 3.11
+ * Requirements: 3.4, 3.10
  */
 
-import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
+import { NativeModules, DeviceEventEmitter, Platform } from 'react-native';
 import type {
   GameCommand,
   GameEvent,
@@ -37,11 +37,17 @@ const { GameBridge: NativeGameBridge } = NativeModules as {
 };
 
 // ============================================================================
-// Constants
+// Constants (from §9.4.1)
 // ============================================================================
 
+/**
+ * Channel constants - must match Flutter bridge schema.dart
+ * These are the single source of truth defined in §9.4.1
+ */
+export const S3_CMD_CHANNEL = 's3/game/cmd';
+export const S3_EVT_CHANNEL = 's3/game/events';
+
 const READY_TIMEOUT_MS = 5000;
-const EVENT_CHANNEL_NAME = 's3/game/events';
 
 // ============================================================================
 // Event Listener Types
@@ -58,11 +64,26 @@ interface EventListeners {
 }
 
 // ============================================================================
+// Error Types
+// ============================================================================
+
+export class GameBridgeError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly recoverable: boolean = false
+  ) {
+    super(message);
+    this.name = 'GameBridgeError';
+  }
+}
+
+// ============================================================================
 // GameBridge Class
 // ============================================================================
 
 class GameBridgeWrapper {
-  private eventEmitter: NativeEventEmitter | null = null;
+  private eventSubscription: any = null;
   private listeners: EventListeners = {
     ready: new Set(),
     state: new Set(),
@@ -80,7 +101,7 @@ class GameBridgeWrapper {
   }
 
   /**
-   * Initializes the event emitter and listener
+   * Initializes the DeviceEventEmitter listener
    */
   private initialize(): void {
     if (this.isInitialized) {
@@ -92,114 +113,239 @@ class GameBridgeWrapper {
       return;
     }
 
-    // Initialize event emitter
-    this.eventEmitter = new NativeEventEmitter(NativeModules.GameBridge);
+    // Set up DeviceEventEmitter listener using S3_EVT_CHANNEL constant
     this.setupEventListener();
     this.isInitialized = true;
   }
 
   /**
-   * Sets up the native event listener
+   * Sets up the native event listener using DeviceEventEmitter
    */
   private setupEventListener(): void {
-    if (!this.eventEmitter) return;
-
-    this.eventEmitter.addListener(EVENT_CHANNEL_NAME, (rawEvent: unknown) => {
-      this.handleEvent(rawEvent);
-    });
+    // Use DeviceEventEmitter for cross-platform event handling
+    this.eventSubscription = DeviceEventEmitter.addListener(
+      S3_EVT_CHANNEL,
+      (rawEvent: unknown) => {
+        this.handleEvent(rawEvent);
+      }
+    );
   }
 
   /**
-   * Handles incoming events from Flutter
+   * Handles incoming events from Flutter with validation and error handling
    */
   private handleEvent(rawEvent: unknown): void {
-    // Validate event
-    const validation = safeValidateGameEvent(rawEvent);
-    
-    if (!validation.success) {
-      console.error('Invalid game event received:', validation.error);
-      return;
-    }
+    try {
+      // Validate event using Zod schema
+      const validation = safeValidateGameEvent(rawEvent);
+      
+      if (!validation.success) {
+        console.error('[GameBridge] Invalid game event received:', {
+          error: validation.error.message,
+          raw: rawEvent,
+        });
+        
+        // Emit error event to listeners for graceful handling
+        const errorEvent: ErrorEvent = {
+          type: 'error',
+          code: 'INVALID_EVENT',
+          message: 'Received invalid event from Flutter game',
+        };
+        this.listeners.error.forEach(listener => listener(errorEvent));
+        return;
+      }
 
-    const event = validation.data;
+      const event = validation.data;
 
-    // Dispatch to type-specific listeners
-    switch (event.type) {
-      case 'ready':
-        this.listeners.ready.forEach(listener => listener(event));
-        if (this.readyResolve) {
-          this.readyResolve(event);
-          this.readyResolve = null;
-          this.readyReject = null;
+      // Log event for debugging
+      if (__DEV__) {
+        console.log('[GameBridge] Event received:', event.type, event);
+      }
+
+      // Dispatch to type-specific listeners
+      switch (event.type) {
+        case 'ready':
+          this.listeners.ready.forEach(listener => {
+            try {
+              listener(event);
+            } catch (err) {
+              console.error('[GameBridge] Error in ready listener:', err);
+            }
+          });
+          if (this.readyResolve) {
+            this.readyResolve(event);
+            this.readyResolve = null;
+            this.readyReject = null;
+          }
+          break;
+        case 'state':
+          this.listeners.state.forEach(listener => {
+            try {
+              listener(event);
+            } catch (err) {
+              console.error('[GameBridge] Error in state listener:', err);
+            }
+          });
+          break;
+        case 'result':
+          this.listeners.result.forEach(listener => {
+            try {
+              listener(event);
+            } catch (err) {
+              console.error('[GameBridge] Error in result listener:', err);
+            }
+          });
+          break;
+        case 'error':
+          this.listeners.error.forEach(listener => {
+            try {
+              listener(event);
+            } catch (err) {
+              console.error('[GameBridge] Error in error listener:', err);
+            }
+          });
+          break;
+      }
+
+      // Dispatch to all-event listeners with error handling
+      this.listeners.all.forEach(listener => {
+        try {
+          listener(event);
+        } catch (err) {
+          console.error('[GameBridge] Error in all-event listener:', err);
         }
-        break;
-      case 'state':
-        this.listeners.state.forEach(listener => listener(event));
-        break;
-      case 'result':
-        this.listeners.result.forEach(listener => listener(event));
-        break;
-      case 'error':
-        this.listeners.error.forEach(listener => listener(event));
-        break;
+      });
+    } catch (err) {
+      console.error('[GameBridge] Unexpected error handling event:', err);
     }
-
-    // Dispatch to all-event listeners
-    this.listeners.all.forEach(listener => listener(event));
   }
 
   /**
    * Opens the Flutter game view and waits for ready event
-   * @throws {Error} If native module is not available or ready timeout occurs
+   * @throws {GameBridgeError} If native module is not available or ready timeout occurs
    */
   async open(): Promise<ReadyEvent> {
     // Ensure initialized
     this.initialize();
 
     if (!NativeGameBridge) {
-      throw new Error('GameBridge native module not available');
+      throw new GameBridgeError(
+        'GameBridge native module not available. Please ensure Flutter integration is enabled.',
+        'MODULE_NOT_AVAILABLE',
+        false
+      );
     }
 
     // Create ready promise if not already waiting
     if (!this.readyPromise) {
+      let timeoutId: NodeJS.Timeout | null = null;
+      
       this.readyPromise = new Promise<ReadyEvent>((resolve, reject) => {
         this.readyResolve = resolve;
         this.readyReject = reject;
 
         // Set timeout for ready event
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           if (this.readyReject) {
-            this.readyReject(new Error('Flutter game ready timeout'));
+            this.readyReject(
+              new GameBridgeError(
+                'Flutter game failed to send ready event within timeout',
+                'READY_TIMEOUT',
+                true
+              )
+            );
             this.readyResolve = null;
             this.readyReject = null;
             this.readyPromise = null;
           }
         }, READY_TIMEOUT_MS);
       });
+      
+      // Store timeout ID for cleanup
+      (this.readyPromise as any)._timeoutId = timeoutId;
     }
 
-    // Open Flutter view
-    await NativeGameBridge.open();
+    try {
+      // Open Flutter view
+      await NativeGameBridge.open();
 
-    // Wait for ready event
-    return this.readyPromise;
+      // Wait for ready event
+      const readyEvent = await this.readyPromise;
+      
+      // Clear timeout
+      const timeoutId = (this.readyPromise as any)._timeoutId;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      return readyEvent;
+    } catch (err) {
+      // Clear timeout on error
+      if (this.readyPromise) {
+        const timeoutId = (this.readyPromise as any)._timeoutId;
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      }
+      
+      // Reset ready promise state
+      this.readyPromise = null;
+      this.readyResolve = null;
+      this.readyReject = null;
+      
+      // Re-throw with better error context
+      if (err instanceof GameBridgeError) {
+        throw err;
+      }
+      throw new GameBridgeError(
+        `Failed to open Flutter game: ${err instanceof Error ? err.message : String(err)}`,
+        'OPEN_FAILED',
+        true
+      );
+    }
   }
 
   /**
-   * Sends a command to the Flutter game
-   * @throws {Error} If native module is not available or command is invalid
+   * Sends a command to the Flutter game with validation
+   * @throws {GameBridgeError} If native module is not available or command is invalid
    */
   async sendCommand(command: GameCommand): Promise<void> {
     if (!NativeGameBridge) {
-      throw new Error('GameBridge native module not available');
+      throw new GameBridgeError(
+        'GameBridge native module not available',
+        'MODULE_NOT_AVAILABLE',
+        false
+      );
     }
 
-    // Validate command
-    const validatedCommand = validateGameCommand(command);
+    try {
+      // Validate command using Zod schema
+      const validatedCommand = validateGameCommand(command);
 
-    // Serialize and send
-    const commandJson = JSON.stringify(validatedCommand);
-    await NativeGameBridge.sendCommand(commandJson);
+      if (__DEV__) {
+        console.log('[GameBridge] Sending command:', validatedCommand.type, validatedCommand);
+      }
+
+      // Serialize and send
+      const commandJson = JSON.stringify(validatedCommand);
+      await NativeGameBridge.sendCommand(commandJson);
+    } catch (err) {
+      // Handle validation errors
+      if (err instanceof Error && err.name === 'ZodError') {
+        throw new GameBridgeError(
+          `Invalid command: ${err.message}`,
+          'INVALID_COMMAND',
+          false
+        );
+      }
+      
+      // Handle native module errors
+      throw new GameBridgeError(
+        `Failed to send command: ${err instanceof Error ? err.message : String(err)}`,
+        'SEND_FAILED',
+        true
+      );
+    }
   }
 
   /**
@@ -311,18 +457,28 @@ class GameBridgeWrapper {
   }
 
   /**
-   * Cleans up resources
+   * Cleans up resources and removes all listeners
    */
   cleanup(): void {
+    // Remove all event listeners
     this.removeAllListeners();
-    if (this.eventEmitter) {
-      this.eventEmitter.removeAllListeners(EVENT_CHANNEL_NAME);
+    
+    // Remove DeviceEventEmitter subscription
+    if (this.eventSubscription) {
+      this.eventSubscription.remove();
+      this.eventSubscription = null;
+    }
+    
+    // Clear ready promise state
+    if (this.readyPromise && (this.readyPromise as any)._timeoutId) {
+      clearTimeout((this.readyPromise as any)._timeoutId);
     }
     this.readyPromise = null;
     this.readyResolve = null;
     this.readyReject = null;
+    
+    // Reset initialization state
     this.isInitialized = false;
-    this.eventEmitter = null;
   }
 }
 

@@ -44,14 +44,17 @@ Before deployment:
     - Document in README.md
     - _Requirements: 1.1, 1.2, 9.1_
 
-  - [ ] 0.2 Configure Flutter module integration (DEFERRED until §9.5)
+  - [x] 0.2 Configure Flutter module integration (DEFERRED until §9.5)
     - **LEGACY**: This task referenced Super Dash paths
     - **NEW**: Defer until runner_game module is created (§9.2) and integration strategy is chosen (§9.5.0)
-    - Will configure Android build.gradle to include Flutter module from `runner_game/.android/`
-    - Will configure iOS Podfile to include Flutter module from `runner_game/.ios/`
+    - **IMPLEMENTATION**: Option B (AAR method) was chosen and implemented
+    - **Android**: Configure build.gradle to consume Flutter AAR from `runner_game/build/host/outputs/repo/`
+      - AAR is built from `runner_game/.android/` using `flutter build aar`
+      - RN host depends on prebuilt AAR artifacts (not direct .android/ inclusion)
+    - **iOS**: Configure Podfile to include Flutter module from `runner_game/.ios/` (direct inclusion)
     - Set up FlutterEngine caching in Android Application class
     - Set up FlutterEngine caching in iOS AppDelegate
-    - Note: `.android/` and `.ios/` directories are generated when module is first integrated into host app
+    - Note: `.android/` directory builds the AAR; `.ios/` directory is included directly
     - Test module integration on both Android and iOS
     - _Requirements: 2.1, 3.1, 3.2, 3.11_
 
@@ -306,7 +309,7 @@ Before deployment:
     - Verify Flutter integration is fully enabled per docs/!!!FLUTTER_TOGGLE_REFERENCE.md
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 6.4 Wire React Native to native bridge
+  - [x] 6.4 Wire React Native to native bridge
 
     - Create GameBridge.ts wrapper for NativeModules
     - **Use channel constants from §9.4.1**: S3_CMD_CHANNEL and S3_EVT_CHANNEL
@@ -502,7 +505,7 @@ Before deployment:
 
   - [ ] 9.4 Implement bridge integration
 
-    - [ ] 9.4.1 Create bridge schema and constants
+    - [x] 9.4.1 Create bridge schema and constants
 
       - Create `runner_game/lib/bridge/schema.dart`
       - Define GameCommand and GameEvent types
@@ -513,14 +516,14 @@ Before deployment:
       - Export constants for use in RN/Android/iOS/Flutter (no fat-fingering strings)
       - _Requirements: 2.1, 2.2, 3.5_
 
-    - [ ] 9.4.2 Implement MethodChannel bridge
+    - [x] 9.4.2 Implement MethodChannel bridge
 
       - Create `runner_game/lib/bridge/method_channel_bridge.dart`
       - Use S3_CMD_CHANNEL and S3_EVT_CHANNEL constants
       - Handle commands and send events
       - _Requirements: 2.1, 2.2, 3.2_
 
-    - [ ] 9.4.3 Wire bridge to main.dart
+    - [x] 9.4.3 Wire bridge to main.dart
       - Initialize bridge in main()
       - Listen for START command with seed and team
       - Send READY event when initialized
@@ -529,18 +532,21 @@ Before deployment:
 
   - [ ] 9.5 Update React Native integration
 
-    - [ ] 9.5.0 Choose integration strategy (GATE)
+    - [x] 9.5.0 Choose integration strategy (GATE)
 
-      - [ ] **Option B**: Prebuilt AAR consumption (`flutter build aar` → publish to mavenLocal() and depend from RN)
+      - [x] **Option B CHOSEN**: Prebuilt AAR consumption (`flutter build aar` → publish to mavenLocal() and depend from RN)
       - Note: Option B decouples host's Gradle/AGP from Flutter's and avoids version conflicts
+      - **Implementation Note**: The Flutter module's `.android/` directory is used to BUILD the AAR, but the RN host consumes the prebuilt AAR artifacts from `runner_game/build/host/outputs/repo/`, not the `.android/` directory directly
       - Document choice in `docs/ANDROID_TOOLCHAIN_MATRIX.md`
       - _Requirements: 3.1_
 
     - [x] 9.5.1 Update Android integration
 
-      - Change path in `android/settings.gradle` from `super_dash/.android/` to `runner_game/.android/`
-      - Verify include_flutter.groovy path
-      - If using Option B (AAR), configure mavenLocal() dependency instead
+      - **IMPLEMENTED**: Option B (AAR method)
+      - Update AAR repository path in `android/settings.gradle` to point to `runner_game/build/host/outputs/repo/`
+      - Add Flutter AAR dependencies in `android/app/build.gradle` (flutter_debug:1.0, flutter_release:1.0)
+      - Direct `.android/` inclusion is DISABLED (causes Gradle plugin conflicts)
+      - Note: AAR must be built first using `cd runner_game && flutter build aar`
       - _Requirements: 3.1_
 
     - [x] 9.5.2 Update iOS integration

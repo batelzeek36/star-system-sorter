@@ -1,110 +1,304 @@
+/// Runner Game - Simple tap-to-jump game with bridge integration
+///
+/// This is a minimal Flutter module that integrates with React Native via
+/// MethodChannel/EventChannel bridge.
+library;
+
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MyApp());
+import 'bridge/method_channel_bridge.dart';
+import 'bridge/schema.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+/// Game core version for compatibility checking
+const String kGameCoreVersion = '1.0.0';
 
-  // This widget is the root of your application.
+void main() {
+  runApp(const RunnerGameApp());
+}
+
+class RunnerGameApp extends StatefulWidget {
+  const RunnerGameApp({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in a Flutter IDE). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  State<RunnerGameApp> createState() => _RunnerGameAppState();
+}
+
+class _RunnerGameAppState extends State<RunnerGameApp> {
+  final MethodChannelBridge _bridge = MethodChannelBridge();
+  StreamSubscription<GameCommand>? _commandSubscription;
+
+  String? _seed;
+  String? _team;
+  String? _eventId;
+  bool _isPlaying = false;
+  bool _isPaused = false;
+  int _score = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeBridge();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  /// Initialize the bridge and listen for commands
+  Future<void> _initializeBridge() async {
+    try {
+      // Initialize the bridge
+      await _bridge.initialize();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+      // Listen for commands from React Native
+      _commandSubscription = _bridge.commandStream.listen(_handleCommand);
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+      // Send READY event to indicate initialization complete
+      _bridge.sendEvent(const ReadyEvent(gameCoreVersion: kGameCoreVersion));
 
-  final String title;
+      debugPrint('[RunnerGame] Bridge initialized, READY event sent');
+    } catch (e) {
+      debugPrint('[RunnerGame] Failed to initialize bridge: $e');
+      _bridge.sendEvent(ErrorEvent(
+        message: 'Failed to initialize bridge: $e',
+        code: 'INIT_ERROR',
+      ));
+    }
+  }
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+  /// Handle incoming commands from React Native
+  void _handleCommand(GameCommand command) {
+    debugPrint('[RunnerGame] Received command: ${command.type}');
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+    switch (command.type) {
+      case GameCommandType.start:
+        _handleStartCommand(command as StartCommand);
+        break;
+      case GameCommandType.pause:
+        _handlePauseCommand();
+        break;
+      case GameCommandType.resume:
+        _handleResumeCommand();
+        break;
+      case GameCommandType.quit:
+        _handleQuitCommand();
+        break;
+    }
+  }
 
-  void _incrementCounter() {
+  /// Handle START command - begin game with seed and team
+  void _handleStartCommand(StartCommand command) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _seed = command.seed;
+      _team = command.team;
+      _eventId = command.eventId;
+      _isPlaying = true;
+      _isPaused = false;
+      _score = 0;
+    });
+
+    debugPrint('[RunnerGame] Game started with seed=${command.seed}, team=${command.team}, eventId=${command.eventId}');
+    _bridge.sendEvent(const StateEvent(state: 'playing'));
+  }
+
+  /// Handle PAUSE command
+  void _handlePauseCommand() {
+    setState(() {
+      _isPaused = true;
+    });
+
+    debugPrint('[RunnerGame] Game paused');
+    _bridge.sendEvent(const StateEvent(state: 'paused'));
+  }
+
+  /// Handle RESUME command
+  void _handleResumeCommand() {
+    setState(() {
+      _isPaused = false;
+    });
+
+    debugPrint('[RunnerGame] Game resumed');
+    _bridge.sendEvent(const StateEvent(state: 'playing'));
+  }
+
+  /// Handle QUIT command
+  void _handleQuitCommand() {
+    setState(() {
+      _isPlaying = false;
+      _isPaused = false;
+    });
+
+    debugPrint('[RunnerGame] Game quit');
+    _bridge.sendEvent(const StateEvent(state: 'quit'));
+  }
+
+  /// Handle game over - send RESULT event
+  void _handleGameOver() {
+    if (!_isPlaying) return;
+
+    setState(() {
+      _isPlaying = false;
+    });
+
+    // Generate a simple client hash (in real implementation, this would be more sophisticated)
+    final clientHash = 'hash_${_seed}_$_score';
+
+    // Send RESULT event to React Native
+    _bridge.sendEvent(ResultEvent(
+      score: _score,
+      seed: _seed ?? '',
+      clientHash: clientHash,
+      gameCoreVersion: kGameCoreVersion,
+    ));
+
+    debugPrint('[RunnerGame] Game over, RESULT event sent: score=$_score, seed=$_seed');
+  }
+
+  /// Simulate scoring (placeholder for actual game logic)
+  void _incrementScore() {
+    if (!_isPlaying || _isPaused) return;
+
+    setState(() {
+      _score += 10;
     });
   }
 
   @override
+  void dispose() {
+    _commandSubscription?.cancel();
+    _bridge.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return MaterialApp(
+      title: 'Runner Game',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      home: Scaffold(
+        backgroundColor: _getTeamColor(),
+        body: SafeArea(
+          child: Center(
+            child: _buildGameContent(),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  /// Get team color based on team name
+  Color _getTeamColor() {
+    if (_team == null) return Colors.grey;
+
+    switch (_team!.toLowerCase()) {
+      case 'manifestor':
+        return Colors.red.shade300;
+      case 'generator':
+        return Colors.orange.shade300;
+      case 'manifesting generator':
+        return Colors.amber.shade300;
+      case 'projector':
+        return Colors.green.shade300;
+      case 'reflector':
+        return Colors.blue.shade300;
+      default:
+        return Colors.grey.shade300;
+    }
+  }
+
+  /// Build game content based on current state
+  Widget _buildGameContent() {
+    if (!_isPlaying && _seed == null) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.sports_esports, size: 64, color: Colors.white70),
+          SizedBox(height: 16),
+          Text(
+            'Waiting for START command...',
+            style: TextStyle(fontSize: 18, color: Colors.white70),
+          ),
+        ],
+      );
+    }
+
+    if (_isPaused) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.pause_circle, size: 64, color: Colors.white),
+          const SizedBox(height: 16),
+          const Text(
+            'PAUSED',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Score: $_score',
+            style: const TextStyle(fontSize: 24, color: Colors.white70),
+          ),
+        ],
+      );
+    }
+
+    if (!_isPlaying) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.flag, size: 64, color: Colors.white),
+          const SizedBox(height: 16),
+          const Text(
+            'GAME OVER',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Final Score: $_score',
+            style: const TextStyle(fontSize: 24, color: Colors.white70),
+          ),
+        ],
+      );
+    }
+
+    // Active game state
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Team: $_team',
+          style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Seed: $_seed',
+          style: const TextStyle(fontSize: 16, color: Colors.white70),
+        ),
+        const SizedBox(height: 32),
+        Text(
+          'Score: $_score',
+          style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        const SizedBox(height: 48),
+        ElevatedButton(
+          onPressed: _incrementScore,
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+            textStyle: const TextStyle(fontSize: 24),
+          ),
+          child: const Text('TAP TO SCORE'),
+        ),
+        const SizedBox(height: 24),
+        ElevatedButton(
+          onPressed: _handleGameOver,
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('END GAME'),
+        ),
+      ],
     );
   }
 }

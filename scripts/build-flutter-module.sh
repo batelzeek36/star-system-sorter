@@ -7,7 +7,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-FLUTTER_MODULE_PATH="$PROJECT_ROOT/super_dash"
+FLUTTER_MODULE_PATH="$PROJECT_ROOT/runner_game"
 
 echo "🔨 Building Flutter module..."
 echo ""
@@ -17,7 +17,7 @@ cd "$FLUTTER_MODULE_PATH"
 # Verify this is a Flutter module
 PROJECT_TYPE=$(grep "project_type:" .metadata | awk '{print $2}')
 if [ "$PROJECT_TYPE" != "module" ]; then
-    echo "❌ Error: Super Dash is not configured as a Flutter module"
+    echo "❌ Error: runner_game is not configured as a Flutter module"
     exit 1
 fi
 

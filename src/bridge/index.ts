@@ -39,6 +39,6 @@ export {
   safeValidateGameEvent,
 } from './types';
 
-// Export GameBridge wrapper
-export { GameBridge } from './GameBridge';
+// Export GameBridge wrapper, constants, and error types
+export { GameBridge, GameBridgeError, S3_CMD_CHANNEL, S3_EVT_CHANNEL } from './GameBridge';
 export type { EventListener } from './GameBridge';

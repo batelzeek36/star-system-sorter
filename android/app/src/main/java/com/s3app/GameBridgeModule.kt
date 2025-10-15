@@ -79,7 +79,7 @@ class GameBridgeModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun open(promise: Promise) {
-    val activity = currentActivity
+    val activity = reactApplicationContext.currentActivity
     
     if (activity == null) {
       promise.reject("NO_ACTIVITY", "No current activity available")
@@ -96,7 +96,7 @@ class GameBridgeModule(reactContext: ReactApplicationContext) :
     try {
       val intent = FlutterActivity
         .withCachedEngine(ENGINE_ID)
-        .build(activity)
+        .build(reactApplicationContext)
       
       activity.startActivity(intent)
       promise.resolve(null)

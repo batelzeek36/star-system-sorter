@@ -20,6 +20,7 @@ class GameBridgePackage : ReactPackage {
     return listOf(GameBridgeModule(reactContext))
   }
 
+  @Deprecated("Deprecated in React Native 0.76+")
   override fun createViewManagers(
     reactContext: ReactApplicationContext
   ): List<ViewManager<*, *>> {

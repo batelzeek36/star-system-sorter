@@ -6,7 +6,7 @@
 
 // Mock React Native modules BEFORE importing GameBridge
 const mockAddListener = jest.fn();
-const mockRemoveAllListeners = jest.fn();
+const mockRemove = jest.fn();
 
 jest.mock('react-native', () => ({
   NativeModules: {
@@ -15,37 +15,54 @@ jest.mock('react-native', () => ({
       sendCommand: jest.fn(),
     },
   },
-  NativeEventEmitter: jest.fn().mockImplementation(() => ({
-    addListener: mockAddListener,
-    removeAllListeners: mockRemoveAllListeners,
-  })),
+  DeviceEventEmitter: {
+    addListener: jest.fn(),
+  },
   Platform: {
     OS: 'ios',
   },
 }));
 
-import { NativeModules, NativeEventEmitter } from 'react-native';
-import { GameBridge } from '../src/bridge/GameBridge';
+import { NativeModules, DeviceEventEmitter } from 'react-native';
+import { GameBridge, GameBridgeError, S3_CMD_CHANNEL, S3_EVT_CHANNEL } from '../src/bridge/GameBridge';
 import type { ReadyEvent, StateEvent, ResultEvent, ErrorEvent } from '../src/bridge/types';
 
 describe('GameBridge', () => {
   let eventListeners: Map<string, Function>;
 
   beforeEach(() => {
-    // Setup event emitter mock BEFORE clearing mocks
-    eventListeners = new Map();
-    mockAddListener.mockImplementation((eventName: string, callback: Function) => {
-      eventListeners.set(eventName, callback);
-      return { remove: jest.fn() };
-    });
-    
-    // Reset GameBridge state
+    // Reset GameBridge state FIRST
     GameBridge.removeAllListeners();
     GameBridge.cleanup();
+    
+    // Clear all mocks
+    jest.clearAllMocks();
+    
+    // Ensure native module is available with fresh mocks
+    (NativeModules as any).GameBridge = {
+      open: jest.fn().mockResolvedValue(undefined),
+      sendCommand: jest.fn().mockResolvedValue(undefined),
+    };
+    
+    // Setup DeviceEventEmitter mock
+    eventListeners = new Map();
+    (DeviceEventEmitter.addListener as jest.Mock).mockImplementation(
+      (eventName: string, callback: Function) => {
+        eventListeners.set(eventName, callback);
+        return { remove: mockRemove };
+      }
+    );
   });
 
   afterEach(() => {
     GameBridge.cleanup();
+  });
+
+  describe('constants', () => {
+    it('should export channel constants from §9.4.1', () => {
+      expect(S3_CMD_CHANNEL).toBe('s3/game/cmd');
+      expect(S3_EVT_CHANNEL).toBe('s3/game/events');
+    });
   });
 
   describe('isAvailable', () => {
@@ -55,13 +72,13 @@ describe('GameBridge', () => {
   });
 
   describe('open', () => {
-    it('should call native open method', async () => {
+    it('should call native open method and wait for ready event', async () => {
       const mockOpen = NativeModules.GameBridge.open as jest.Mock;
       mockOpen.mockResolvedValue(undefined);
 
       // Emit ready event after a short delay
       setTimeout(() => {
-        const listener = eventListeners.get('s3/game/events');
+        const listener = eventListeners.get(S3_EVT_CHANNEL);
         if (listener) {
           listener({
             type: 'ready',
@@ -77,20 +94,40 @@ describe('GameBridge', () => {
       expect(readyEvent.game_core_version).toBe('1.0.0');
     });
 
-    it('should timeout if ready event not received within 5000ms', async () => {
+    it('should throw GameBridgeError with READY_TIMEOUT if ready event not received', async () => {
       const mockOpen = NativeModules.GameBridge.open as jest.Mock;
       mockOpen.mockResolvedValue(undefined);
 
-      // Don't emit ready event
-      await expect(GameBridge.open()).rejects.toThrow('Flutter game ready timeout');
-    }, 6000);
+      // Don't emit ready event - should timeout after 5000ms
+      const openPromise = GameBridge.open();
+      
+      await expect(openPromise).rejects.toThrow(GameBridgeError);
+      await expect(openPromise).rejects.toMatchObject({
+        code: 'READY_TIMEOUT',
+        recoverable: true,
+      });
+    }, 7000);
+
+    it('should throw GameBridgeError with MODULE_NOT_AVAILABLE if native module missing', async () => {
+      // Temporarily remove native module
+      const originalModule = NativeModules.GameBridge;
+      (NativeModules as any).GameBridge = undefined;
+
+      const openPromise = GameBridge.open();
+      
+      await expect(openPromise).rejects.toThrow(GameBridgeError);
+      await expect(openPromise).rejects.toMatchObject({
+        code: 'MODULE_NOT_AVAILABLE',
+        recoverable: false,
+      });
+
+      // Restore native module
+      (NativeModules as any).GameBridge = originalModule;
+    });
   });
 
   describe('sendCommand', () => {
     it('should validate and send start command', async () => {
-      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
-      mockSendCommand.mockResolvedValue(undefined);
-
       await GameBridge.start({
         seed: '0123456789abcdef',
         team: 'solar',
@@ -98,6 +135,7 @@ describe('GameBridge', () => {
         musicEnabled: true,
       });
 
+      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
       expect(mockSendCommand).toHaveBeenCalledWith(
         JSON.stringify({
           type: 'start',
@@ -110,53 +148,70 @@ describe('GameBridge', () => {
     });
 
     it('should send pause command', async () => {
-      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
-      mockSendCommand.mockResolvedValue(undefined);
-
       await GameBridge.pause();
 
+      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
       expect(mockSendCommand).toHaveBeenCalledWith(
         JSON.stringify({ type: 'pause' })
       );
     });
 
     it('should send resume command', async () => {
-      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
-      mockSendCommand.mockResolvedValue(undefined);
-
       await GameBridge.resume();
 
+      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
       expect(mockSendCommand).toHaveBeenCalledWith(
         JSON.stringify({ type: 'resume' })
       );
     });
 
     it('should send quit command', async () => {
-      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
-      mockSendCommand.mockResolvedValue(undefined);
-
       await GameBridge.quit();
 
+      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
       expect(mockSendCommand).toHaveBeenCalledWith(
         JSON.stringify({ type: 'quit' })
       );
     });
 
     it('should send set-music command', async () => {
-      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
-      mockSendCommand.mockResolvedValue(undefined);
-
       await GameBridge.setMusic(false);
 
+      const mockSendCommand = NativeModules.GameBridge.sendCommand as jest.Mock;
       expect(mockSendCommand).toHaveBeenCalledWith(
         JSON.stringify({ type: 'set-music', enabled: false })
       );
     });
 
-    it('should throw error for invalid command', async () => {
+    it('should throw GameBridgeError for invalid command', async () => {
       await expect(
         GameBridge.sendCommand({ type: 'invalid' } as any)
-      ).rejects.toThrow();
+      ).rejects.toThrow(GameBridgeError);
+      await expect(
+        GameBridge.sendCommand({ type: 'invalid' } as any)
+      ).rejects.toMatchObject({
+        code: 'INVALID_COMMAND',
+      });
+    });
+
+    it('should handle errors gracefully when sending commands', async () => {
+      // Create a new mock that rejects
+      (NativeModules as any).GameBridge = {
+        open: jest.fn().mockResolvedValue(undefined),
+        sendCommand: jest.fn().mockRejectedValue(new Error('Native error')),
+      };
+
+      await expect(GameBridge.pause()).rejects.toThrow(GameBridgeError);
+      
+      // Try again to check the error details
+      try {
+        await GameBridge.pause();
+        fail('Should have thrown');
+      } catch (err) {
+        expect(err).toBeInstanceOf(GameBridgeError);
+        expect((err as GameBridgeError).code).toBe('SEND_FAILED');
+        expect((err as GameBridgeError).recoverable).toBe(true);
+      }
     });
   });
 
@@ -170,7 +225,7 @@ describe('GameBridge', () => {
         game_core_version: '1.0.0',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(readyEvent);
 
       expect(listener).toHaveBeenCalledWith(readyEvent);
@@ -186,7 +241,7 @@ describe('GameBridge', () => {
         progress: 0.5,
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(stateEvent);
 
       expect(listener).toHaveBeenCalledWith(stateEvent);
@@ -210,7 +265,7 @@ describe('GameBridge', () => {
         inputs: 'compressed-input-data',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(resultEvent);
 
       expect(listener).toHaveBeenCalledWith(resultEvent);
@@ -226,7 +281,7 @@ describe('GameBridge', () => {
         message: 'Something went wrong',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(errorEvent);
 
       expect(listener).toHaveBeenCalledWith(errorEvent);
@@ -241,7 +296,7 @@ describe('GameBridge', () => {
         game_core_version: '1.0.0',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(readyEvent);
 
       expect(listener).toHaveBeenCalledWith(readyEvent);
@@ -258,7 +313,7 @@ describe('GameBridge', () => {
         game_core_version: '1.0.0',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(readyEvent);
 
       expect(listener).not.toHaveBeenCalled();
@@ -274,7 +329,7 @@ describe('GameBridge', () => {
         game_core_version: '1.0.0',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(readyEvent);
 
       expect(listener).not.toHaveBeenCalled();
@@ -293,7 +348,7 @@ describe('GameBridge', () => {
         game_core_version: '1.0.0',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(readyEvent);
 
       expect(listener1).not.toHaveBeenCalled();
@@ -309,10 +364,54 @@ describe('GameBridge', () => {
         // missing game_core_version
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(invalidEvent);
 
       expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('should emit error event for invalid events', () => {
+      const errorListener = jest.fn();
+      GameBridge.on('error', errorListener);
+
+      const invalidEvent = {
+        type: 'ready',
+        // missing game_core_version
+      };
+
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
+      eventListener?.(invalidEvent);
+
+      expect(errorListener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'error',
+          code: 'INVALID_EVENT',
+        })
+      );
+    });
+
+    it('should handle errors in event listeners gracefully', () => {
+      const throwingListener = jest.fn(() => {
+        throw new Error('Listener error');
+      });
+      const normalListener = jest.fn();
+
+      GameBridge.on('ready', throwingListener);
+      GameBridge.on('ready', normalListener);
+
+      const readyEvent: ReadyEvent = {
+        type: 'ready',
+        game_core_version: '1.0.0',
+      };
+
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
+      
+      // Should not throw
+      expect(() => eventListener?.(readyEvent)).not.toThrow();
+      
+      // Both listeners should be called
+      expect(throwingListener).toHaveBeenCalled();
+      expect(normalListener).toHaveBeenCalled();
     });
   });
 
@@ -328,11 +427,25 @@ describe('GameBridge', () => {
         game_core_version: '1.0.0',
       };
 
-      const eventListener = eventListeners.get('s3/game/events');
+      const eventListener = eventListeners.get(S3_EVT_CHANNEL);
       eventListener?.(readyEvent);
 
       expect(listener).not.toHaveBeenCalled();
-      expect(mockRemoveAllListeners).toHaveBeenCalledWith('s3/game/events');
+      expect(mockRemove).toHaveBeenCalled();
     });
+
+    it('should clear ready promise timeout on cleanup', async () => {
+      const mockOpen = NativeModules.GameBridge.open as jest.Mock;
+      mockOpen.mockResolvedValue(undefined);
+
+      // Start open but don't emit ready
+      const openPromise = GameBridge.open();
+
+      // Cleanup should clear the timeout
+      GameBridge.cleanup();
+
+      // The promise should still reject but cleanup should have cleared timeout
+      await expect(openPromise).rejects.toThrow();
+    }, 6000);
   });
 });

@@ -1,11 +1,30 @@
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
 extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Flutter AAR repository (absolute path)
+        maven {
+            url new File(settingsDir.parentFile, 'runner_game/build/host/outputs/repo').toURI().toString()
+        }
+        // Flutter storage for engine artifacts
+        maven {
+            url 'https://storage.googleapis.com/download.flutter.io'
+        }
+    }
+}
+
 rootProject.name = 'S3App'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
-// Flutter module integration (DISABLED - old super_dash removed, will be replaced with runner_game)
+// Flutter module integration (DISABLED - using AAR instead)
+// Direct project inclusion causes "Project.afterEvaluate" error
+// Use prebuilt AAR method instead (see FLUTTER_AAR_INTEGRATION.md)
 // setBinding(new Binding([gradle: this]))
 // evaluate(new File(
 //   settingsDir.parentFile,

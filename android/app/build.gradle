@@ -117,8 +117,7 @@ dependencies {
         implementation jscFlavor
     }
 
-    // Flutter module integration (DISABLED - old super_dash removed, will be replaced with runner_game)
-    // Option A (Direct Include): implementation project(':flutter')
-    // Option B (AAR): implementation 'com.starsystemsorter.runner_game:flutter_debug:1.0'
-    //                 (requires: flutter build aar && publish to mavenLocal())
+    // Flutter module integration via Maven AAR
+    debugImplementation 'com.starsystemsorter.runner_game:flutter_debug:1.0'
+    releaseImplementation 'com.starsystemsorter.runner_game:flutter_release:1.0'
 }
