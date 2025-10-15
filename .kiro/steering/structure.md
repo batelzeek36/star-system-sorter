@@ -106,9 +106,6 @@ Screen components for navigation. Each screen is a top-level view.
 - `InputScreen.tsx` - Birth data input
 - `ResultScreen.tsx` - Star system classification results
 - `WhyScreen.tsx` - Explanation of results
-- `GameHubScreen.tsx` - Game lobby and team selection
-- `SuperDashScreen.tsx` - Flutter game integration
-- `LeaderboardScreen.tsx` - Competition rankings
 - `ProfileScreen.tsx` - User profile
 - `SettingsScreen.tsx` - App settings
 
@@ -135,18 +132,7 @@ React Navigation configuration and routing.
 - `guards.ts` - Navigation guards
 - `ErrorBoundary.tsx` - Error boundary for navigation
 
-### `src/bridge/`
 
-Bridge between React Native and Flutter game module.
-
-**Files:**
-
-- `GameBridge.ts` - Main bridge implementation
-- `types.ts` - Bridge type definitions
-- `generate-schemas.ts` - JSON schema generator
-- `GAMEBRIDGE_USAGE.md` - Usage documentation
-
-**Schemas:** JSON schemas in `schemas/` directory for type validation.
 
 ### `src/scorer/`
 
@@ -187,25 +173,7 @@ Utilities and helper functions (bottom layer).
 
 - `validation.ts` - Validation utilities
 
-## Flutter Module (`runner_game/`)
 
-```
-runner_game/
-├── lib/                 # Dart source code
-│   ├── game/           # Flame game implementation
-│   ├── bridge/         # MethodChannel/EventChannel bridge
-│   ├── audio/          # Audio system
-│   └── main.dart       # Entry point
-├── assets/             # Game assets (images, audio, maps)
-├── test/               # Flutter tests
-└── pubspec.yaml        # Flutter dependencies
-```
-
-**Module Configuration:**
-
-- Project type: `module` (not standalone app)
-- Android package: `com.starsystemsorter.runner_game`
-- iOS bundle ID: `com.starsystemsorter.runnerGame`
 
 ## Backend Server (`apps/server/`)
 

@@ -8,7 +8,6 @@ import {render, fireEvent, waitFor} from '@testing-library/react-native';
 import {OnboardingScreen} from '../src/screens/OnboardingScreen';
 import {InputScreen} from '../src/screens/InputScreen';
 import {ResultScreen} from '../src/screens/ResultScreen';
-import {GameHubScreen} from '../src/screens/GameHubScreen';
 
 // Mock navigation
 const createMockNavigation = () => ({
@@ -37,16 +36,6 @@ describe('Navigation Tests', () => {
 
       fireEvent.press(getByText('Get Started'));
       expect(navigation.navigate).toHaveBeenCalledWith('Input');
-    });
-
-    it('navigates to GameHub when Game Hub button is pressed', () => {
-      const navigation = createMockNavigation();
-      const {getByText} = render(
-        <OnboardingScreen navigation={navigation as any} route={{} as any} />,
-      );
-
-      fireEvent.press(getByText('Game Hub'));
-      expect(navigation.navigate).toHaveBeenCalledWith('GameHub');
     });
   });
 
@@ -180,29 +169,4 @@ describe('Navigation Tests', () => {
     });
   });
 
-  describe('GameHubScreen', () => {
-    it('navigates to TeamSelect with eventId', () => {
-      const navigation = createMockNavigation();
-      const {getByText} = render(
-        <GameHubScreen navigation={navigation as any} route={{} as any} />,
-      );
-
-      fireEvent.press(getByText('Start Game (Mock)'));
-      expect(navigation.navigate).toHaveBeenCalledWith('TeamSelect', {
-        eventId: 'event_001',
-      });
-    });
-
-    it('navigates to Leaderboard with eventId', () => {
-      const navigation = createMockNavigation();
-      const {getByText} = render(
-        <GameHubScreen navigation={navigation as any} route={{} as any} />,
-      );
-
-      fireEvent.press(getByText('View Leaderboard'));
-      expect(navigation.navigate).toHaveBeenCalledWith('Leaderboard', {
-        eventId: 'event_001',
-      });
-    });
-  });
 });

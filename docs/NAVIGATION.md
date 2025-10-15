@@ -16,13 +16,7 @@ App.tsx
             ├── Result
             ├── Why
             ├── Profile
-            ├── Settings
-            ├── GameHub
-            ├── TeamSelect
-            ├── Lobby
-            ├── SuperDash
-            ├── MatchResult
-            └── Leaderboard
+            └── Settings
 ```
 
 ## Navigation Guards
@@ -32,10 +26,6 @@ Guards automatically validate route parameters and prevent navigation with inval
 **Protected Routes:**
 - `Result`: Requires classification, percentage, allies
 - `Why`: Requires contributorsPerSystem, percentages
-- `TeamSelect`: Requires eventId
-- `Lobby`: Requires eventId, teamId, seed
-- `SuperDash`: Requires eventId, teamId, seed
-- `MatchResult`: Requires score, validated, suspect, metrics
 
 **Usage:**
 ```typescript
@@ -61,9 +51,8 @@ Supports URL schemes: `s3://` and `starsystemsorter://`
 - `s3://onboarding` → Onboarding screen
 - `s3://input` → Input screen
 - `s3://result` → Result screen
-- `s3://game` → GameHub screen
-- `s3://game/lobby` → Lobby screen
-- `s3://leaderboard` → Leaderboard screen
+- `s3://profile` → Profile screen
+- `s3://settings` → Settings screen
 
 ## Type Safety
 
@@ -97,8 +86,6 @@ function ResultScreen({navigation, route}: Props) {
 **Custom Options:**
 - `Onboarding`: No header
 - `Result`: No back button
-- `SuperDash`: No header, landscape orientation, fade animation
-- `MatchResult`: No back button
 
 ## Navigation Methods
 

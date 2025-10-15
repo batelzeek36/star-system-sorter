@@ -8,8 +8,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import type {RootStackParamList} from './types';
 import {useNavigationGuards} from './guards';
 
-// Import screens (will be created in task 7.x)
-// For now, we'll use placeholder screens
+// Import screens
 import {
   OnboardingScreen,
   InputScreen,
@@ -17,12 +16,6 @@ import {
   WhyScreen,
   ProfileScreen,
   SettingsScreen,
-  GameHubScreen,
-  TeamSelectScreen,
-  LobbyScreen,
-  SuperDashScreen,
-  MatchResultScreen,
-  LeaderboardScreen,
 } from '@/screens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -91,53 +84,6 @@ export function RootNavigator() {
         component={SettingsScreen}
         options={{
           title: 'Settings',
-        }}
-      />
-
-      {/* Game Flow */}
-      <Stack.Screen
-        name="GameHub"
-        component={GameHubScreen}
-        options={{
-          title: 'Game Hub',
-        }}
-      />
-      <Stack.Screen
-        name="TeamSelect"
-        component={TeamSelectScreen}
-        options={{
-          title: 'Choose Your Team',
-        }}
-      />
-      <Stack.Screen
-        name="Lobby"
-        component={LobbyScreen}
-        options={{
-          title: 'Game Lobby',
-        }}
-      />
-      <Stack.Screen
-        name="SuperDash"
-        component={SuperDashScreen}
-        options={{
-          headerShown: false,
-          orientation: 'landscape',
-          animation: 'fade',
-        }}
-      />
-      <Stack.Screen
-        name="MatchResult"
-        component={MatchResultScreen}
-        options={{
-          title: 'Match Result',
-          headerBackVisible: false,
-        }}
-      />
-      <Stack.Screen
-        name="Leaderboard"
-        component={LeaderboardScreen}
-        options={{
-          title: 'Leaderboard',
         }}
       />
     </Stack.Navigator>

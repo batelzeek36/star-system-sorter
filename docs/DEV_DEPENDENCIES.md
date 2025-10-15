@@ -116,11 +116,7 @@ npm run typecheck
 
 MSW v2 is configured with @mswjs/interceptors for React Native compatibility. Mock handlers are defined in `jest.setup.js` and include:
 
-- `POST /api/runs/submit` - Game run submission
-- `GET /api/leaderboard/daily` - Daily leaderboard
-- `GET /api/events/active` - Active events
-- `GET /api/music/packs` - Music packs
-- `POST /api/music/prefs` - Music preferences
+- `POST /internal/hd` - BodyGraph API proxy with caching
 
 ### Usage in Tests
 

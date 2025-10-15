@@ -15,10 +15,6 @@ export function OnboardingScreen({navigation}: Props) {
     navigation.navigate('Input');
   };
 
-  const handleGoToGameHub = () => {
-    navigation.navigate('GameHub');
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Star System Sorter</Text>
@@ -32,16 +28,6 @@ export function OnboardingScreen({navigation}: Props) {
           accessibilityLabel="Get Started"
           accessibilityRole="button">
           <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.secondaryButton]}
-          onPress={handleGoToGameHub}
-          accessibilityLabel="Go to Game Hub"
-          accessibilityRole="button">
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-            Game Hub
-          </Text>
         </TouchableOpacity>
       </View>
     </View>

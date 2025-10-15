@@ -2,7 +2,6 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import Flutter
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -10,17 +9,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
-  
-  // FlutterEngine cache for runner_game
-  lazy var flutterEngine = FlutterEngine(name: "s3_engine")
 
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    // Initialize and cache FlutterEngine
-    initializeFlutterEngine()
-    
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -37,13 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
 
     return true
-  }
-  
-  private func initializeFlutterEngine() {
-    // Start executing Dart code to pre-warm the FlutterEngine
-    flutterEngine.run()
-    
-    // Note: GeneratedPluginRegistrant not needed for module without plugins
   }
 }
 

@@ -27,17 +27,6 @@ export type RootStackParamList = {
   };
   Profile: undefined;
   Settings: undefined;
-  GameHub: undefined;
-  TeamSelect: {eventId: string};
-  Lobby: {eventId: string; teamId: string; seed: string};
-  SuperDash: {eventId: string; teamId: string; seed: string};
-  MatchResult: {
-    score: number;
-    validated: boolean;
-    suspect: boolean;
-    metrics: Record<string, number>;
-  };
-  Leaderboard: {eventId?: string};
 };
 
 /**

@@ -7,14 +7,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // Flutter AAR repository (absolute path)
-        maven {
-            url new File(settingsDir.parentFile, 'runner_game/build/host/outputs/repo').toURI().toString()
-        }
-        // Flutter storage for engine artifacts
-        maven {
-            url 'https://storage.googleapis.com/download.flutter.io'
-        }
     }
 }
 

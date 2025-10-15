@@ -10,13 +10,7 @@
 - **UI Components**: shadcn/ui adapted for React Native
 - **SVG**: react-native-svg
 
-## Game Module
 
-- **Framework**: Flutter 3.16.0+ (as embedded module)
-- **Game Engine**: Flame
-- **Module Type**: Flutter module (not standalone app)
-- **Android Package**: `com.starsystemsorter.runner_game`
-- **iOS Bundle ID**: `com.starsystemsorter.runnerGame`
 
 ## Backend
 

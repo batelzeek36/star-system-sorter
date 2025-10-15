@@ -12,34 +12,22 @@
 │  Onboarding  │ (Initial Screen)
 └──────┬───────┘
        │
-       ├─────────────────┐
-       │                 │
-       ▼                 ▼
-   ┌───────┐      ┌──────────┐
-   │ Input │      │ GameHub  │
-   └───┬───┘      └────┬─────┘
-       │               │
-       │               ├──────────────┐
-       │               │              │
-       ▼               ▼              ▼
-   ┌────────┐    ┌────────────┐  ┌─────────────┐
-   │ Result │    │ TeamSelect │  │ Leaderboard │
-   └───┬────┘    └─────┬──────┘  └──────▲──────┘
-       │               │                 │
-       ├───────┐       ▼                 │
-       │       │   ┌───────┐             │
-       ▼       │   │ Lobby │             │
-   ┌──────┐   │   └───┬───┘             │
-   │ Why  │   │       │                 │
-   └──────┘   │       ▼                 │
-              │   ┌───────────┐         │
-              │   │ SuperDash │         │
-              │   └─────┬─────┘         │
-              │         │               │
-              │         ▼               │
-              │   ┌─────────────┐      │
-              │   │ MatchResult │──────┘
-              │   └─────────────┘
+       ▼
+   ┌───────┐
+   │ Input │
+   └───┬───┘
+       │
+       ▼
+   ┌────────┐
+   │ Result │
+   └───┬────┘
+       │
+       ├───────┐
+       │       │
+       ▼       │
+   ┌──────┐   │
+   │ Why  │   │
+   └──────┘   │
               │
               ▼
           ┌─────────┐
@@ -71,28 +59,7 @@
 - Input → Result: `{classification, primary, hybrid, percentage, allies}`
 - Result → Why: `{contributorsPerSystem, percentages}`
 
-### 2. Game Flow (Competitive Journey)
-
-**Path**: Onboarding → GameHub → TeamSelect → Lobby → SuperDash → MatchResult → Leaderboard
-
-**Purpose**: User plays Super Dash game and competes on team leaderboards
-
-**Steps**:
-1. **GameHub**: View available events and start game
-2. **TeamSelect**: Choose star system team
-3. **Lobby**: Pre-game setup and information
-4. **SuperDash**: Play the game (Flutter module)
-5. **MatchResult**: View game results and validation
-6. **Leaderboard**: See team rankings
-
-**Parameters Passed**:
-- GameHub → TeamSelect: `{eventId}`
-- TeamSelect → Lobby: `{eventId, teamId, seed}`
-- Lobby → SuperDash: `{eventId, teamId, seed}`
-- SuperDash → MatchResult: `{score, validated, suspect, metrics}`
-- MatchResult → Leaderboard: `{eventId?}`
-
-### 3. Settings Flow
+### 2. Settings Flow
 
 **Path**: Profile → Settings
 
@@ -130,22 +97,17 @@
 
 **Hidden Headers**:
 - Onboarding (full-screen welcome)
-- SuperDash (game immersion)
 
 **Custom Headers**:
 - Result (no back button - prevents returning to Input)
-- MatchResult (no back button - prevents returning to game)
 
 **Standard Headers**:
 - All other screens use default header with back button
 
 ### Orientation Locking
 
-**Landscape Only**:
-- SuperDash (game requirement)
-
 **Portrait/Landscape**:
-- All other screens (responsive)
+- All screens (responsive)
 
 ## Deep Linking
 
@@ -157,8 +119,8 @@ s3://screen/params
 ### Supported URLs
 - `s3://input` - Go to Input screen
 - `s3://result?classification=primary&system=Pleiades` - Show result
-- `s3://game?eventId=event_001` - Start game
-- `s3://leaderboard?eventId=event_001` - View leaderboard
+- `s3://profile` - View profile
+- `s3://settings` - Open settings
 
 ### Configuration
 Deep linking is configured in `src/navigation/linking.ts`
@@ -179,11 +141,10 @@ Deep linking is configured in `src/navigation/linking.ts`
 
 **Android Hardware Back**:
 - Standard screens: Navigate back
-- SuperDash: Show pause modal (first press), quit (second press)
 - Root screen: Exit app confirmation
 
 **iOS Swipe Back**:
-- Enabled on all screens except Result and MatchResult
+- Enabled on all screens except Result
 - Smooth gesture animation
 
 ## Accessibility
