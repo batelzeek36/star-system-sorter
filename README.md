@@ -1,6 +1,6 @@
 # Star System Sorter (S³)
 
-A hybrid mobile application combining React Native for UI with an embedded Flutter/Flame game (Super Dash). The app features a deterministic star system classification system based on Human Design principles, team-based gaming with async competition, comprehensive moderation, and server-side validation.
+A React Native mobile application featuring a deterministic star system classification system based on Human Design principles. The app provides birth data input, HD chart generation via BodyGraph API, and comprehensive content moderation with server-side validation.
 
 ## Project Structure
 
@@ -13,13 +13,15 @@ A hybrid mobile application combining React Native for UI with an embedded Flutt
 │   ├── components/      # Reusable UI components
 │   ├── scorer/          # Scoring library
 │   ├── moderation/      # Moderation system
-│   ├── bridge/          # Native game bridge
 │   ├── hd/              # Human Design integration
+│   ├── navigation/      # Navigation configuration
+│   ├── state/           # Zustand state management
 │   └── lib/             # Utilities and helpers
-├── components/          # Existing shadcn/ui components (to be adapted)
-├── super_dash/         # Flutter/Flame game module
-├── __tests__/          # Test files
-└── package.json        # Dependencies and scripts
+├── apps/                # Backend services
+│   └── server/          # Node.js API server
+├── components/          # shadcn/ui components (to be adapted)
+├── __tests__/           # Test files
+└── package.json         # Dependencies and scripts
 ```
 
 ## Prerequisites
@@ -30,7 +32,6 @@ A hybrid mobile application combining React Native for UI with an embedded Flutt
 - **Android Studio**: For Android development
 - **Xcode**: For iOS development (macOS only)
 - **CocoaPods**: For iOS dependencies (macOS only)
-- **Flutter SDK**: >= 3.16.0 (for Super Dash game module integration)
 
 ## Getting Started
 
@@ -42,38 +43,16 @@ npm install
 yarn install
 ```
 
-### 2. Flutter Module Setup
+This will also automatically install iOS CocoaPods dependencies via the postinstall script.
 
-Set up the Super Dash Flutter module integration:
+### 2. Environment Setup
 
-```bash
-./scripts/setup-flutter-module.sh
-```
-
-This script will:
-- Install Flutter dependencies
-- Build the Flutter module for Android (AAR)
-- Build the Flutter module for iOS (Framework)
-- Install iOS CocoaPods dependencies
-
-**Manual Setup (if script fails):**
+Create a `.env` file in the project root:
 
 ```bash
-# Navigate to Flutter module
-cd super_dash
-flutter pub get
-flutter build aar --release
-flutter build ios-framework --release
-cd ..
-
-# Install iOS pods
-cd ios
-bundle install
-bundle exec pod install
-cd ..
+BODYGRAPH_API_KEY=your-api-key-here
+PORT=3000
 ```
-
-See [docs/FLUTTER_MODULE_INTEGRATION.md](docs/FLUTTER_MODULE_INTEGRATION.md) for detailed integration documentation.
 
 ### 3. Start Metro Bundler
 
@@ -85,7 +64,17 @@ npm start
 yarn start
 ```
 
-### 4. Run on Android
+### 4. Start Backend Server (Optional)
+
+In a new terminal window:
+
+```bash
+npm run dev --prefix ./apps/server
+```
+
+The server will run on `http://localhost:3000` (or the PORT specified in `.env`).
+
+### 5. Run on Android
 
 In a new terminal window:
 
@@ -100,7 +89,7 @@ yarn android
 - Android SDK configured
 - Android emulator running or physical device connected via USB with USB debugging enabled
 
-### 5. Run on iOS (macOS only)
+### 6. Run on iOS (macOS only)
 
 In a new terminal window:
 
@@ -224,33 +213,13 @@ ios/
 - **Info.plist**: App permissions, bundle ID, and metadata
 - **Podfile**: CocoaPods dependencies for native modules
 
-## Flutter Module Integration
+## Core Features
 
-The Super Dash game has been converted to a Flutter module and is ready for integration.
-
-**Module Location:** `super_dash/`
-
-**Module Configuration:**
-- **Android Package:** `com.starsystemsorter.super_dash`
-- **iOS Bundle ID:** `com.starsystemsorter.superDash`
-- **Project Type:** Flutter module (not standalone app)
-
-**Integration Status:**
-- ✅ Converted to Flutter module structure
-- ✅ Module configuration in `pubspec.yaml`
-- ✅ Dependencies resolved
-- ⏳ Android integration (pending)
-- ⏳ iOS integration (pending)
-- ⏳ FlutterEngine caching setup (pending)
-- ⏳ MethodChannel/EventChannel bridge (pending)
-
-**Next Steps:**
-1. Configure Android to include Flutter module in `build.gradle`
-2. Configure iOS to include Flutter module in `Podfile`
-3. Set up FlutterEngine caching for performance
-4. Implement MethodChannel/EventChannel bridge for communication
-
-See `super_dash/README.md` for detailed module documentation and integration instructions.
+- **Star System Classification**: Deterministic scoring based on Human Design birth data
+- **Birth Data Input**: Comprehensive form with date, time, location, and timezone
+- **HD Chart Generation**: Integration with BodyGraph Chart API
+- **Content Moderation**: Comprehensive moderation across all user inputs
+- **Server-Side Validation**: Node.js backend with API proxy and 30-day caching
 
 ## Testing
 
@@ -310,12 +279,14 @@ cd ..
 
 ### Technology Stack
 
-- **Frontend**: React Native 0.82+ with TypeScript
+- **Frontend**: React Native 0.82+ with TypeScript 5.9+
+- **React**: 19.1.1
 - **Navigation**: React Navigation (native stack)
 - **State Management**: zustand (minimal, 2-3 atoms)
-- **Forms**: react-hook-form + Zod validation
-- **Game Module**: Flutter/Flame (Super Dash)
-- **Backend**: Node.js server (see `apps/server/`)
+- **Forms**: react-hook-form + Zod validation (v4)
+- **UI Components**: shadcn/ui adapted for React Native
+- **SVG**: react-native-svg
+- **Backend**: Node.js 20+ with Express (see `apps/server/`)
 
 ### Server (Node.js)
 
@@ -361,10 +332,10 @@ See `apps/server/README.md` for detailed documentation.
 
 ### Design Principles
 
-- **Modularity**: Small, focused files (60-120 LOC preferred, ≤150 LOC max)
-- **Determinism**: PCG32 RNG, fixed timestep for reproducible gameplay
+- **Modularity**: Small, focused files (target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC)
+- **Determinism**: PCG32 RNG for reproducible scoring
 - **Safety-first**: Comprehensive moderation across all user content
-- **Native-first**: React Native UI with Flutter native modules
+- **Type Safety**: TypeScript strict mode enabled throughout
 
 ### Code Quality & Dependency Rules
 
@@ -396,15 +367,17 @@ src/scorer/
 └── index.ts          # Public API (import from here only)
 ```
 
-## Next Steps
+## Development Status
 
-1. Install core dependencies (zod, react-hook-form, zustand, etc.)
-2. Set up React Navigation
-3. Adapt existing shadcn/ui components for React Native
-4. Integrate hdkit for Human Design calculations
-5. Implement scorer library
-6. Set up Flutter module integration
-7. Implement native bridge (MethodChannel/EventChannel)
+This is an MVP-focused implementation prioritizing:
+- ✅ Core React Native setup with TypeScript
+- ✅ Navigation structure
+- ✅ Dependency management and build tooling
+- ⏳ Human Design API integration
+- ⏳ Scorer library implementation
+- ⏳ UI components and screens
+- ⏳ Content moderation system
+- ⏳ Testing infrastructure
 
 ## Troubleshooting
 
@@ -469,7 +442,8 @@ For more troubleshooting, see:
 
 - [React Native Documentation](https://reactnative.dev/docs/getting-started)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Flutter Documentation](https://flutter.dev/docs)
+- [React Navigation](https://reactnavigation.org/docs/getting-started)
+- [Zod Validation](https://zod.dev/)
 - [Metro Bundler](https://facebook.github.io/metro/)
 
 ## License
