@@ -18,13 +18,11 @@ star-system-sorter/
 ├── ios/                  # iOS native project
 ├── src/                  # React Native source code
 ├── components/           # shadcn/ui components (to be adapted)
-├── runner_game/         # Flutter/Flame game module
 ├── apps/                # Backend services
 │   └── server/          # Node.js API server
 ├── __tests__/           # Test files
 ├── scripts/             # Build and setup scripts
-├── docs/                # Documentation
-└── schemas/             # JSON schemas for bridge types
+└── docs/                # Documentation
 ```
 
 ## Source Code Structure (`src/`)
@@ -34,7 +32,6 @@ src/
 ├── screens/             # Screen components (top layer)
 ├── components/          # Reusable UI components
 ├── navigation/          # Navigation configuration
-├── bridge/              # Native game bridge (MethodChannel/EventChannel)
 ├── scorer/              # Scoring library (deterministic)
 ├── hd/                  # Human Design API integration
 ├── moderation/          # Content moderation system
@@ -199,8 +196,6 @@ Test files mirror the source structure:
 
 Build and setup automation:
 
-- `setup-flutter-module.sh` - Initial Flutter setup
-- `build-flutter-module.sh` - Build Flutter module
 - `rebuild-native.sh` - Rebuild native projects
 - `reload-app.sh` - Reload app with cache clearing
 - `verify-*.sh` - Verification scripts
@@ -209,11 +204,11 @@ Build and setup automation:
 
 Technical documentation:
 
-- `FLUTTER_MODULE_INTEGRATION.md` - Flutter integration guide
 - `DEPENDENCY_RULES.md` - Dependency graph rules
 - `BODYGRAPH_API.md` - BodyGraph API documentation
 - `NAVIGATION.md` - Navigation patterns
 - `DEBUGGING_GUIDE.md` - Debugging tips
+- `DEV_DEPENDENCIES.md` - Development dependencies guide
 
 ## Configuration Files
 
@@ -232,7 +227,6 @@ Technical documentation:
 
 - `android/build.gradle` - Android build configuration
 - `ios/Podfile` - iOS dependencies
-- `runner_game/pubspec.yaml` - Flutter dependencies
 
 ## Path Aliases & Metro Configuration
 

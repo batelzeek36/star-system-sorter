@@ -94,22 +94,10 @@ npm run rebuild:android      # Rebuild Android native project
 npm run rebuild:all          # Rebuild both platforms
 ```
 
-### Flutter Module
-```bash
-./scripts/setup-flutter-module.sh        # Initial Flutter module setup
-./scripts/build-flutter-module.sh        # Build Flutter module
-./scripts/test-flutter-integration.sh    # Test Flutter integration
-```
-
 ### Server
 ```bash
 npm run dev --prefix ./apps/server       # Start dev server (auto-reload)
 npm test --prefix ./apps/server          # Run server tests
-```
-
-### Schema Generation
-```bash
-npm run generate:schemas     # Generate JSON schemas from TypeScript types
 ```
 
 ## Environment Variables
@@ -151,21 +139,21 @@ PORT=3000
 ## Performance Targets
 
 - Cold launch: ≤2.5s (Android), ≤1.8s (iOS)
-- Game FPS: ≥55 target, never <45 for >1s
 - Memory: ≤350MB peak on mid-tier devices
-- Flutter module size: ≤25MB added to APK/IPA
+- Bundle size: Keep minimal, monitor APK/IPA size
 
 ## Engineering Guardrails
 
 **Do:**
-- React Native UI + Flutter native module only (MethodChannel/EventChannel)
-- Determinism: PCG32 RNG, fixed timestep (16.6667ms), avoid wall-clock in logic
+- React Native UI only (no web client)
+- Determinism: PCG32 RNG for scoring, avoid wall-clock in logic
 - Keep deps within the documented budget; favor small, focused files
+- TypeScript strict mode throughout
 
 **Don't:**
 - No web client, no iframe, no Vite/react-router-dom/Tailwind
 - No adding deps with telemetry/analytics or native perms without review
-- No `Date.now()`/randomness in scoring/physics paths
+- No `Date.now()`/randomness in scoring paths
 
 ## Dependency Budget (Allowed)
 
@@ -184,12 +172,12 @@ PORT=3000
 - File size limits respected (target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC)
 - Function size limits respected (≤40 LOC, cyclomatic ≤10)
 - App boots Android **and** iOS (Onboarding→Input→Result smoke)
-- Update docs when schemas/bridge/contracts change
+- Update docs when schemas/API contracts change
 
 ## Escalation Triggers
 
 - New dependency, native permission, or RNG/time usage in logic
-- Schema/bridge contract changes or breaking API changes
+- Schema/API contract changes or breaking changes
 - Any file >500 LOC (hard limit—must be refactored into modular files)
 
 ## Troubleshooting
