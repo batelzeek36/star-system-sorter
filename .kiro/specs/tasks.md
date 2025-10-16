@@ -108,7 +108,7 @@ This replaces the previous plan. Scope is **classification only**: collect birth
     - `cd android && ./gradlew clean && cd ..`
     - `cd ios && bundle exec pod deintegrate && bundle exec pod install && cd ..`
 
-- [ ] **0.9 Sanity builds**
+- [x] **0.9 Sanity builds**
   - `npm run android` (expect the app to launch without any game/bridge references)
   - `npm run ios` (optional on macOS)
 
@@ -119,9 +119,9 @@ This replaces the previous plan. Scope is **classification only**: collect birth
 - [x] **1.1 RN foundation & deps** (already done)
 - [x] **1.2 BodyGraph client & cache** (already done)
 - [x] **1.3 Scorer library & tests** (already done)
-- [ ] **1.4 Moderation (trimmed)** _(optional but recommended for store readiness)_
-  - [ ] Create `src/moderation/types.ts`, `blocklists.ts`, `sanitizer.ts`, `service.ts`, `index.ts`
-  - [ ] Unit tests for blocklists, sanitization, decisions, rate-limits
+- [x] **1.4 Moderation (trimmed)** _(optional but recommended for store readiness)_
+  - [x] Create `src/moderation/types.ts`, `blocklists.ts`, `sanitizer.ts`, `service.ts`, `index.ts`
+  - [x] Unit tests for blocklists, sanitization, decisions, rate-limits
 
 ---
 

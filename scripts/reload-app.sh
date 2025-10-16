@@ -7,7 +7,7 @@
 #   ./scripts/reload-app.sh android
 #   ./scripts/reload-app.sh both
 #   ./scripts/reload-app.sh both --clean
-#   npm start --prefix ./star-system-sorter/apps/server   -- for API
+#   npm start --prefix ./apps/server   -- for API
 
 set -e
 
@@ -111,8 +111,11 @@ main() {
     print_warning "iOS/Android will open in SEPARATE terminals"
     echo ""
     
-    # Kill Metro
-    kill_metro
+    # Kill Metro first
+    print_step "Killing any existing Metro processes..."
+    lsof -ti:8081 | xargs kill -9 2>/dev/null || true
+    sleep 1
+    print_success "Metro processes killed"
     
     # Clean builds if requested
     if [ "$CLEAN_BUILD" = "--clean" ]; then

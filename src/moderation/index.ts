@@ -3,6 +3,15 @@
  * Public API for content moderation
  */
 
-// Export moderation service here as it is created
-// Example: export { ModerationService } from './service';
-// Example: export type { ModResult, ModContext } from './types';
+export { ModerationService, moderationService } from './service';
+export { findBlockedTerms, getAllBlocklistEntries, getBlocklistByCategory } from './blocklists';
+export { sanitizeBasic, sanitizeWithMasking } from './sanitizer';
+export type {
+  ModerationResult,
+  ModerationDecision,
+  ModerationContext,
+  RateLimitConfig,
+  RateLimitState,
+  BlocklistCategory,
+  BlocklistEntry,
+} from './types';
