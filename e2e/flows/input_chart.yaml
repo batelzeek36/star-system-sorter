@@ -1,0 +1,46 @@
+appId: com.s3app
+---
+# Birth data input and chart generation flow
+
+- launchApp
+- tapOn:
+    id: "btn-get-started"
+- assertVisible:
+    id: "screen-input"
+
+# Input name
+- tapOn:
+    id: "input-name"
+- inputText: "Test User"
+
+# Input birth date
+- tapOn:
+    id: "input-birthdate"
+- inputText: "1992-10-03"
+
+# Input birth time
+- tapOn:
+    id: "input-birthtime"
+- inputText: "00:03"
+
+# Input location
+- tapOn:
+    id: "input-location"
+- inputText: "Attleboro, MA"
+
+# Submit form
+- tapOn:
+    id: "btn-compute-chart"
+
+# Wait for result screen
+- assertVisible:
+    id: "screen-result"
+    timeout: 10000
+
+# Verify HD type is displayed
+- assertVisible:
+    id: "label-hd-type"
+
+# Verify star system is displayed
+- assertVisible:
+    id: "label-star-system"

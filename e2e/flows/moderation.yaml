@@ -1,0 +1,36 @@
+appId: com.s3app
+---
+# Test moderation system blocks inappropriate content
+
+- launchApp
+- tapOn:
+    id: "btn-get-started"
+- assertVisible:
+    id: "screen-input"
+
+# Try to input blocked content in name field
+- tapOn:
+    id: "input-name"
+- inputText: "Test <script>alert('xss')</script>"
+
+# Try to submit
+- tapOn:
+    id: "btn-compute-chart"
+
+# Should show validation error
+- assertVisible:
+    text: "Invalid input detected"
+
+# Clear and try profanity
+- tapOn:
+    id: "input-name"
+- clearText
+- inputText: "fuck this"
+
+# Try to submit
+- tapOn:
+    id: "btn-compute-chart"
+
+# Should show moderation error
+- assertVisible:
+    text: "inappropriate content"

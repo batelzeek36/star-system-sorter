@@ -1,0 +1,29 @@
+{
+  "description": "Test case for known birth data - Manifesting Generator",
+  "input": {
+    "name": "Test User",
+    "birthDate": "1992-10-03",
+    "birthTime": "00:03",
+    "location": "Attleboro, MA",
+    "timezone": "America/New_York"
+  },
+  "expected": {
+    "hdType": "Manifesting Generator",
+    "profile": "TODO: Add actual profile from HD chart",
+    "authority": "TODO: Add actual authority from HD chart",
+    "channels": [
+      "TODO: Add actual channels from HD chart"
+    ],
+    "gates": [
+      "TODO: Add actual gates from HD chart"
+    ],
+    "starSystem": {
+      "primary": "TODO: Add mapped star system",
+      "secondary": "TODO: Add secondary if applicable"
+    },
+    "reasoning": [
+      "TODO: Add reasoning keys from scorer"
+    ]
+  },
+  "notes": "This is a placeholder. Run the app manually with this birth data and capture the actual HD chart results to fill in the expected values."
+}

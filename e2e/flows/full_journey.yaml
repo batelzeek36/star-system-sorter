@@ -1,0 +1,60 @@
+appId: com.s3app
+---
+# Complete user journey: onboarding → input → result → why screen
+
+- launchApp
+- assertVisible:
+    id: "screen-onboarding"
+
+# Complete onboarding
+- tapOn:
+    id: "btn-get-started"
+- assertVisible:
+    id: "screen-input"
+
+# Fill in birth data (known test case)
+- tapOn:
+    id: "input-name"
+- inputText: "Test User"
+- tapOn:
+    id: "input-birthdate"
+- inputText: "1992-10-03"
+- tapOn:
+    id: "input-birthtime"
+- inputText: "00:03"
+- tapOn:
+    id: "input-location"
+- inputText: "Attleboro, MA"
+
+# Compute chart
+- tapOn:
+    id: "btn-compute-chart"
+- assertVisible:
+    id: "screen-result"
+    timeout: 10000
+
+# Verify result elements
+- assertVisible:
+    id: "label-hd-type"
+- assertVisible:
+    id: "label-star-system"
+- assertVisible:
+    id: "radial-chart"
+
+# Navigate to Why screen
+- tapOn:
+    id: "btn-why"
+- assertVisible:
+    id: "screen-why"
+- assertVisible:
+    text: "Why This Star System?"
+
+# Verify explanation content
+- assertVisible:
+    id: "explanation-text"
+
+# Go back to result
+- tapOn:
+    id: "btn-back"
+- assertVisible:
+    id: "screen-result"

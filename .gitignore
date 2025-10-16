@@ -56,6 +56,10 @@ yarn-error.log
 /coverage
 .nyc_output
 
+# E2E Testing
+.artifacts/
+.maestro/
+
 # Metro bundler logs
 metro.log
 logs/

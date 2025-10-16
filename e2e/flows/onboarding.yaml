@@ -1,0 +1,15 @@
+appId: com.s3app
+---
+# Basic onboarding flow - verify app launches and navigation works
+
+- launchApp
+- assertVisible:
+    id: "screen-onboarding"
+- assertVisible:
+    text: "Star System Sorter"
+- assertVisible:
+    id: "btn-get-started"
+- tapOn:
+    id: "btn-get-started"
+- assertVisible:
+    id: "screen-input"
