@@ -1,0 +1,1299 @@
+# Design Document
+
+## Overview
+
+Star System Sorter (S³) is a React Native mobile application that provides a deterministic star system classification system based on Human Design principles. The app features an ethereal, mystical design with a dark canvas, lavender primary colors, and gold highlights.
+
+**Key Design Principles:**
+- **Ethereal Flow**: Soft gradients, rounded shapes, gentle animations, starfield backgrounds
+- **Mobile-First**: React Native for iOS and Android with touch-optimized UI (≥44px targets)
+- **Modularity**: Small, focused files (target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC)
+- **Determinism**: Reproducible scoring based on Human Design birth data
+- **Accessibility**: WCAG 2.1 AA compliance with proper contrast ratios and focus states
+- **Privacy-First**: No PII collection, local-first data storage
+
+## Architecture
+
+### High-Level Architecture
+
+```mermaid
+graph TB
+    subgraph "Mobile App (React Native)"
+        UI[Screens<br/>9 core flows]
+        Components[S³ Components<br/>Button, Card, Chip, etc.]
+        Scorer[Scorer Library<br/>TypeScript]
+        Mod[Moderation<br/>Client-side filters]
+        State[Zustand State<br/>Minimal atoms]
+    end
+    
+    subgraph "Server (Node.js)"
+        API[HTTP API<br/>Express-based]
+        HDProxy[BodyGraph API Proxy<br/>30-day cache]
+        Store[In-Memory Store<br/>No database]
+    end
+    
+    UI --> Components
+    UI --> Scorer
+    UI --> Mod
+    UI --> State
+    UI --> API
+    API --> HDProxy
+    API --> Store
+```
+
+### Technology Stack
+
+**Frontend (React Native):**
+- React Native 0.82+ with TypeScript 5.9+
+- React 19.1.1
+- React Navigation (native stack)
+- Zod v4 for validation (single source of truth)
+- react-hook-form + @hookform/resolvers for forms
+- zustand (minimal: 2-3 global state atoms)
+- react-native-svg for vector graphics
+- pako for compression
+- Design tokens from Figma exported to JSON
+
+**Backend (Node.js):**
+- Node.js 20+ with TypeScript
+- Express-based server
+- BodyGraph Chart API proxy with 30-day caching
+- In-memory storage (no database for MVP)
+- Zod for validation
+
+**Development Tools:**
+- Jest 29+ for unit/integration testing
+- @testing-library/react-native for component tests
+- Detox 20+ for E2E tests
+- MSW (Mock Service Worker) for API mocking
+- dependency-cruiser for enforcing import rules (no cycles, no deep imports, layering)
+- ESLint with @react-native/eslint-config
+- Prettier 2.8.8
+- TypeScript strict mode
+
+## Design System
+
+### Design Tokens
+
+All design tokens are exported from Figma to `design-tokens.json` and implemented as CSS variables in `globals.css`. The design follows the **Ethereal Flow** direction with:
+
+**Color Palette:**
+- **Canvas**: Dark backgrounds (#0a0612, #060408)
+- **Lavender Primary**: Scale from 100-900 (#f3f0ff to #5b21b6)
+- **Gold Highlights**: Scale from 100-700 (#fef3c7 to #b45309)
+- **Text Colors**: WCAG AA compliant contrast ratios
+  - Primary: #ffffff (21:1 contrast)
+  - Secondary: #e5e7eb (14.8:1 contrast)
+  - Muted: #9ca3af (7.2:1 contrast)
+  - Subtle: #6b7280 (4.7:1 contrast)
+
+**Spacing & Layout:**
+- 4px grid system (spacing-1 through spacing-16)
+- Touch targets: Minimum 44px (WCAG 2.1 AA)
+- Border radius: sm (8px), md (12px), lg (16px), xl (24px), full (9999px)
+
+**Typography:**
+- Font sizes: xs (12px) to 4xl (36px)
+- Font weights: normal (400), medium (500), semibold (600), bold (700)
+- Line heights: tight (1.25), normal (1.5), relaxed (1.75)
+
+**Elevation & Effects:**
+- 5 elevation levels (0-4) with lavender-tinted shadows
+- Focus rings for accessibility (default + error variants)
+- Blur effects: sm (4px), md (8px), lg (16px), xl (24px)
+
+**Motion:**
+- Duration: fast (150ms), normal (200ms), slow (300ms), slower (500ms)
+- Easing: cubic-bezier curves for smooth animations
+- Press animations: scale(0.98) on active state
+
+### Star Systems
+
+Six primary star systems for classification:
+- **Orion** (synonym: Osirian)
+- **Sirius**
+- **Pleiades**
+- **Andromeda**
+- **Lyra**
+- **Arcturus**
+
+Each has a unique geometric crest icon (SVG) exported at 24px, 28px, and 48px sizes.
+
+## Components and Interfaces
+
+### 1. UI Layer (React Native)
+
+#### State Management
+
+**Global State (zustand):**
+- Use zustand for minimal global state (2-3 atoms maximum)
+- Atoms: `userSession`, `chartData`, `toastNotifications`
+- Keep most state local to components
+- Avoid over-using global state
+
+**Form State (react-hook-form):**
+- Use react-hook-form for all forms
+- Integrate with Zod via @hookform/resolvers
+- Zod schemas are single source of truth for validation
+- Example:
+```typescript
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const schema = z.object({
+  date: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/),
+  time: z.string().regex(/^\d{2}:\d{2} (AM|PM)$/),
+  location: z.string().min(1),
+});
+
+const form = useForm({
+  resolver: zodResolver(schema),
+});
+```
+
+#### Screen Hierarchy
+
+```
+App.tsx
+├── Navigation Stack
+│   ├── 01_Onboarding Screen
+│   │   └── Button (primary CTA)
+│   ├── 02_Input Screen
+│   │   ├── AppBar (with back button)
+│   │   ├── Tabs (Birth Data | Upload PDF)
+│   │   ├── Field components (date, time, location)
+│   │   └── Button (Compute Chart)
+│   ├── 03_Result Screen
+│   │   ├── RadialChart (percentage display)
+│   │   ├── Card (primary system)
+│   │   ├── Chip components (ally systems)
+│   │   ├── Button (View Why, Generate Narrative)
+│   │   ├── Disclaimer text
+│   │   └── TabBar (Home/Community/Profile)
+│   ├── 04_Why Screen
+│   │   ├── AppBar (with back button)
+│   │   ├── Card components (contributors)
+│   │   └── Percentage displays
+│   ├── 05_Community Screen
+│   │   ├── StarSystemCrest (header)
+│   │   ├── Tabs (Feed/Quests/Members)
+│   │   ├── Post cards
+│   │   └── TabBar
+│   ├── 06_Profile Screen
+│   │   ├── Avatar placeholder
+│   │   ├── Card components (star systems)
+│   │   ├── Button (Generate Avatar)
+│   │   └── TabBar
+│   ├── 07_Paywall Screen
+│   │   ├── Feature list
+│   │   ├── Card (pricing)
+│   │   └── Button (Subscribe, Maybe Later)
+│   ├── 08_Settings Screen
+│   │   ├── AppBar (with back button)
+│   │   ├── InlineAlert (privacy notice)
+│   │   └── Card components (settings groups)
+│   └── 09_EmptyStates Screen
+│       ├── Empty state examples
+│       └── Error state examples
+└── Toast Provider
+```
+
+#### S³ Custom Components
+
+**Button.tsx** (~100 LOC)
+- Variants: primary, secondary, ghost, destructive
+- Sizes: sm (44px), md (44px), lg (48px)
+- States: default, hover, active, focus, disabled, loading
+- Props: `{ variant, size, leadingIcon, loading, children }`
+- Features: gradient backgrounds, scale animation (0.98), focus rings
+
+**Card.tsx** (~60 LOC)
+- Variants: default, emphasis, warning
+- Gradient backgrounds with backdrop blur
+- Border styling with lavender/gold accents
+- Props: `{ variant, children, className }`
+
+**Chip.tsx** (~80 LOC)
+- Variants: gold, lavender
+- States: default, selectable, selected, dismissible
+- Used for star system allies with percentages
+- Touch targets ≥44px for interactive variants
+
+**Field.tsx** (~100 LOC)
+- Form input component with label, helper text, error states
+- Icon slot (leading)
+- Focus ring animation
+- Error state with red border + icon
+- Props: `{ label, icon, helperText, error, ...inputProps }`
+
+**StarSystemCrests.tsx** (~150 LOC)
+- Six geometric SVG icons (Orion, Sirius, Pleiades, Andromeda, Lyra, Arcturus)
+- Export sizes: 24px, 28px, 48px
+- CurrentColor fill for theming
+- Individual components: `OrionCrest`, `SiriusCrest`, etc.
+
+**AppBar.tsx** (~60 LOC)
+- Navigation header with title and back button
+- Height: 56px
+- Props: `{ title, onBack, showBack }`
+
+**TabBar.tsx** (~80 LOC)
+- Bottom navigation with 3 tabs (Home, Community, Profile)
+- Active state indicator
+- Icon + label for each tab
+- Touch targets ≥44px
+
+**Toast.tsx** (~100 LOC)
+- Toast notifications (auto-dismiss, top-center)
+- InlineAlert variant (dismissible)
+- Types: success, info, warning, error
+- Icon indicators with semantic colors
+
+**RadialChart.tsx** (~100 LOC)
+- SVG-based radial progress chart
+- Animated on mount
+- Props: `{ percentage, label, color }`
+- Used for primary star system percentage display
+
+#### Reusable shadcn/ui Components
+
+From `components/ui` (adapted for React Native):
+- Button, Card, Input, Form, Select, Dialog, Tabs
+- Alert, Badge, Checkbox, Label, Separator
+- Table, Toast, Tooltip, Progress
+- Dropdown Menu, Popover, Sheet
+
+From `components/figma`:
+- ImageWithFallback for avatar/image handling
+
+### 2. Scorer Library (TypeScript)
+
+**Location:** `src/scorer/`
+
+**Files:**
+- `types.ts` (~80 LOC): HD extract types, canon types, result types
+- `canon.ts` (~100 LOC): Load and validate mock canon YAML
+- `score.ts` (~120 LOC): Core scoring algorithm
+- `tie.ts` (~80 LOC): Tie-breaking logic
+- `checksum.ts` (~60 LOC): Canon checksum computation
+- `index.ts` (~40 LOC): Public API exports
+
+**Key Interfaces:**
+
+```typescript
+// types.ts
+export interface HDExtract {
+  type: string;
+  authority: string;
+  profile: string;
+  centers: string[];
+  channels: number[];
+  gates: number[];
+}
+
+export interface Canon {
+  version: string;
+  systems: Record<string, SystemWeights>;
+}
+
+export interface SystemWeights {
+  weights: Record<string, number>;
+  why: string;
+}
+
+export interface ScorerResult {
+  classification: 'primary' | 'hybrid' | 'unresolved';
+  primary?: string;
+  hybrid?: [string, string];
+  allies: Array<{ system: string; percentage: number }>;
+  percentages: Record<string, number>;
+  contributorsPerSystem: Record<string, string[]>;
+  meta: {
+    canonVersion: string;
+    canonChecksum: string;
+  };
+}
+
+export interface TiePolicy {
+  leadPct: number;
+  minPrimaryPct: number;
+  hybridWindowPct: number;
+}
+```
+
+**Scoring Algorithm:**
+
+1. Load canon and compute checksum
+2. For each system, compute weighted score from HD extract
+3. Normalize scores to percentages (0.1% precision)
+4. Apply tie policy:
+   - If lead > hybridWindowPct: primary classification
+   - If lead <= hybridWindowPct: hybrid classification
+   - Tie-break by contributor count, then lexicographic order
+5. Return result with meta information
+
+### 3. Human Design Integration
+
+**Location:** `src/hd/`
+
+**Files:**
+- `api-client.ts` (~120 LOC): BodyGraph API client with caching
+- `cache.ts` (~80 LOC): 30-day cache implementation
+- `types.ts` (~60 LOC): HD type definitions
+
+**API Integration:**
+- Proxy through Node.js server (`apps/server/`)
+- 30-day cache for chart data
+- Birth data input: date, time, location
+- Returns HD chart with type, authority, profile, centers, channels, gates
+
+### 4. Moderation System (TypeScript)
+
+**Location:** `src/moderation/`
+
+**Files:**
+- `types.ts` (~60 LOC): ModResult, context types
+- `blocklists.ts` (~100 LOC): Pattern lists for hard/soft blocks
+- `sanitizer.ts` (~120 LOC): Text and prompt sanitization
+- `service.ts` (~150 LOC): ModerationService class
+- `index.ts` (~40 LOC): Public API exports
+
+**Key Interfaces:**
+
+```typescript
+// types.ts
+export interface ModResult {
+  decision: 'allow' | 'soft_block' | 'hard_block' | 'review';
+  reasons: string[];
+  severity: number;
+  redactions?: string[];
+}
+
+export interface ModContext {
+  type: 'dm' | 'room' | 'post' | 'avatar_prompt' | 'avatar_image';
+  authorId: string;
+  timestamp: number;
+}
+
+// service.ts
+export class ModerationService {
+  checkText(params: {
+    text: string;
+    context: ModContext;
+    authorId: string;
+  }): ModResult;
+  
+  checkImage(params: {
+    prompt?: string;
+    bytes?: Uint8Array;
+    context: ModContext;
+    authorId: string;
+  }): ModResult;
+  
+  checkRateLimit(authorId: string, action: string): boolean;
+}
+```
+
+**Moderation Pipeline:**
+
+1. **Pre-filter (client)**: Basic pattern matching against blocklists
+2. **Server check**: More comprehensive validation
+3. **Decision handlers**:
+   - `allow`: Deliver content
+   - `soft_block`: Show "Please rephrase..." message
+   - `hard_block`: Show policy violation message
+   - `review`: Queue for admin review
+4. **Rate limiting**: Track actions per user per time window
+
+### 5. Server API (Node.js)
+
+**Location:** `apps/server/src/`
+
+**Files:**
+- `index.ts` (~80 LOC): Express server setup
+- `http.ts` (~60 LOC): HTTP server configuration
+- `routes/` (~150 LOC): API routes
+  - `bodygraph.ts`: BodyGraph API proxy
+  - `health.ts`: Health check endpoint
+- `cache.ts` (~100 LOC): 30-day cache implementation
+- `types.ts` (~60 LOC): Type definitions
+
+**API Endpoints:**
+
+**POST /api/chart**
+```typescript
+Request: {
+  date: string; // MM/DD/YYYY
+  time: string; // HH:MM AM/PM
+  location: string;
+  timezone?: string;
+}
+
+Response: {
+  type: string;
+  authority: string;
+  profile: string;
+  centers: string[];
+  channels: number[];
+  gates: number[];
+  // ... additional HD chart data
+}
+```
+
+**GET /api/health**
+```typescript
+Response: {
+  status: 'ok';
+  timestamp: number;
+  uptime: number;
+}
+```
+
+**BodyGraph API Proxy:**
+
+1. Receive birth data from mobile app
+2. Check 30-day cache for existing chart
+3. If cache miss, call BodyGraph Chart API
+4. Store result in cache with 30-day TTL
+5. Return HD chart data to mobile app
+
+**Caching Strategy:**
+
+```typescript
+interface CacheEntry {
+  key: string; // hash of birth data
+  data: HDChart;
+  timestamp: number;
+  expiresAt: number; // timestamp + 30 days
+}
+
+function getCacheKey(birthData: BirthData): string {
+  return crypto
+    .createHash('sha256')
+    .update(JSON.stringify(birthData))
+    .digest('hex');
+}
+
+function isCacheValid(entry: CacheEntry): boolean {
+  return Date.now() < entry.expiresAt;
+}
+```
+
+**Environment Variables:**
+
+```bash
+BODYGRAPH_API_KEY=your-api-key-here
+PORT=3000
+NODE_ENV=production
+```
+
+## Data Models
+
+### Client-Side State
+
+```typescript
+// State management with zustand
+interface AppState {
+  // User session
+  userSession: {
+    userId?: string;
+    isAuthenticated: boolean;
+  };
+  
+  // Chart data
+  chartData: {
+    birthData?: BirthData;
+    hdChart?: HDChart;
+    scorerResult?: ScorerResult;
+  };
+  
+  // Toast notifications
+  toasts: Array<{
+    id: string;
+    type: 'success' | 'info' | 'warning' | 'error';
+    message: string;
+    duration?: number;
+  }>;
+}
+
+interface BirthData {
+  date: string; // MM/DD/YYYY
+  time: string; // HH:MM AM/PM
+  location: string;
+  timezone?: string;
+}
+
+interface HDChart {
+  type: string;
+  authority: string;
+  profile: string;
+  centers: string[];
+  channels: number[];
+  gates: number[];
+}
+```
+
+### Server-Side Cache
+
+```typescript
+// In-memory cache for BodyGraph API responses
+interface CacheStore {
+  charts: Map<string, CacheEntry>;
+}
+
+interface CacheEntry {
+  key: string; // SHA256 hash of birth data
+  data: HDChart;
+  timestamp: number;
+  expiresAt: number; // timestamp + 30 days (2,592,000,000 ms)
+}
+```
+
+### Mock Canon Data
+
+```yaml
+# src/scorer/canon.mock.yaml
+version: "0.1.0"
+systems:
+  Pleiades:
+    weights:
+      type_manifestor: 15
+      type_generator: 10
+      authority_emotional: 12
+      profile_1_3: 8
+      center_sacral_defined: 10
+      channel_34_57: 20
+      gate_1: 5
+    why: "Manifestors with emotional authority and channel 34-57 show strong Pleiadian alignment"
+  
+  Sirius:
+    weights:
+      type_projector: 15
+      authority_splenic: 12
+      profile_2_4: 10
+      center_spleen_defined: 10
+      channel_18_58: 18
+      gate_2: 5
+    why: "Projectors with splenic authority and channel 18-58 show strong Sirian alignment"
+  
+  Andromeda:
+    weights:
+      type_reflector: 15
+      authority_lunar: 12
+      profile_6_2: 10
+      center_open_all: 15
+      channel_10_20: 18
+      gate_3: 5
+    why: "Reflectors with lunar authority show strong Andromedan alignment"
+  
+  Lyra:
+    weights:
+      type_generator: 15
+      authority_sacral: 12
+      profile_5_1: 10
+      center_sacral_defined: 10
+      channel_59_6: 18
+      gate_4: 5
+    why: "Generators with sacral authority and channel 59-6 show strong Lyran alignment"
+  
+  Arcturus:
+    weights:
+      type_manifestor: 15
+      authority_ego: 12
+      profile_4_6: 10
+      center_heart_defined: 10
+      channel_21_45: 18
+      gate_5: 5
+    why: "Manifestors with ego authority show strong Arcturian alignment"
+  
+  Orion:
+    weights:
+      type_projector: 15
+      authority_self: 12
+      profile_2_5: 10
+      center_g_defined: 10
+      channel_1_8: 18
+      gate_6: 5
+    why: "Projectors with self-projected authority show strong Orion alignment"
+```
+
+## Screen Flows
+
+### 01. Onboarding Screen
+**Purpose:** Welcome users and explain the app  
+**Components:**
+- S³ logo and hero text
+- Starfield background animation
+- 3-step explanation (Input → Sort → Narrative)
+- Primary button: "Begin Sorting"
+
+**Navigation:** → Input Screen
+
+### 02. Input Screen
+**Purpose:** Collect birth data for HD chart generation  
+**Components:**
+- AppBar with back button
+- Tabs: "Birth Data" | "Upload Chart PDF"
+- Form fields with icons:
+  - Date (calendar icon)
+  - Time (clock icon)
+  - Location (pin icon)
+- Primary button: "Compute Chart"
+- Toast notification on submit
+
+**Navigation:** ← Onboarding | → Result Screen
+
+### 03. Result Screen
+**Purpose:** Display star system classification results  
+**Components:**
+- Header: "Your Primary Star System"
+- RadialChart showing percentage (e.g., 62%)
+- Primary system card with crest
+- Ally chips (e.g., Sirius 18%, Lyra 12%, Andromeda 8%)
+- Buttons: "View Why" | "Generate Narrative"
+- **Disclaimer:** "For insight & entertainment. Not medical, financial, or legal advice."
+- TabBar: Home (active) | Community | Profile
+
+**Navigation:** ← Input | → Why Screen | → Paywall | ↔ TabBar
+
+### 04. Why Screen
+**Purpose:** Explain classification reasoning  
+**Components:**
+- AppBar with back button
+- Header: "Why [Star System]"
+- Contributor cards with weights:
+  - Sacral Authority +22%
+  - Channel 13-33 +18%
+  - Profile 1/3 +12%
+  - Defined Throat +10%
+- Icons and gradient backgrounds per contributor
+
+**Navigation:** ← Result Screen
+
+### 05. Community Screen
+**Purpose:** Star system community hub  
+**Components:**
+- Star system crest header
+- Tabs: Feed | Quests | Members
+- Community posts with Like/Reply actions
+- Quest cards with progress
+- TabBar: Home | Community (active) | Profile
+
+**Navigation:** ↔ TabBar
+
+### 06. Profile Screen
+**Purpose:** User profile and star system affiliations  
+**Components:**
+- Avatar placeholder
+- User type display (e.g., "Manifesting Generator • 1/3")
+- Star system profile cards (Primary + Allies)
+- Button: "Generate Avatar"
+- Settings icon → Settings Screen
+- TabBar: Home | Community | Profile (active)
+
+**Navigation:** ↔ TabBar | → Settings Screen
+
+### 07. Paywall Screen
+**Purpose:** Subscription upsell  
+**Components:**
+- Header: "Join the Community"
+- Feature list:
+  - Narrative generation
+  - Community access
+  - Avatar generation
+  - Early access to features
+- Pricing card: $9.99/month
+- Primary button: "Start Subscription"
+- Secondary button: "Maybe Later"
+- Close button → Result Screen
+
+**Navigation:** ← Result Screen
+
+### 08. Settings Screen
+**Purpose:** App settings and privacy controls  
+**Components:**
+- AppBar with back button
+- InlineAlert: Privacy notice (dismissible)
+- Settings groups:
+  - Privacy & Security (Data & Privacy)
+  - Notifications (Preferences)
+  - Display (Starfield intensity, animations)
+  - Account (Sign Out, Delete Account)
+- Legal links: Terms of Service | Privacy Policy
+- Version number
+
+**Navigation:** ← Profile Screen
+
+### 09. Empty States & Errors Screen
+**Purpose:** Handle edge cases gracefully  
+**Components:**
+- Empty state examples:
+  - No chart computed yet
+  - No community posts
+  - No quests available
+- Error state examples:
+  - Network error
+  - Invalid data
+  - API failure
+- InlineAlert examples (all 4 types)
+- Disclaimer text example
+
+**Navigation:** Context-dependent
+
+## Error Handling
+
+### Client-Side Errors
+
+**Scorer Errors:**
+- Invalid HD extract format → Show "Invalid chart data" message
+- Canon load failure → Show "System error, please try again"
+- Computation error → Log to console, show generic error
+
+**Moderation Errors:**
+- Soft block → Show "Please rephrase..." with retry
+- Hard block → Show policy violation, no retry
+- Rate limit → Show "Too many requests, please wait"
+
+**Network Errors:**
+- API timeout → Show "Connection lost" with retry button
+- 4xx errors → Show specific error message from server
+- 5xx errors → Show "Server error, please try again later"
+
+**Form Validation Errors:**
+- Invalid date format → Inline error with red border
+- Missing required field → Inline error with helper text
+- Invalid location → Suggest corrections
+
+### Server-Side Errors
+
+**API Errors:**
+- Invalid schema → 400 Bad Request with field errors
+- Missing API key → 401 Unauthorized
+- Rate limit exceeded → 429 Too Many Requests
+- BodyGraph API failure → 502 Bad Gateway
+
+**Cache Errors:**
+- Memory limit reached → Clear old entries, log warning
+- Serialization error → Skip cache, call API directly
+
+**Error Response Format:**
+```typescript
+{
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  }
+}
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+**Scorer (`__tests__/scorer.test.ts`):**
+- Test each system's scoring with known inputs
+- Test tie-breaking logic with edge cases
+- Test canon checksum computation
+- Golden fixtures: known HD extracts → expected results
+- Test percentage normalization (0.1% precision)
+
+**Moderation (`__tests__/moderation-service.test.ts`):**
+- Test blocklist patterns (hard/soft)
+- Test content sanitization
+- Test rate limiting logic
+- Test decision handlers
+
+**Components (`__tests__/*.test.tsx`):**
+- Test Button variants and states
+- Test Card rendering
+- Test Chip selection and dismissal
+- Test Field validation and error states
+- Test StarSystemCrest rendering
+- Test Toast notifications
+
+### Integration Tests
+
+**API (`apps/server/__tests__/api.test.ts`):**
+- Test /api/chart endpoint with valid/invalid inputs
+- Test BodyGraph API proxy
+- Test 30-day cache behavior
+- Test cache key generation
+- Test error handling (network, API failures)
+
+**Navigation (`__tests__/navigation.test.tsx`):**
+- Test screen transitions
+- Test TabBar navigation
+- Test back button behavior
+- Test deep linking
+
+### E2E Tests (Detox)
+
+**User Flows:**
+- Onboarding → Input → Result → Why
+- Result → Paywall → Close
+- Profile → Settings → Back
+- TabBar navigation (Home ↔ Community ↔ Profile)
+
+**Form Submission:**
+- Input birth data with valid values
+- Submit form and verify toast notification
+- Verify navigation to Result screen
+- Verify chart data displayed correctly
+
+**Error Handling:**
+- Test network error recovery
+- Test invalid input handling
+- Test empty states
+
+### Coverage Targets
+
+- Scorer: ≥80%
+- Moderation: ≥80%
+- Components: ≥70%
+- Server: ≥70%
+- App-wide: ≥60%
+
+### CI Pipeline
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm run lint
+      - run: npm run lint:graph
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:coverage
+      
+  ios-build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: cd ios && bundle exec pod install
+      - run: npm run ios -- --configuration Release
+      
+  android-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - run: npm install
+      - run: cd android && ./gradlew assembleRelease
+```
+
+## Security Considerations
+
+### PII Handling
+
+- **Never store**: Birth data in logs or analytics
+- **Hash user IDs**: Use SHA256 for logs and metrics
+- **Retention**: 90 days for runs, 30 days for flagged content
+- **Purge**: Automatic deletion after retention period
+
+### Content Moderation
+
+- **Pre-generation**: Sanitize avatar prompts before sending to generator
+- **Post-generation**: Check generated images before display
+- **Audit log**: Track all moderation actions (actor, action, reason, timestamp)
+- **Admin UI**: Stub interface for reviewing flagged content
+
+### Anti-Cheat
+
+- **Nonce**: Prevent replay attacks
+- **Rate limiting**: Prevent spam submissions
+- **Statistical validation**: Detect impossible scores/metrics
+- **Version checking**: Reject mismatched game versions
+
+### API Security
+
+- **Input validation**: Zod schemas for all endpoints
+- **Payload size**: 200KB limit (compressed)
+- **Rate limiting**: Per-user and per-IP limits
+- **CORS**: Whitelist allowed origins
+
+## Performance Considerations
+
+### Client Performance
+
+- **Code splitting**: Lazy load screens with React.lazy()
+- **Asset optimization**: Compress images, use WebP
+- **Bundle size**: Target <500KB initial bundle
+- **Render optimization**: Memoize expensive components
+
+### Game Performance
+
+- **Target FPS**: ≥55 FPS, never <45 for >1s
+- **Memory**: ≤350MB peak on mid-tier devices
+- **Load time**: <3s for game initialization
+
+### Server Performance
+
+- **In-memory storage**: Fast reads/writes, no DB overhead
+- **Leaderboard caching**: Recompute only on new submissions
+- **Concurrent requests**: Handle 100+ req/s
+- **Memory management**: Periodic cleanup of old data
+
+## Deployment Strategy
+
+### Development
+
+```bash
+# Start all services
+npm run dev
+
+# Individual services
+npm run dev:web      # Vite dev server (port 5173)
+npm run dev:game     # Flutter web build (port 8080)
+npm run dev:server   # Node server (port 3000)
+```
+
+### Production Build
+
+```bash
+# Build web app
+npm run build:web
+
+# Build Flutter game
+cd super_dash && flutter build web --release
+
+# Build server
+npm run build:server
+
+# Deploy
+npm run deploy
+```
+
+### Environment Variables
+
+```bash
+# .env
+NODE_ENV=production
+PORT=3000
+GAME_URL=https://game.example.com
+ALLOWED_ORIGINS=https://app.example.com
+MAX_PAYLOAD_SIZE=204800
+```
+
+## Future Enhancements
+
+### Phase 2 (Post-MVP)
+
+- **Full determinism**: Headless re-simulation in Node
+- **Ghost replay**: Render teammate runs as translucent overlays
+- **Real-time multiplayer**: WebSocket-based live races
+- **Authentication**: User accounts and profiles
+- **Payments**: Premium features and cosmetics
+- **Push notifications**: Event reminders and results
+- **Analytics**: Privacy-respecting usage metrics
+
+### Phase 3 (Long-term)
+
+- **Native mobile apps**: React Native for iOS/Android
+- **More games**: Additional mini-games beyond Super Dash
+- **Social features**: Friends, teams, chat
+- **Tournaments**: Scheduled competitive events
+- **Achievements**: Badges and progression systems
+- **Localization**: Multi-language support
+
+## Open Questions
+
+1. **Super Dash RNG**: Does the existing game use seeded RNG? If not, how difficult to add?
+2. **Input recording**: What's the best way to capture inputs without modifying core game logic?
+3. **Team theming**: Should visual changes be subtle overlays or more dramatic reskins?
+4. **Leaderboard reset**: Daily? Weekly? Both?
+5. **Music licensing**: What's the plan for soundtrack packs?
+6. **Hosting**: Where will Flutter web build be hosted? Same domain or separate?
+
+## Design Decisions and Rationales
+
+### Why Web React + Tailwind/shadcn?
+
+- **Leverage existing components**: 40+ shadcn/ui components already built
+- **Existing styling**: globals.css with design tokens ready to use
+- **Faster iteration**: Web dev tools, hot reload, and Vite
+- **Easier Flutter integration**: iframe embedding simpler than native modules
+- **Future flexibility**: Can wrap in Electron/Tauri for desktop, or Capacitor for mobile
+
+### Why In-Memory Storage Instead of Database?
+
+- **MVP simplicity**: No DB setup, migrations, or ORM
+- **Fast development**: Direct object manipulation
+- **Sufficient for testing**: Can handle thousands of runs
+- **Easy migration**: Clear interfaces make DB swap straightforward later
+
+### Why Deterministic Core Now (Not Later)?
+
+- **Fair competition**: Headless re-simulation prevents cheating
+- **Adapter pattern**: Inject deterministic components via DI without rewriting game
+- **PCG32 + fixed timestep**: Well-understood techniques for determinism
+- **Cross-lang validation**: Dart and Node produce identical scores for same inputs
+- **Trust**: Players trust validated leaderboards more than statistical checks
+
+### Why PostMessage for iframe Communication?
+
+- **Web-native**: Standard browser API, no plugins needed
+- **Security**: Origin validation prevents unauthorized access
+- **Easy testing**: Can mock postMessage in unit tests
+- **Cross-browser**: Works consistently across all modern browsers
+- **Sandboxing**: iframe sandbox attribute provides additional security
+
+## Appendix A: Message Schemas (JSON Examples)
+
+### Commands (Parent → iframe)
+
+**Start Command:**
+```json
+{
+  "type": "start",
+  "payload": {
+    "game": "super_dash",
+    "seed": "a1b2c3d4e5f67890",
+    "team": "Pleiades"
+  }
+}
+```
+
+**Pause Command:**
+```json
+{
+  "type": "pause"
+}
+```
+
+**Resume Command:**
+```json
+{
+  "type": "resume"
+}
+```
+
+**Quit Command:**
+```json
+{
+  "type": "quit"
+}
+```
+
+**Set Music Command:**
+```json
+{
+  "type": "set-music",
+  "payload": {
+    "pack": "Sirius"
+  }
+}
+```
+
+### Events (iframe → Parent)
+
+**Ready Event:**
+```json
+{
+  "type": "ready"
+}
+```
+
+**State Event:**
+```json
+{
+  "type": "state",
+  "payload": {
+    "fps": 60
+  }
+}
+```
+
+**Result Event:**
+```json
+{
+  "type": "result",
+  "payload": {
+    "game": "super_dash",
+    "score": 12450,
+    "durationMs": 284000,
+    "suspect": false,
+    "clientHash": "a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
+    "game_core_version": "1.0.0",
+    "metrics": {
+      "distance": 5420,
+      "coins": 121,
+      "jumps": 87
+    }
+  }
+}
+```
+
+**Error Event:**
+```json
+{
+  "type": "error",
+  "payload": {
+    "code": "CHEAT_DETECTED",
+    "message": "Invalid input sequence detected"
+  }
+}
+```
+
+## Appendix B: Integration Checklist
+
+### Flutter Web Build
+
+**Build Command:**
+```bash
+cd /Users/kingkamehameha/Documents/Kiro/GF\ App/super_dash
+flutter build web --release --web-renderer canvaskit
+```
+
+**Output Location:**
+```
+super_dash/build/web/
+├── index.html
+├── main.dart.js
+├── flutter.js
+├── canvaskit/
+└── assets/
+```
+
+### Hosting Options
+
+**Option 1: Subdomain**
+- Game hosted at: `https://game.example.com`
+- App hosted at: `https://app.example.com`
+- CORS: Allow `app.example.com` origin
+- Env var: `GAME_ORIGIN=https://game.example.com`
+
+**Option 2: Subpath**
+- Game hosted at: `https://example.com/game/`
+- App hosted at: `https://example.com/`
+- Same origin, no CORS needed
+- Env var: `GAME_ORIGIN=https://example.com`
+
+### iframe Configuration
+
+**HTML:**
+```html
+<iframe
+  id="game-frame"
+  src={process.env.GAME_ORIGIN}
+  sandbox="allow-scripts allow-pointer-lock allow-same-origin"
+  allow="gamepad; fullscreen"
+  style={{ width: '100%', height: '100vh', border: 'none' }}
+/>
+```
+
+**Environment Variables:**
+```bash
+# .env
+VITE_GAME_ORIGIN=http://localhost:8080  # Dev
+# VITE_GAME_ORIGIN=https://game.example.com  # Prod
+```
+
+### Super Dash Adapter Files
+
+**Required New Files:**
+1. `lib/bridge/message_bus.dart` - postMessage in/out
+2. `lib/bridge/schema.dart` - Command/event models + JSON
+3. `lib/core/seeded_rng.dart` - PCG32 implementation
+4. `lib/core/fixed_timestep.dart` - 16.6667ms loop
+5. `lib/core/fixed_point.dart` - Q16.16 math helpers
+6. `lib/core/input_recorder.dart` - Timeline + RLE + hash
+7. `lib/theming/team_theme.dart` - Colors from tokens
+8. `lib/adapter/game_adapter.dart` - DI container
+
+**Modified Files:**
+1. `lib/main.dart` - Wire start/pause/resume/quit, send ready/result events
+
+### Security Configuration
+
+**CORS (Server):**
+```typescript
+// apps/server/src/http.ts
+const ALLOWED_ORIGINS = [
+  process.env.APP_ORIGIN || 'http://localhost:5173',
+];
+
+res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+```
+
+**Origin Validation (Client):**
+```typescript
+// src/bridge/protocol.ts
+const ALLOWED_GAME_ORIGINS = [
+  import.meta.env.VITE_GAME_ORIGIN,
+];
+
+window.addEventListener('message', (event) => {
+  if (!ALLOWED_GAME_ORIGINS.includes(event.origin)) {
+    console.warn('Rejected message from:', event.origin);
+    return;
+  }
+  // Process message
+});
+```
+
+### Compliance
+
+- **No remote execution**: Bundle all game assets in Flutter web build
+- **Version gating**: Reject runs with mismatched `game_core_version`
+- **Sandbox**: Use `allow-scripts allow-pointer-lock allow-same-origin` (tune as needed)
+- **Music licensing**: Placeholder packs until licensed
+
+## Diff Summary
+
+**Major Changes:**
+1. **Platform**: Changed from "React Native mobile app" to "Web React + TypeScript + Tailwind/shadcn"
+2. **Game Integration**: Changed from "native bridge (Android/iOS)" to "iframe + postMessage (web)"
+3. **Determinism**: Moved from "Phase 2 future enhancement" to "MVP requirement with PCG32, fixed timestep, Q16.16 math"
+4. **Super Dash Reuse**: Added explicit path `/Users/kingkamehameha/Documents/Kiro/GF App/super_dash` and adapter pattern via DI
+5. **Bridge Spec**: Added origin allowlist, sandbox guidance, timeout/retry logic
+6. **Server**: Added headless re-simulation requirement (not just statistical validation)
+7. **Testing**: Replaced native bridge tests with postMessage contract tests and Playwright E2E
+8. **Performance**: Updated targets for web (cold start <3s, game init <3s)
+9. **Security**: Added CORS, origin validation, iframe sandbox recommendations
+10. **Deliverables**: Added Appendix A (Message Schemas) and Appendix B (Integration Checklist)
+
+**Unchanged:**
+- Moderation rules and retention policies
+- Leaderboard aggregation formula
+- Rate limiting rules
+- PII handling and security policies
+- File size limits (≤150 LOC, prefer 60-120)
+- Test coverage targets (≥80% core, ≥60% app-wide)
+- Accessibility requirements (WCAG AA, 44px touch targets)
+
+## Conclusion
+
+This design leverages existing assets (shadcn/ui components, Super Dash game, globals.css) to build a web app with minimal new code. The modular architecture with small files, clear boundaries, and comprehensive testing ensures maintainability. The scorer provides deterministic classification, moderation ensures safety, and the server validates gameplay via headless re-simulation for fair competition.
+
+Key success metrics:
+- ✅ Reuse 40+ existing shadcn/ui components
+- ✅ Integrate Super Dash with <500 LOC of adapter code
+- ✅ All files ≤150 LOC (prefer 60-120)
+- ✅ Cyclomatic complexity ≤10 per function
+- ✅ Test coverage: ≥80% for core, ≥60% app-wide
+- ✅ Acyclic import graph with enforced layering
+- ✅ Web performance: cold start <3s, game init <3s, FPS ≥55
+- ✅ Deterministic validation: Dart and Node produce identical scores

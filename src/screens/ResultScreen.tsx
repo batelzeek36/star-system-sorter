@@ -117,7 +117,6 @@ function getSystemColor(system: StarSystemName): string {
     Sirius: '#50E3C2',
     Arcturus: '#F5A623',
     Andromeda: '#BD10E0',
-    Lyra: '#7ED321',
     Orion: '#D0021B',
   };
   return colors[system] || '#4F46E5';

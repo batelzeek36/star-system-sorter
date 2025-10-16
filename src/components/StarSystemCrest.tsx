@@ -3,20 +3,20 @@
  * 
  * Renders SVG crest for each star system with size and variant options.
  * Uses react-native-svg for cross-platform rendering.
+ * Provides fallback for unknown/missing star systems.
  * 
  * Requirements: 1.3, 1.15
  */
 
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import Svg, {Circle, Path, Polygon, G} from 'react-native-svg';
+import {View, StyleSheet, Text} from 'react-native';
+import Svg, {Circle, Path, Polygon, G, Ellipse} from 'react-native-svg';
 
 export type StarSystemName =
   | 'Pleiades'
   | 'Sirius'
   | 'Arcturus'
   | 'Andromeda'
-  | 'Lyra'
   | 'Orion';
 
 export type CrestSize = 'sm' | 'md' | 'lg';
@@ -24,13 +24,15 @@ export type CrestVariant = 'default' | 'outlined';
 
 export interface StarSystemCrestProps {
   /** Star system name */
-  system: StarSystemName;
+  system: StarSystemName | string;
   /** Size variant */
   size?: CrestSize;
   /** Visual variant */
   variant?: CrestVariant;
   /** Optional color override */
   color?: string;
+  /** Show fallback text for unknown systems */
+  showFallbackText?: boolean;
 }
 
 const SIZE_MAP: Record<CrestSize, number> = {
@@ -39,29 +41,33 @@ const SIZE_MAP: Record<CrestSize, number> = {
   lg: 120,
 };
 
-const SYSTEM_COLORS: Record<StarSystemName, string> = {
+const SYSTEM_COLORS: Record<string, string> = {
   Pleiades: '#4A90E2',
   Sirius: '#50E3C2',
   Arcturus: '#F5A623',
   Andromeda: '#BD10E0',
-  Lyra: '#7ED321',
   Orion: '#D0021B',
 };
+
+const FALLBACK_COLOR = '#9CA3AF';
 
 /**
  * StarSystemCrest
  * 
  * Displays a geometric crest representing a star system.
  * Each system has a unique geometric pattern.
+ * Shows fallback for unknown systems.
  */
 export function StarSystemCrest({
   system,
   size = 'md',
   variant = 'default',
   color,
+  showFallbackText = false,
 }: StarSystemCrestProps) {
   const dimension = SIZE_MAP[size];
-  const systemColor = color || SYSTEM_COLORS[system];
+  const isKnownSystem = system in SYSTEM_COLORS;
+  const systemColor = color || SYSTEM_COLORS[system] || FALLBACK_COLOR;
   const strokeWidth = variant === 'outlined' ? 2 : 0;
   const fillOpacity = variant === 'outlined' ? 0 : 1;
 
@@ -71,24 +77,30 @@ export function StarSystemCrest({
       accessibilityLabel={`${system} crest`}
       accessibilityRole="image">
       <Svg width={dimension} height={dimension} viewBox="0 0 100 100">
-        {renderCrest(system, systemColor, strokeWidth, fillOpacity)}
+        {renderCrest(system, systemColor, strokeWidth, fillOpacity, isKnownSystem)}
       </Svg>
+      {!isKnownSystem && showFallbackText && (
+        <Text style={[styles.fallbackText, {fontSize: dimension * 0.12}]}>
+          {system}
+        </Text>
+      )}
     </View>
   );
 }
 
 function renderCrest(
-  system: StarSystemName,
+  system: string,
   color: string,
   strokeWidth: number,
   fillOpacity: number,
+  isKnownSystem: boolean,
 ): React.ReactNode {
   const fill = fillOpacity > 0 ? color : 'none';
   const stroke = strokeWidth > 0 ? color : 'none';
 
   switch (system) {
     case 'Pleiades':
-      // Seven-pointed star cluster
+      // Seven-pointed star cluster (Seven Sisters)
       return (
         <G>
           <Circle cx="50" cy="50" r="8" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
@@ -103,18 +115,21 @@ function renderCrest(
       );
 
     case 'Sirius':
-      // Bright diamond star
+      // Bright diamond star (brightest star in night sky)
       return (
-        <Polygon
-          points="50,10 70,50 50,90 30,50"
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={strokeWidth}
-        />
+        <G>
+          <Polygon
+            points="50,10 70,50 50,90 30,50"
+            fill={fill}
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+          />
+          <Circle cx="50" cy="50" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+        </G>
       );
 
     case 'Arcturus':
-      // Triangular constellation
+      // Triangular constellation with central energy
       return (
         <G>
           <Polygon
@@ -124,6 +139,9 @@ function renderCrest(
             strokeWidth={strokeWidth}
           />
           <Circle cx="50" cy="50" r="8" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          <Circle cx="50" cy="20" r="4" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          <Circle cx="80" cy="70" r="4" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          <Circle cx="20" cy="70" r="4" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
         </G>
       );
 
@@ -131,8 +149,20 @@ function renderCrest(
       // Spiral galaxy pattern
       return (
         <G>
-          <Path
-            d="M 50 20 Q 70 30 70 50 Q 70 70 50 80 Q 30 70 30 50 Q 30 30 50 20"
+          <Ellipse
+            cx="50"
+            cy="50"
+            rx="35"
+            ry="20"
+            fill={fill}
+            stroke={stroke}
+            strokeWidth={strokeWidth}
+          />
+          <Ellipse
+            cx="50"
+            cy="50"
+            rx="25"
+            ry="15"
             fill={fill}
             stroke={stroke}
             strokeWidth={strokeWidth}
@@ -141,44 +171,41 @@ function renderCrest(
         </G>
       );
 
-    case 'Lyra':
-      // Harp/lyre shape
-      return (
-        <G>
-          <Path
-            d="M 30 80 L 30 30 Q 50 20 70 30 L 70 80"
-            fill="none"
-            stroke={stroke || color}
-            strokeWidth={strokeWidth || 3}
-          />
-          <Circle cx="30" cy="80" r="5" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-          <Circle cx="70" cy="80" r="5" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-        </G>
-      );
-
     case 'Orion':
-      // Belt and sword pattern
+      // Belt and sword pattern (Orion's Belt constellation)
       return (
         <G>
-          <Circle cx="35" cy="30" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-          <Circle cx="50" cy="30" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-          <Circle cx="65" cy="30" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-          <Circle cx="50" cy="50" r="8" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-          <Circle cx="50" cy="70" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          {/* Belt - three stars in a row */}
+          <Circle cx="35" cy="40" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          <Circle cx="50" cy="40" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          <Circle cx="65" cy="40" r="6" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          {/* Sword - vertical line below belt */}
+          <Circle cx="50" cy="55" r="5" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+          <Circle cx="50" cy="70" r="7" fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
         </G>
       );
 
     default:
-      // Fallback: simple circle
+      // Fallback: generic star pattern for unknown systems
       return (
-        <Circle
-          cx="50"
-          cy="50"
-          r="30"
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={strokeWidth}
-        />
+        <G>
+          <Circle
+            cx="50"
+            cy="50"
+            r="25"
+            fill={fill}
+            stroke={stroke || color}
+            strokeWidth={strokeWidth || 2}
+            opacity={0.5}
+          />
+          <Polygon
+            points="50,20 55,45 80,45 60,60 65,85 50,70 35,85 40,60 20,45 45,45"
+            fill={fill}
+            stroke={stroke || color}
+            strokeWidth={strokeWidth || 1}
+            opacity={0.7}
+          />
+        </G>
       );
   }
 }
@@ -187,5 +214,13 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  fallbackText: {
+    position: 'absolute',
+    bottom: -20,
+    color: FALLBACK_COLOR,
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });

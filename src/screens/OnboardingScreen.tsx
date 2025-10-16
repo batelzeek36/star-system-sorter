@@ -1,12 +1,12 @@
 /**
  * Onboarding Screen
- * App introduction and welcome flow
- * TODO: Implement full onboarding in task 7.1
+ * App introduction and welcome flow with Figma design system
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
+import {Button, Card, SectionHeader} from '@/components';
 
 type Props = ScreenProps<'Onboarding'>;
 
@@ -17,18 +17,35 @@ export function OnboardingScreen({navigation}: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Star System Sorter</Text>
-      <Text style={styles.subtitle}>S³</Text>
-      <Text style={styles.placeholder}>Onboarding Screen - Coming Soon</Text>
+      <View style={styles.content}>
+        <SectionHeader
+          title="Star System Sorter"
+          subtitle="S³"
+          align="center"
+          testID="onboarding-header"
+        />
+
+        <Card variant="emphasis" style={styles.card} testID="onboarding-card">
+          <Text style={styles.description} accessibilityRole="text">
+            Discover your star system classification based on Human Design
+            principles.
+          </Text>
+          <Text style={styles.disclaimer} accessibilityRole="text">
+            For insight & entertainment. Not medical, financial, or legal
+            advice.
+          </Text>
+        </Card>
+      </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
+        <Button
+          variant="primary"
+          size="lg"
           onPress={handleGetStarted}
           accessibilityLabel="Get Started"
-          accessibilityRole="button">
-          <Text style={styles.buttonText}>Get Started</Text>
-        </TouchableOpacity>
+          testID="get-started-button">
+          Get Started
+        </Button>
       </View>
     </View>
   );
@@ -37,51 +54,31 @@ export function OnboardingScreen({navigation}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#0a0612', // canvas-dark from design tokens
     padding: 20,
-    backgroundColor: '#ffffff',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#000000',
+  content: {
+    flex: 1,
+    justifyContent: 'center',
   },
-  subtitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 16,
-    color: '#666666',
+  card: {
+    marginTop: 32,
   },
-  placeholder: {
+  description: {
     fontSize: 16,
-    color: '#888888',
-    marginBottom: 32,
+    lineHeight: 24,
+    color: '#e5e7eb', // text-secondary
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  disclaimer: {
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#9ca3af', // text-muted
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   buttonContainer: {
-    width: '100%',
-    gap: 12,
-  },
-  button: {
-    backgroundColor: '#000000',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    minHeight: 44,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#000000',
-  },
-  secondaryButtonText: {
-    color: '#000000',
+    paddingBottom: 20,
   },
 });

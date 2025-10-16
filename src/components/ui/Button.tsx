@@ -1,6 +1,6 @@
 /**
  * Button Component (React Native)
- * Adapted from shadcn/ui button with same API surface
+ * Based on Figma design system tokens
  */
 
 import React from 'react';
@@ -11,72 +11,59 @@ import {
   ViewStyle,
   TextStyle,
   ActivityIndicator,
-  type TouchableOpacityProps,
+  View,
 } from 'react-native';
-import {colors, radius, fontSizes, fontWeights} from './theme';
 
-export type ButtonVariant =
-  | 'default'
-  | 'destructive'
-  | 'outline'
-  | 'secondary'
-  | 'ghost'
-  | 'link';
-
-export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
-
-export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
+  size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  disabled?: boolean;
+  onPress?: () => void;
   children: React.ReactNode;
+  accessibilityLabel?: string;
+  testID?: string;
 }
 
 export function Button({
-  variant = 'default',
-  size = 'default',
+  variant = 'primary',
+  size = 'md',
   loading = false,
-  disabled,
-  style,
-  textStyle,
+  disabled = false,
+  onPress,
   children,
-  ...props
+  accessibilityLabel,
+  testID,
 }: ButtonProps) {
-  const buttonStyle = [
+  const buttonStyle: ViewStyle[] = [
     styles.base,
-    styles[`variant_${variant}`],
     styles[`size_${size}`],
-    (disabled || loading) && styles.disabled,
-    style,
+    styles[`variant_${variant}`],
+    ...(disabled || loading ? [styles.disabled] : []),
   ];
 
-  const textStyles = [
+  const textStyle: TextStyle[] = [
     styles.text,
+    styles[`text_${size}`],
     styles[`text_${variant}`],
-    styles[`textSize_${size}`],
-    textStyle,
+    ...(disabled || loading ? [styles.textDisabled] : []),
   ];
 
   return (
     <TouchableOpacity
       style={buttonStyle}
+      onPress={onPress}
       disabled={disabled || loading}
-      activeOpacity={0.7}
-      {...props}>
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      testID={testID}>
       {loading ? (
         <ActivityIndicator
-          color={
-            variant === 'default' || variant === 'destructive'
-              ? colors.primaryForeground
-              : colors.foreground
-          }
+          color={variant === 'primary' ? '#ffffff' : '#a78bfa'}
+          size="small"
         />
-      ) : typeof children === 'string' ? (
-        <Text style={textStyles}>{children}</Text>
       ) : (
-        children
+        <Text style={textStyle}>{children}</Text>
       )}
     </TouchableOpacity>
   );
@@ -84,91 +71,81 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    flexDirection: 'row',
+    borderRadius: 9999, // full radius (pill shape)
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.md,
-    borderWidth: 0,
+    flexDirection: 'row',
   },
-  // Variants
-  variant_default: {
-    backgroundColor: colors.primary,
+  // Size variants
+  size_sm: {
+    minHeight: 44,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  variant_destructive: {
-    backgroundColor: colors.destructive,
+  size_md: {
+    minHeight: 44,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
   },
-  variant_outline: {
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
+  size_lg: {
+    minHeight: 48,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+  },
+  // Variant styles
+  variant_primary: {
+    backgroundColor: '#a78bfa', // lavender-500
+    shadowColor: '#8b5cf6',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
   variant_secondary: {
-    backgroundColor: colors.secondary,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(167, 139, 250, 0.4)',
   },
   variant_ghost: {
     backgroundColor: 'transparent',
   },
-  variant_link: {
-    backgroundColor: 'transparent',
-  },
-  // Sizes
-  size_default: {
-    height: 36,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  size_sm: {
-    height: 32,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  size_lg: {
-    height: 40,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-  },
-  size_icon: {
-    width: 36,
-    height: 36,
-    paddingHorizontal: 0,
+  variant_destructive: {
+    backgroundColor: '#ef4444', // error color
+    shadowColor: '#ef4444',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
   // Text styles
   text: {
-    fontSize: fontSizes.sm,
-    fontWeight: fontWeights.medium,
+    fontWeight: '600',
   },
-  text_default: {
-    color: colors.primaryForeground,
+  text_sm: {
+    fontSize: 14,
   },
-  text_destructive: {
-    color: colors.destructiveForeground,
+  text_md: {
+    fontSize: 16,
   },
-  text_outline: {
-    color: colors.foreground,
+  text_lg: {
+    fontSize: 18,
+  },
+  text_primary: {
+    color: '#ffffff',
   },
   text_secondary: {
-    color: colors.secondaryForeground,
+    color: '#ffffff',
   },
   text_ghost: {
-    color: colors.foreground,
+    color: '#d4c5ff', // lavender-300
   },
-  text_link: {
-    color: colors.primary,
-    textDecorationLine: 'underline',
+  text_destructive: {
+    color: '#ffffff',
   },
-  textSize_default: {
-    fontSize: fontSizes.sm,
-  },
-  textSize_sm: {
-    fontSize: fontSizes.xs,
-  },
-  textSize_lg: {
-    fontSize: fontSizes.base,
-  },
-  textSize_icon: {
-    fontSize: fontSizes.sm,
+  textDisabled: {
+    opacity: 1, // opacity handled by container
   },
 });
