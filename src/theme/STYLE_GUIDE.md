@@ -324,6 +324,216 @@ const validation = validateEtherealFlow({
 9. ❌ Not using gold for highlights and emphasis
 10. ❌ Using light backgrounds instead of dark canvas
 
+## NativeWind Migration Guide
+
+### Overview
+
+The app has migrated from StyleSheet-based styling to **NativeWind** (Tailwind CSS for React Native). This section provides guidance on using className utilities and migrating existing components.
+
+### When to Use className vs StyleSheet
+
+**Use className (preferred):**
+- Static layout styles (flex, padding, margin, sizing)
+- Color utilities (background, text, border)
+- Typography (font size, weight, line height)
+- Border utilities (width, radius, color)
+- Touch target enforcement
+
+**Use inline styles:**
+- Platform-specific elevation/shadows
+- Animations (Animated API)
+- Transforms (rotate, scale, translate)
+- Letter spacing
+- Complex runtime calculations
+- SVG properties
+
+**Use useTheme() hook:**
+- Components that need runtime theme values
+- Complex calculations based on theme tokens
+- Animations that reference theme colors
+- SVG components with dynamic colors
+
+### Common StyleSheet → className Mappings
+
+#### Layout
+```typescript
+// Before (StyleSheet)
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+// After (NativeWind)
+<View className="flex-1 items-center justify-center">
+```
+
+#### Spacing
+```typescript
+// Before
+paddingHorizontal: spacing[5]  // 20px
+paddingTop: spacing[16]        // 64px
+marginBottom: spacing[12]      // 48px
+
+// After
+className="px-5 pt-16 mb-12"
+```
+
+#### Colors
+```typescript
+// Before
+backgroundColor: colors.canvas.dark
+color: colors.text.primary
+borderColor: colors.borders.subtle
+
+// After
+className="bg-canvas-dark text-text-primary border-borders-subtle"
+```
+
+#### Typography
+```typescript
+// Before
+fontSize: typography.fontSize['3xl']
+fontWeight: typography.fontWeight.bold
+color: colors.text.primary
+
+// After
+className="text-3xl font-bold text-text-primary"
+```
+
+#### Borders
+```typescript
+// Before
+borderWidth: 2
+borderRadius: borderRadius.full
+borderColor: colors.lavender[500]
+
+// After
+className="border-2 rounded-full border-lavender-500"
+```
+
+### Touch Targets with NativeWind
+
+```typescript
+// Enforce minimum 44px height
+<View className="min-h-[44px]">
+
+// Button with proper touch target
+<TouchableOpacity className="min-h-[44px] px-6 py-3 rounded-full bg-lavender-500">
+  <Text className="text-base font-semibold text-text-primary">
+    Button Text
+  </Text>
+</TouchableOpacity>
+```
+
+### Platform-Specific Styling
+
+```typescript
+import { Platform } from 'react-native';
+
+// Combine className with Platform.select
+<View 
+  className="bg-lavender-500 rounded-md"
+  style={Platform.select({
+    android: { elevation: 4 },
+    ios: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 6,
+    },
+  })}
+>
+```
+
+### Conditional className
+
+```typescript
+const [isFocused, setIsFocused] = useState(false);
+const [hasError, setHasError] = useState(false);
+
+<TextInput
+  className={`
+    px-4 py-3 rounded-xl text-base
+    ${isFocused ? 'border-lavender-500' : 'border-borders-muted'}
+    ${hasError ? 'border-semantic-error bg-semantic-error/10' : 'bg-surface-muted'}
+  `.trim()}
+/>
+```
+
+### Using UI Primitives
+
+Instead of creating styled components from scratch, use the primitives in `src/ui/`:
+
+```typescript
+import { Button } from '@/ui/Button';
+import { Card } from '@/ui/Card';
+import { Input } from '@/ui/Input';
+import { Sheet } from '@/ui/Sheet';
+
+// Button with variants
+<Button variant="primary" size="lg" onPress={handlePress}>
+  Get Started
+</Button>
+
+// Card with gradient backgrounds
+<Card variant="emphasis">
+  <Text className="text-lg text-text-primary">Card Content</Text>
+</Card>
+
+// Input with label and error states
+<Input
+  label="Email"
+  value={email}
+  onChangeText={setEmail}
+  error={errors.email}
+/>
+```
+
+### File Size Guidelines
+
+When creating or refactoring components:
+
+- **Target**: 100-200 lines of code (sweet spot for readability)
+- **Soft Limit**: 300 lines of code (review and consider refactoring)
+- **Hard Limit**: 500 lines of code (must split into multiple modular files)
+
+**When approaching the soft limit (300 LOC):**
+- Extract reusable components into separate files
+- Split complex logic into helper functions/modules
+- Move type definitions to dedicated `types.ts` files
+- Consider if the file is doing too much (violating single responsibility)
+
+**When hitting the hard limit (500 LOC):**
+- File must be split into multiple modular files
+- Create a module directory with `index.ts` for public API
+- Break down by feature, responsibility, or logical grouping
+
+### Migration Checklist
+
+When migrating a component to NativeWind:
+
+- [ ] Replace StyleSheet.create with className utilities
+- [ ] Update component imports (Button, Card, Input from @/ui/)
+- [ ] Convert all View, Text, ScrollView styles to className
+- [ ] Handle special properties (letterSpacing, transform) with inline styles
+- [ ] Add platform-specific styles with Platform.select
+- [ ] Verify touch targets are ≥44px
+- [ ] Update tests (remove ThemeProvider wrapper if present)
+- [ ] Run tests to verify functionality
+- [ ] Check visual parity on both iOS and Android
+- [ ] Verify accessibility props are maintained
+- [ ] Ensure file stays within size limits (target 100-200 LOC)
+
+### Resources
+
+- **Migration Patterns**: `.kiro/specs/nativewind-migration/CHANGELOG.md`
+- **UI Primitives**: `src/ui/README.md`
+- **Design Tokens**: `src/theme/tokens.ts`
+- **NativeWind Docs**: https://www.nativewind.dev/
+
 ## Checklist for New Components
 
 - [ ] Uses theme tokens (no hardcoded values)
@@ -338,3 +548,5 @@ const validation = validateEtherealFlow({
 - [ ] Accessibility labels present
 - [ ] Focus states defined
 - [ ] Matches Figma design exactly
+- [ ] Uses className utilities (NativeWind) for static styles
+- [ ] File size within limits (target 100-200 LOC, soft limit 300 LOC, hard limit 500 LOC)

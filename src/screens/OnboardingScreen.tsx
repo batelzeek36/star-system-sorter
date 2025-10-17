@@ -4,16 +4,20 @@
  * 
  * Features:
  * - S³ hero with logo icon and starfield background
- * - "Begin Sorting" CTA using Figma Button component
+ * - "Begin Sorting" CTA using NativeWind Button primitive
  * - 3-step explanation (Input → Sort → Narrative)
  * - Navigate to Input screen
+ * 
+ * Styling: NativeWind (Tailwind CSS utilities)
+ * Design tokens: Figma/design-tokens.json
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, ScrollView} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
-import {Button, Card, StarfieldBackground} from '@/components';
-import {colors, spacing, typography, borderRadius} from '@/theme/tokens';
+import {StarfieldBackground} from '@/components';
+import {Button} from '@/ui/Button';
+import {Card} from '@/ui/Card';
 
 type Props = ScreenProps<'Onboarding'>;
 
@@ -23,71 +27,91 @@ export function OnboardingScreen({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-canvas-dark">
       {/* Starfield background effect */}
       <StarfieldBackground />
       
       <ScrollView 
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{flexGrow: 1}}
+        className="px-5 pt-16 pb-6"
         showsVerticalScrollIndicator={false}
       >
         {/* Hero Section with S³ Logo */}
-        <View style={styles.heroSection}>
-          <View style={styles.logoContainer} testID="onboarding-header">
-            <Text style={styles.logoIcon} accessibilityRole="text">
+        <View className="items-center mb-12">
+          <View className="items-center mb-6" testID="onboarding-header">
+            <Text 
+              className="text-4xl text-lavender-400 mb-3 text-center"
+              accessibilityRole="text"
+            >
               ✦
             </Text>
-            <Text style={styles.appTitle} accessibilityRole="header">
+            <Text 
+              className="text-3xl font-bold text-text-primary text-center mb-2"
+              accessibilityRole="header"
+            >
               Star System Sorter
             </Text>
-            <Text style={styles.appSubtitle} accessibilityRole="text">
+            <Text 
+              className="text-2xl font-medium text-lavender-500 text-center"
+              style={{letterSpacing: 2}}
+              accessibilityRole="text"
+            >
               S³
             </Text>
           </View>
           
-          <Text style={styles.tagline} accessibilityRole="text">
+          <Text 
+            className="text-lg leading-relaxed text-text-secondary text-center px-4"
+            accessibilityRole="text"
+          >
             Discover your star system classification based on Human Design principles.
           </Text>
         </View>
 
         {/* 3-Step Explanation */}
-        <View style={styles.stepsSection}>
-          <Card variant="default" style={styles.stepCard} testID="onboarding-card">
-            <View style={styles.stepItem}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>1</Text>
+        <View className="flex-1 justify-center">
+          <Card variant="default" testID="onboarding-card" className="mb-6">
+            <View className="flex-row items-start py-4">
+              <View className="w-10 h-10 rounded-full bg-lavender-900 border-2 border-lavender-500 items-center justify-center mr-4">
+                <Text className="text-lg font-bold text-lavender-400">1</Text>
               </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Input</Text>
-                <Text style={styles.stepDescription}>
+              <View className="flex-1 pt-1">
+                <Text className="text-xl font-semibold text-text-primary mb-1">
+                  Input
+                </Text>
+                <Text className="text-base leading-normal text-text-muted">
                   Enter your birth data (date, time, location)
                 </Text>
               </View>
             </View>
 
-            <View style={styles.stepDivider} />
+            <View className="h-px bg-borders-subtle ml-5" />
 
-            <View style={styles.stepItem}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>2</Text>
+            <View className="flex-row items-start py-4">
+              <View className="w-10 h-10 rounded-full bg-lavender-900 border-2 border-lavender-500 items-center justify-center mr-4">
+                <Text className="text-lg font-bold text-lavender-400">2</Text>
               </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Sort</Text>
-                <Text style={styles.stepDescription}>
+              <View className="flex-1 pt-1">
+                <Text className="text-xl font-semibold text-text-primary mb-1">
+                  Sort
+                </Text>
+                <Text className="text-base leading-normal text-text-muted">
                   We compute your Human Design chart and classify your star system
                 </Text>
               </View>
             </View>
 
-            <View style={styles.stepDivider} />
+            <View className="h-px bg-borders-subtle ml-5" />
 
-            <View style={styles.stepItem}>
-              <View style={styles.stepNumber}>
-                <Text style={styles.stepNumberText}>3</Text>
+            <View className="flex-row items-start py-4">
+              <View className="w-10 h-10 rounded-full bg-lavender-900 border-2 border-lavender-500 items-center justify-center mr-4">
+                <Text className="text-lg font-bold text-lavender-400">3</Text>
               </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>Narrative</Text>
-                <Text style={styles.stepDescription}>
+              <View className="flex-1 pt-1">
+                <Text className="text-xl font-semibold text-text-primary mb-1">
+                  Narrative
+                </Text>
+                <Text className="text-base leading-normal text-text-muted">
                   View your results, allies, and understand why
                 </Text>
               </View>
@@ -95,14 +119,17 @@ export function OnboardingScreen({navigation}: Props) {
           </Card>
 
           {/* Disclaimer */}
-          <Text style={styles.disclaimer} accessibilityRole="text">
+          <Text 
+            className="text-sm leading-normal text-text-subtle text-center italic px-4"
+            accessibilityRole="text"
+          >
             For insight & entertainment. Not medical, financial, or legal advice.
           </Text>
         </View>
       </ScrollView>
 
       {/* CTA Button */}
-      <View style={styles.buttonContainer}>
+      <View className="px-5 pb-6 pt-4">
         <Button
           variant="primary"
           size="lg"
@@ -115,112 +142,3 @@ export function OnboardingScreen({navigation}: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.canvas.dark,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: spacing[5],
-    paddingTop: spacing[16],
-    paddingBottom: spacing[6],
-  },
-  heroSection: {
-    alignItems: 'center',
-    marginBottom: spacing[12],
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: spacing[6],
-  },
-  logoIcon: {
-    fontSize: typography.fontSize['4xl'],
-    color: colors.lavender[400],
-    marginBottom: spacing[3],
-    textAlign: 'center',
-  },
-  appTitle: {
-    fontSize: typography.fontSize['3xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: spacing[2],
-  },
-  appSubtitle: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.medium,
-    color: colors.lavender[500],
-    textAlign: 'center',
-    letterSpacing: 2,
-  },
-  tagline: {
-    fontSize: typography.fontSize.lg,
-    lineHeight: typography.fontSize.lg * typography.lineHeight.relaxed,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    paddingHorizontal: spacing[4],
-  },
-  stepsSection: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  stepCard: {
-    marginBottom: spacing[6],
-  },
-  stepItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: spacing[4],
-  },
-  stepNumber: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.lavender[900],
-    borderWidth: 2,
-    borderColor: colors.lavender[500],
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing[4],
-  },
-  stepNumberText: {
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.lavender[400],
-  },
-  stepContent: {
-    flex: 1,
-    paddingTop: spacing[1],
-  },
-  stepTitle: {
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: spacing[1],
-  },
-  stepDescription: {
-    fontSize: typography.fontSize.base,
-    lineHeight: typography.fontSize.base * typography.lineHeight.normal,
-    color: colors.text.muted,
-  },
-  stepDivider: {
-    height: 1,
-    backgroundColor: colors.borders.subtle,
-    marginLeft: 20,
-  },
-  disclaimer: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.fontSize.sm * typography.lineHeight.normal,
-    color: colors.text.subtle,
-    textAlign: 'center',
-    fontStyle: 'italic',
-    paddingHorizontal: spacing[4],
-  },
-  buttonContainer: {
-    paddingHorizontal: spacing[5],
-    paddingBottom: spacing[6],
-    paddingTop: spacing[4],
-  },
-});

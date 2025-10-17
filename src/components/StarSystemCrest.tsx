@@ -9,8 +9,8 @@
  */
 
 import React from 'react';
-import {View, StyleSheet, Text} from 'react-native';
-import Svg, {Circle, Path, Polygon, G, Ellipse} from 'react-native-svg';
+import {View, Text} from 'react-native';
+import Svg, {Circle, Polygon, G, Ellipse} from 'react-native-svg';
 
 export type StarSystemName =
   | 'Pleiades'
@@ -73,14 +73,21 @@ export function StarSystemCrest({
 
   return (
     <View
-      style={[styles.container, {width: dimension, height: dimension}]}
+      className="items-center justify-center relative"
+      style={{width: dimension, height: dimension}}
       accessibilityLabel={`${system} crest`}
       accessibilityRole="image">
       <Svg width={dimension} height={dimension} viewBox="0 0 100 100">
-        {renderCrest(system, systemColor, strokeWidth, fillOpacity, isKnownSystem)}
+        {renderCrest(system, systemColor, strokeWidth, fillOpacity)}
       </Svg>
       {!isKnownSystem && showFallbackText && (
-        <Text style={[styles.fallbackText, {fontSize: dimension * 0.12}]}>
+        <Text 
+          className="absolute text-center font-medium"
+          style={{
+            bottom: -20,
+            color: FALLBACK_COLOR,
+            fontSize: dimension * 0.12,
+          }}>
           {system}
         </Text>
       )}
@@ -93,7 +100,6 @@ function renderCrest(
   color: string,
   strokeWidth: number,
   fillOpacity: number,
-  isKnownSystem: boolean,
 ): React.ReactNode {
   const fill = fillOpacity > 0 ? color : 'none';
   const stroke = strokeWidth > 0 ? color : 'none';
@@ -210,17 +216,4 @@ function renderCrest(
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  fallbackText: {
-    position: 'absolute',
-    bottom: -20,
-    color: FALLBACK_COLOR,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-});
+

@@ -8,9 +8,9 @@
  */
 
 import React, {useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, Animated} from 'react-native';
+import {View, Text, Animated} from 'react-native';
 import Svg, {Circle, G} from 'react-native-svg';
-import {useTheme} from '../theme';
+import {colors, spacing, typography} from '../theme/tokens';
 
 export interface RadialChartProps {
   /** Percentage value (0-100) */
@@ -40,7 +40,6 @@ export function RadialChart({
   size = 120,
   strokeWidth = 8,
 }: RadialChartProps) {
-  const theme = useTheme();
   const animatedValue = useRef(new Animated.Value(0)).current;
   
   // Calculate circle properties
@@ -68,8 +67,8 @@ export function RadialChart({
   });
 
   return (
-    <View style={styles.container} accessibilityLabel={`${label}: ${percentage.toFixed(1)}%`}>
-      <View style={[styles.chartContainer, {width: size, height: size}]}>
+    <View style={{alignItems: 'center'}} accessibilityLabel={`${label}: ${percentage.toFixed(1)}%`}>
+      <View style={{position: 'relative', alignItems: 'center', justifyContent: 'center', width: size, height: size}}>
         <Svg width={size} height={size}>
           <G rotation="-90" origin={`${center}, ${center}`}>
             {/* Background circle */}
@@ -77,7 +76,7 @@ export function RadialChart({
               cx={center}
               cy={center}
               r={radius}
-              stroke={theme.colors.borders.muted}
+              stroke={colors.borders.muted}
               strokeWidth={strokeWidth}
               fill="none"
             />
@@ -98,16 +97,13 @@ export function RadialChart({
         </Svg>
         
         {/* Center text */}
-        <View style={styles.centerText}>
+        <View style={{position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
           <Text 
-            style={[
-              styles.percentage, 
-              {
-                color,
-                fontSize: theme.typography.fontSize['2xl'],
-                fontWeight: theme.typography.fontWeight.bold,
-              }
-            ]}>
+            style={{
+              color,
+              fontSize: typography.fontSize['2xl'],
+              fontWeight: typography.fontWeight.bold,
+            }}>
             {clampedPercentage.toFixed(1)}%
           </Text>
         </View>
@@ -115,40 +111,15 @@ export function RadialChart({
       
       {/* Label */}
       <Text 
-        style={[
-          styles.label,
-          {
-            marginTop: theme.spacing[2],
-            fontSize: theme.typography.fontSize.sm,
-            fontWeight: theme.typography.fontWeight.semibold,
-            color: theme.colors.text.secondary,
-          }
-        ]}>
+        style={{
+          marginTop: spacing[2],
+          fontSize: typography.fontSize.sm,
+          fontWeight: typography.fontWeight.semibold,
+          color: colors.text.secondary,
+          textAlign: 'center',
+        }}>
         {label}
       </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-  },
-  chartContainer: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerText: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  percentage: {
-    // Dynamic styles applied inline
-  },
-  label: {
-    textAlign: 'center',
-    // Dynamic styles applied inline
-  },
-});

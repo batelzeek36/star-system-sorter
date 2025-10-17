@@ -88,7 +88,7 @@ describe('SettingsScreen', () => {
 
   it('dismisses privacy alert when close button is pressed', () => {
     const navigation = createMockNavigation();
-    const {getByTestId, queryByTestId} = renderWithTheme(
+    const {getByTestId} = renderWithTheme(
       <SettingsScreen navigation={navigation as any} route={{} as any} />,
     );
 

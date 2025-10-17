@@ -41,9 +41,11 @@ appId: ${APP_ID}
 - tapOn:
     id: "button-compute-chart"
 
-# Wait for processing and navigation to result screen
-- assertVisible:
-    id: "result-screen"
+# Wait for processing and navigation to result screen (API call may take time)
+- extendedWaitUntil:
+    visible:
+      id: "result-screen"
+    timeout: 30000
 
 # Step 3: Result Screen - Verify result elements
 - assertVisible:

@@ -109,6 +109,7 @@ export async function classify(
 }
 
 // Canon exports (task 3.2 complete)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export { loadCanon, computeCanonChecksum, getCanonWithChecksum } from './canon';
 
 // Score exports (task 3.3 complete)

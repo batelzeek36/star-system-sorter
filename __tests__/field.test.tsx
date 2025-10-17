@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Field } from '../src/components/Field';
 import { ThemeProvider } from '../src/theme';
 

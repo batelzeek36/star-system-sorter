@@ -144,7 +144,7 @@ function normalizeProfile(raw?: string): string {
 function extractGates(props: any): number[] {
   const gatesList = props.Gates?.list || [];
   const gates = gatesList.map((g: any) => g.option).filter((n: any) => typeof n === 'number');
-  return gates.sort((a, b) => a - b);
+  return gates.sort((a: number, b: number) => a - b);
 }
 
 // Gate-to-Center mapping based on Human Design system

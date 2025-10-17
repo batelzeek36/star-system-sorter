@@ -3,11 +3,11 @@
  * Adapted from Figma/components/s3/Toast.tsx for React Native
  * 
  * Toast notifications and InlineAlert components
+ * Styled with NativeWind (Tailwind CSS utilities)
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
-import { useTheme } from '../theme';
+import { View, Text, Animated, TouchableOpacity, Platform } from 'react-native';
 
 interface ToastProps {
   message: string;
@@ -18,97 +18,88 @@ interface ToastProps {
 }
 
 export function Toast({ message, type = 'success', onClose, duration = 3000, testID }: ToastProps) {
-  const theme = useTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-20)).current;
 
   useEffect(() => {
-    // Fade in
+    // Fade in (200ms - motion.duration.normal)
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: theme.motion.duration.normal,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: 0,
-        duration: theme.motion.duration.normal,
+        duration: 200,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // Auto dismiss
+    // Auto dismiss (300ms - motion.duration.slow)
     const timer = setTimeout(() => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: theme.motion.duration.slow,
+          duration: 300,
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: -20,
-          duration: theme.motion.duration.slow,
+          duration: 300,
           useNativeDriver: true,
         }),
       ]).start(() => onClose());
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [fadeAnim, translateY, onClose, duration, theme.motion.duration]);
+  }, [fadeAnim, translateY, onClose, duration]);
 
   const config = {
     success: {
       icon: '✓',
-      backgroundColor: theme.colors.semantic.success,
-      textColor: theme.colors.text.primary,
+      bgClass: 'bg-semantic-success',
+      textClass: 'text-text-primary',
     },
     error: {
       icon: '✕',
-      backgroundColor: theme.colors.semantic.error,
-      textColor: theme.colors.text.primary,
+      bgClass: 'bg-semantic-error',
+      textClass: 'text-text-primary',
     },
     warning: {
       icon: '⚠',
-      backgroundColor: theme.colors.semantic.warning,
-      textColor: theme.colors.text.primary,
+      bgClass: 'bg-semantic-warning',
+      textClass: 'text-text-primary',
     },
     info: {
       icon: 'ℹ',
-      backgroundColor: theme.colors.semantic.info,
-      textColor: theme.colors.text.primary,
+      bgClass: 'bg-semantic-info',
+      textClass: 'text-text-primary',
     },
   };
 
-  const { icon, backgroundColor, textColor } = config[type];
+  const { icon, bgClass, textClass } = config[type];
+
+  // Platform-specific elevation (Android uses elevation prop, iOS uses shadow utilities)
+  const elevationStyle = Platform.select({
+    android: { elevation: 10 },
+    ios: {},
+  });
 
   return (
     <Animated.View
       testID={testID}
-      style={[
-        styles.container,
-        {
-          opacity: fadeAnim,
-          transform: [{ translateY }],
-          backgroundColor,
-          paddingHorizontal: theme.spacing[4],
-          paddingVertical: theme.spacing[3],
-          borderRadius: theme.borderRadius.full,
-          ...theme.elevation[3],
-        },
-      ]}
+      className={`absolute top-16 left-1/2 z-[1000] flex-row items-center gap-3 min-w-[200px] px-4 py-3 rounded-full shadow-lg shadow-black/30 ${bgClass}`}
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY }, { translateX: -100 }],
+        ...elevationStyle,
+      }}
     >
-      <Text style={[styles.icon, { color: textColor, fontSize: theme.typography.fontSize.lg }]}>
+      <Text className={`flex-shrink-0 text-lg ${textClass}`}>
         {icon}
       </Text>
-      <Text
-        style={[
-          styles.message,
-          {
-            color: textColor,
-            fontSize: theme.typography.fontSize.sm,
-          },
-        ]}
-      >
+      <Text className={`text-center text-sm ${textClass}`}>
         {message}
       </Text>
     </Animated.View>
@@ -123,64 +114,44 @@ interface InlineAlertProps {
 }
 
 export function InlineAlert({ message, type = 'info', onDismiss, testID }: InlineAlertProps) {
-  const theme = useTheme();
-
   const config = {
     success: {
       icon: '✓',
-      backgroundColor: `${theme.colors.semantic.success}1A`, // 10% opacity
-      borderColor: theme.colors.semantic.success,
-      textColor: '#6ee7b7', // green-300
+      bgClass: 'bg-semantic-success/10',
+      borderClass: 'border-semantic-success',
+      textClass: 'text-green-300',
     },
     error: {
       icon: '⚠',
-      backgroundColor: `${theme.colors.semantic.error}1A`, // 10% opacity
-      borderColor: theme.colors.semantic.error,
-      textColor: '#fca5a5', // red-300
+      bgClass: 'bg-semantic-error/10',
+      borderClass: 'border-semantic-error',
+      textClass: 'text-red-300',
     },
     warning: {
       icon: '⚠',
-      backgroundColor: `${theme.colors.semantic.warning}1A`, // 10% opacity
-      borderColor: theme.colors.semantic.warning,
-      textColor: theme.colors.gold[300],
+      bgClass: 'bg-semantic-warning/10',
+      borderClass: 'border-semantic-warning',
+      textClass: 'text-gold-300',
     },
     info: {
       icon: 'ℹ',
-      backgroundColor: `${theme.colors.semantic.info}1A`, // 10% opacity
-      borderColor: theme.colors.semantic.info,
-      textColor: '#93c5fd', // blue-300
+      bgClass: 'bg-semantic-info/10',
+      borderClass: 'border-semantic-info',
+      textClass: 'text-blue-300',
     },
   };
 
-  const { icon, backgroundColor, borderColor, textColor } = config[type];
+  const { icon, bgClass, borderClass, textClass } = config[type];
 
   return (
     <View
       testID={testID}
-      style={[
-        styles.inlineContainer,
-        {
-          backgroundColor,
-          borderColor,
-          borderWidth: 1,
-          borderRadius: theme.borderRadius.lg,
-          padding: theme.spacing[3],
-        },
-      ]}
+      className={`flex-row items-start gap-3 border rounded-2xl p-3 ${bgClass} ${borderClass}`}
     >
-      <Text style={[styles.inlineIcon, { color: textColor, fontSize: theme.typography.fontSize.sm }]}>
+      <Text className={`flex-shrink-0 text-sm ${textClass}`}>
         {icon}
       </Text>
-      <Text
-        style={[
-          styles.inlineMessage,
-          {
-            color: textColor,
-            fontSize: theme.typography.fontSize.xs,
-            lineHeight: theme.typography.fontSize.xs * theme.typography.lineHeight.relaxed,
-          },
-        ]}
-      >
+      <Text className={`flex-1 text-xs leading-relaxed ${textClass}`}>
         {message}
       </Text>
       {onDismiss && (
@@ -190,7 +161,7 @@ export function InlineAlert({ message, type = 'info', onDismiss, testID }: Inlin
           accessibilityLabel="Dismiss alert"
           accessibilityRole="button"
         >
-          <Text style={[styles.dismissIcon, { color: textColor, fontSize: theme.typography.fontSize.sm }]}>
+          <Text className={`flex-shrink-0 text-sm ${textClass}`}>
             ✕
           </Text>
         </TouchableOpacity>
@@ -199,36 +170,4 @@ export function InlineAlert({ message, type = 'info', onDismiss, testID }: Inlin
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 64,
-    left: '50%',
-    transform: [{ translateX: -100 }],
-    zIndex: 1000,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    minWidth: 200,
-  },
-  icon: {
-    flexShrink: 0,
-  },
-  message: {
-    textAlign: 'center',
-  },
-  inlineContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  inlineIcon: {
-    flexShrink: 0,
-  },
-  inlineMessage: {
-    flex: 1,
-  },
-  dismissIcon: {
-    flexShrink: 0,
-  },
-});
+

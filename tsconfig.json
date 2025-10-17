@@ -10,7 +10,7 @@
       "@components/*": ["components/*"]
     }
   },
-  "include": ["src", "index.js", "index.ts", "index.tsx", "App.tsx"],
+  "include": ["src", "index.js", "index.ts", "index.tsx", "App.tsx", "nativewind-env.d.ts"],
   "exclude": [
     "node_modules",
     "android",

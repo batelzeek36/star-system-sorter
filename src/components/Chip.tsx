@@ -4,6 +4,8 @@
  * 
  * Star system ally chips with percentages
  * Variants: gold, lavender
+ * 
+ * Migrated to NativeWind - uses className utilities
  */
 
 import React from 'react';
@@ -11,11 +13,7 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  type ViewStyle,
-  type TextStyle,
 } from 'react-native';
-import { useTheme } from '../theme';
 
 interface ChipProps {
   starSystem: string;
@@ -40,85 +38,57 @@ export function Chip({
   onDismiss,
   testID,
 }: ChipProps) {
-  const theme = useTheme();
-
-  const variantStyles: Record<
-    string,
-    { container: ViewStyle; text: TextStyle; selectedContainer: ViewStyle; selectedText: TextStyle }
-  > = {
-    gold: {
-      container: {
-        backgroundColor: `${theme.colors.gold[500]}33`, // 20% opacity
-        borderColor: `${theme.colors.gold[400]}66`, // 40% opacity
-      },
-      text: {
-        color: theme.colors.gold[300],
-      },
-      selectedContainer: {
-        backgroundColor: theme.colors.gold[500],
-        borderColor: theme.colors.gold[400],
-      },
-      selectedText: {
-        color: theme.colors.text.primary,
-      },
-    },
-    lavender: {
-      container: {
-        backgroundColor: `${theme.colors.lavender[500]}33`, // 20% opacity
-        borderColor: `${theme.colors.lavender[400]}4D`, // 30% opacity
-      },
-      text: {
-        color: theme.colors.lavender[300],
-      },
-      selectedContainer: {
-        backgroundColor: theme.colors.lavender[500],
-        borderColor: theme.colors.lavender[400],
-      },
-      selectedText: {
-        color: theme.colors.text.primary,
-      },
-    },
+  // Build className for container based on variant and selected state
+  const getContainerClassName = () => {
+    const base = 'flex-row items-center gap-2 px-3 py-1 rounded-full border';
+    
+    if (variant === 'gold') {
+      if (selected) {
+        return `${base} bg-gold-500 border-gold-400`;
+      }
+      return `${base} bg-gold-500/20 border-gold-400/40`;
+    }
+    
+    // lavender variant (default)
+    if (selected) {
+      return `${base} bg-lavender-500 border-lavender-400`;
+    }
+    return `${base} bg-lavender-500/20 border-lavender-400/30`;
   };
 
-  const currentVariant = variantStyles[variant];
-  const containerStyle = selected ? currentVariant.selectedContainer : currentVariant.container;
-  const textStyle = selected ? currentVariant.selectedText : currentVariant.text;
+  // Build className for text based on variant and selected state
+  const getTextClassName = () => {
+    const base = 'text-center text-xs font-medium';
+    
+    if (variant === 'gold') {
+      return selected ? `${base} text-text-primary` : `${base} text-gold-300`;
+    }
+    
+    // lavender variant (default)
+    return selected ? `${base} text-text-primary` : `${base} text-lavender-300`;
+  };
 
   const content = (
     <View
-      style={[
-        styles.container,
-        containerStyle,
-        {
-          paddingHorizontal: theme.spacing[3],
-          paddingVertical: theme.spacing[1],
-          borderRadius: theme.borderRadius.full,
-          borderWidth: 1,
-          minHeight: selectable ? theme.components.touchTarget.minimum : undefined,
-        },
-      ]}
+      className={`${getContainerClassName()} ${selectable ? 'min-h-11' : ''}`}
     >
-      <Text
-        style={[
-          styles.text,
-          textStyle,
-          {
-            fontSize: theme.typography.fontSize.xs,
-            fontWeight: theme.typography.fontWeight.medium,
-          },
-        ]}
-      >
+      <Text className={getTextClassName()}>
         {starSystem} {percentage !== undefined && `${percentage}%`}
       </Text>
       {dismissible && onDismiss && (
         <TouchableOpacity
           onPress={onDismiss}
-          style={styles.dismissButton}
+          className="w-4 h-4 rounded-full items-center justify-center"
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           accessibilityLabel={`Dismiss ${starSystem}`}
           accessibilityRole="button"
         >
-          <Text style={[styles.dismissIcon, textStyle]}>×</Text>
+          <Text 
+            className={`text-base ${variant === 'gold' ? (selected ? 'text-text-primary' : 'text-gold-300') : (selected ? 'text-text-primary' : 'text-lavender-300')}`}
+            style={{ lineHeight: 16 }}
+          >
+            ×
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -141,25 +111,3 @@ export function Chip({
 
   return <View testID={testID}>{content}</View>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  text: {
-    textAlign: 'center',
-  },
-  dismissButton: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dismissIcon: {
-    fontSize: 16,
-    lineHeight: 16,
-  },
-});

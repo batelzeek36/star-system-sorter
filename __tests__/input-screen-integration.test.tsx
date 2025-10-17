@@ -1,6 +1,9 @@
 /**
  * Input Screen Integration Tests
  * Tests the wiring between Input screen, hdkit adapter, and scorer
+ * 
+ * Note: InputScreen uses NativeWind className utilities, but Button component
+ * still uses ThemeProvider. Tests wrap with ThemeProvider for compatibility.
  */
 
 import React from 'react';
@@ -32,7 +35,7 @@ const mockComputeHDExtract = computeHDExtract as jest.MockedFunction<
 jest.mock('../src/scorer');
 const mockClassify = classify as jest.MockedFunction<typeof classify>;
 
-// Helper to render with theme
+// Helper to render with theme (Button component still needs ThemeProvider)
 const renderWithTheme = (component: React.ReactElement) => {
   return render(<ThemeProvider>{component}</ThemeProvider>);
 };

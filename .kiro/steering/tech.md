@@ -8,6 +8,7 @@
 - **State Management**: zustand (minimal, 2-3 atoms)
 - **Forms**: react-hook-form + Zod validation (v4)
 - **UI Components**: shadcn/ui adapted for React Native
+- **Styling**: NativeWind (Tailwind CSS for React Native)
 - **SVG**: react-native-svg
 
 
@@ -127,6 +128,7 @@ PORT=3000
 - `react-native-screens` - Native screen optimization
 - `react-native-svg` - SVG rendering
 - `pako` - Compression
+- `nativewind` - Tailwind CSS for React Native
 
 ### Development
 - `@testing-library/react-native` - Component testing
@@ -135,6 +137,7 @@ PORT=3000
 - `msw` - API mocking
 - `tsx` - TypeScript execution
 - `zod-to-json-schema` - Schema generation
+- `tailwindcss` - CSS framework (used by NativeWind)
 
 ## Performance Targets
 
@@ -151,15 +154,15 @@ PORT=3000
 - TypeScript strict mode throughout
 
 **Don't:**
-- No web client, no iframe, no Vite/react-router-dom/Tailwind
+- No web client, no iframe, no Vite/react-router-dom
 - No adding deps with telemetry/analytics or native perms without review
 - No `Date.now()`/randomness in scoring paths
 
 ## Dependency Budget (Allowed)
 
-**App:** react-native, react, @react-navigation/native, @react-navigation/native-stack, react-native-screens, react-native-safe-area-context, react-native-gesture-handler, zod, react-hook-form, @hookform/resolvers, zustand, react-native-svg, pako
+**App:** react-native, react, @react-navigation/native, @react-navigation/native-stack, react-native-screens, react-native-safe-area-context, react-native-gesture-handler, zod, react-hook-form, @hookform/resolvers, zustand, react-native-svg, pako, nativewind
 
-**Tests/Tooling:** jest, @testing-library/react-native, msw@2 + @mswjs/interceptors (Jest only), dependency-cruiser, zod-to-json-schema, babel-plugin-module-resolver, eslint, prettier
+**Tests/Tooling:** jest, @testing-library/react-native, msw@2 + @mswjs/interceptors (Jest only), dependency-cruiser, zod-to-json-schema, babel-plugin-module-resolver, eslint, prettier, tailwindcss
 
 > RN ships its own types—no separate `@types/react-native` needed.
 > pako is primary compression library (RN doesn't have CompressionStream; native optimization can come later).

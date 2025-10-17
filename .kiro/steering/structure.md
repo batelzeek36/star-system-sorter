@@ -31,6 +31,7 @@ star-system-sorter/
 src/
 ├── screens/             # Screen components (top layer)
 ├── components/          # Reusable UI components
+├── ui/                  # NativeWind primitive components (Button, Card, Input, Sheet)
 ├── navigation/          # Navigation configuration
 ├── scorer/              # Scoring library (deterministic)
 ├── hd/                  # Human Design API integration
@@ -116,6 +117,17 @@ Reusable UI components used across screens.
 - `ScoreDisplay.tsx` - Score display component
 - `StarSystemCrest.tsx` - Star system visual representation
 - `TimeZonePicker.tsx` - Time zone selection
+
+### `src/ui/`
+
+NativeWind primitive components (styled with className utilities).
+
+**Files:**
+
+- `Button.tsx` - Button primitive with variants (primary, secondary, ghost, destructive)
+- `Card.tsx` - Card primitive with gradient backgrounds
+- `Input.tsx` - Input primitive with label and error states
+- `Sheet.tsx` - Modal sheet primitive
 
 ### `src/navigation/`
 

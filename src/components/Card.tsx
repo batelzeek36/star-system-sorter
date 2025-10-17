@@ -10,8 +10,8 @@
  */
 
 import React, { type ReactNode } from 'react';
-import { View, StyleSheet, type ViewStyle } from 'react-native';
-import { useTheme } from '../theme';
+import { View, type ViewStyle } from 'react-native';
+import { colors, borderRadius, spacing, elevation } from '../theme/tokens';
 
 interface CardProps {
   children: ReactNode;
@@ -21,28 +21,26 @@ interface CardProps {
 }
 
 export function Card({ children, variant = 'default', style, testID }: CardProps) {
-  const theme = useTheme();
-
   // Gradient simulation using layered backgrounds
   // Mimics: bg-gradient-to-br from-[color1] to-[color2]
   const gradientLayers = {
     default: {
-      base: `${theme.colors.lavender[900]}33`, // 20% opacity (from color)
-      overlay: `${theme.colors.lavender[800]}1A`, // 10% opacity (to color)
-      border: theme.colors.borders.muted,
-      elevation: theme.elevation[0],
+      base: `${colors.lavender[900]}33`, // 20% opacity (from color)
+      overlay: `${colors.lavender[800]}1A`, // 10% opacity (to color)
+      border: colors.borders.muted,
+      elevation: elevation[0],
     },
     emphasis: {
-      base: `${theme.colors.lavender[600]}4D`, // 30% opacity (from color)
-      overlay: `${theme.colors.lavender[700]}33`, // 20% opacity (to color)
-      border: `${theme.colors.lavender[400]}66`, // 40% opacity
-      elevation: theme.elevation[2],
+      base: `${colors.lavender[600]}4D`, // 30% opacity (from color)
+      overlay: `${colors.lavender[700]}33`, // 20% opacity (to color)
+      border: `${colors.lavender[400]}66`, // 40% opacity
+      elevation: elevation[2],
     },
     warning: {
-      base: `${theme.colors.semantic.warning}1A`, // 10% opacity (warning-muted)
-      overlay: `${theme.colors.gold[600]}1A`, // 10% opacity (to color)
-      border: `${theme.colors.gold[400]}66`, // 40% opacity
-      elevation: theme.elevation[0],
+      base: `${colors.semantic.warning}1A`, // 10% opacity (warning-muted)
+      overlay: `${colors.gold[600]}1A`, // 10% opacity (to color)
+      border: `${colors.gold[400]}66`, // 40% opacity
+      elevation: elevation[0],
     },
   };
 
@@ -52,13 +50,14 @@ export function Card({ children, variant = 'default', style, testID }: CardProps
     <View
       testID={testID}
       style={[
-        styles.container,
         {
+          overflow: 'hidden',
+          position: 'relative',
           backgroundColor: currentGradient.base,
           borderColor: currentGradient.border,
           borderWidth: 1,
-          borderRadius: theme.borderRadius.xl,
-          padding: theme.spacing[4],
+          borderRadius: borderRadius.xl,
+          padding: spacing[4],
           ...currentGradient.elevation,
         },
         style,
@@ -66,31 +65,22 @@ export function Card({ children, variant = 'default', style, testID }: CardProps
     >
       {/* Gradient overlay layer (simulates gradient-to-br effect) */}
       <View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: currentGradient.overlay,
-            borderRadius: theme.borderRadius.xl - 1, // Account for border
-          },
-        ]}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: currentGradient.overlay,
+          borderRadius: borderRadius.xl - 1, // Account for border
+        }}
         pointerEvents="none"
       />
       
       {/* Content layer */}
-      <View style={styles.content}>
+      <View style={{position: 'relative', zIndex: 1}}>
         {children}
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  content: {
-    position: 'relative',
-    zIndex: 1,
-  },
-});

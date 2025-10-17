@@ -9,8 +9,12 @@
  * - Primary vs Hybrid system display
  * - Accessibility compliance
  * 
- * Requirements: 1.3, 1.7, 1.10
- * Task: 6.4.1
+ * Requirements: 1.3, 1.7, 1.10, 5.5, 7.5
+ * Task: 5.2 (NativeWind migration - test updates)
+ * 
+ * Note: ResultScreen uses className (NativeWind), but RadialChart and Chip
+ * components still use ThemeProvider. Tests wrap with ThemeProvider until
+ * those components are migrated.
  */
 
 import React from 'react';
@@ -35,7 +39,7 @@ const mockNavigation = {
   setParams: jest.fn(),
 } as any;
 
-// Wrapper with ThemeProvider
+// Wrapper with ThemeProvider for unmigrated child components (RadialChart, Chip)
 const renderWithTheme = (component: React.ReactElement) => {
   return render(<ThemeProvider>{component}</ThemeProvider>);
 };

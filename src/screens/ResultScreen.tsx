@@ -6,33 +6,31 @@
  * ally chips, "View Why" button, and disclaimer.
  * 
  * Requirements: 1.3, 1.7, 1.10
- * Task: 2.2.3
+ * Task: 2.2.3, 5.1 (NativeWind migration)
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, ScrollView} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
 import {
   StarSystemCrest,
   RadialChart,
   Chip,
-  Button,
   type StarSystemName,
 } from '@/components';
-import {useTheme} from '@/theme';
+import {Button, Card} from '@/ui';
 import {StarfieldBackground} from '@/components/StarfieldBackground';
 
 type Props = ScreenProps<'Result'>;
 
 export function ResultScreen({navigation, route}: Props) {
-  const theme = useTheme();
   const {classification, primary, hybrid, percentage, allies, contributorsPerSystem, percentages} = route.params;
 
   // Determine which system to display crest for
   const displaySystem = (primary || (hybrid && hybrid[0])) as StarSystemName | undefined;
   
   // Get color for the primary/hybrid system
-  const systemColor = displaySystem ? getSystemColor(displaySystem) : theme.colors.lavender[500];
+  const systemColor = displaySystem ? getSystemColor(displaySystem) : '#a78bfa';
 
   const handleViewWhy = () => {
     navigation.navigate('Why', {
@@ -42,31 +40,25 @@ export function ResultScreen({navigation, route}: Props) {
   };
 
   return (
-    <View style={styles.root}>
+    <View className="flex-1 bg-canvas-dark">
       <StarfieldBackground />
       <ScrollView 
-        contentContainerStyle={[styles.container, {padding: theme.spacing[5]}]}
+        contentContainerStyle={{flexGrow: 1}}
+        className="p-6"
         showsVerticalScrollIndicator={false}
         testID="result-screen">
         
         {/* Header: "Your Primary Star System" */}
-        <View style={[styles.header, {marginBottom: theme.spacing[8]}]}>
+        <View className="items-center mb-6">
           <Text 
-            style={[
-              styles.title, 
-              {
-                fontSize: theme.typography.fontSize['3xl'],
-                fontWeight: theme.typography.fontWeight.bold,
-                color: theme.colors.text.primary,
-              }
-            ]}
+            className="text-3xl font-bold text-text-primary text-center"
             testID="result-header">
             Your Primary Star System
           </Text>
         </View>
 
         {/* Radial percentage chart (62% example) */}
-        <View style={[styles.chartContainer, {marginBottom: theme.spacing[8]}]}>
+        <View className="items-center mb-6">
           <RadialChart
             percentage={percentage}
             label={displaySystem || 'System'}
@@ -78,8 +70,8 @@ export function ResultScreen({navigation, route}: Props) {
 
         {/* Primary star system display with crest */}
         {displaySystem && (
-          <View style={[styles.primarySystemContainer, {marginBottom: theme.spacing[6]}]}>
-            <View style={[styles.crestContainer, {marginBottom: theme.spacing[4]}]}>
+          <View className="items-center mb-6">
+            <View className="items-center mb-4">
               <StarSystemCrest
                 system={displaySystem}
                 size="lg"
@@ -87,28 +79,13 @@ export function ResultScreen({navigation, route}: Props) {
               />
             </View>
             <Text 
-              style={[
-                styles.systemName,
-                {
-                  fontSize: theme.typography.fontSize['2xl'],
-                  fontWeight: theme.typography.fontWeight.bold,
-                  color: theme.colors.text.primary,
-                }
-              ]}
+              className="text-3xl font-bold text-text-primary text-center"
               testID="primary-system-name">
               {classification === 'hybrid' && hybrid
                 ? `${hybrid[0]} / ${hybrid[1]}`
                 : (primary || 'Unknown')}
             </Text>
-            <Text 
-              style={[
-                styles.systemType,
-                {
-                  fontSize: theme.typography.fontSize.sm,
-                  color: theme.colors.text.muted,
-                  marginTop: theme.spacing[1],
-                }
-              ]}>
+            <Text className="text-sm text-text-muted text-center mt-1">
               {classification === 'hybrid' ? 'Hybrid System' : 'Primary System'}
             </Text>
           </View>
@@ -116,20 +93,11 @@ export function ResultScreen({navigation, route}: Props) {
 
         {/* Ally chips (e.g., Sirius 18%, Lyra 12%, Andromeda 8%) using Figma Chip */}
         {allies.length > 0 && (
-          <View style={[styles.alliesSection, {marginBottom: theme.spacing[8]}]}>
-            <Text 
-              style={[
-                styles.alliesTitle,
-                {
-                  fontSize: theme.typography.fontSize.base,
-                  fontWeight: theme.typography.fontWeight.semibold,
-                  color: theme.colors.text.secondary,
-                  marginBottom: theme.spacing[3],
-                }
-              ]}>
+          <View className="items-center mb-6">
+            <Text className="text-lg font-semibold text-text-secondary text-center mb-3">
               Allied Systems
             </Text>
-            <View style={styles.chipsContainer}>
+            <View className="flex-row flex-wrap justify-center gap-2">
               {allies.map((ally, index) => (
                 <Chip
                   key={index}
@@ -144,7 +112,7 @@ export function ResultScreen({navigation, route}: Props) {
         )}
 
         {/* "View Why" button using Figma Button */}
-        <View style={[styles.buttonContainer, {marginBottom: theme.spacing[6]}]}>
+        <View className="w-full mb-6">
           <Button
             variant="primary"
             size="lg"
@@ -156,31 +124,13 @@ export function ResultScreen({navigation, route}: Props) {
         </View>
 
         {/* Disclaimer: "For insight & entertainment. Not medical, financial, or legal advice." */}
-        <View 
-          style={[
-            styles.disclaimer,
-            {
-              backgroundColor: `${theme.colors.gold[400]}1A`, // 10% opacity
-              borderColor: `${theme.colors.gold[400]}33`, // 20% opacity
-              borderRadius: theme.borderRadius.md,
-              padding: theme.spacing[4],
-              borderWidth: 1,
-            }
-          ]}>
+        <Card variant="warning" className="items-center p-4">
           <Text 
-            style={[
-              styles.disclaimerText,
-              {
-                fontSize: theme.typography.fontSize.xs,
-                color: theme.colors.gold[300],
-                textAlign: 'center',
-                fontStyle: 'italic',
-              }
-            ]}
+            className="text-xs text-gold-300 text-center italic leading-[18px]"
             testID="disclaimer-text">
             For insight & entertainment. Not medical, financial, or legal advice.
           </Text>
-        </View>
+        </Card>
       </ScrollView>
     </View>
   );
@@ -199,55 +149,3 @@ function getSystemColor(system: StarSystemName): string {
   };
   return colors[system] || '#a78bfa';
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#0a0612', // canvas.dark
-  },
-  container: {
-    flexGrow: 1,
-  },
-  header: {
-    alignItems: 'center',
-  },
-  title: {
-    textAlign: 'center',
-  },
-  chartContainer: {
-    alignItems: 'center',
-  },
-  primarySystemContainer: {
-    alignItems: 'center',
-  },
-  crestContainer: {
-    alignItems: 'center',
-  },
-  systemName: {
-    textAlign: 'center',
-  },
-  systemType: {
-    textAlign: 'center',
-  },
-  alliesSection: {
-    alignItems: 'center',
-  },
-  alliesTitle: {
-    textAlign: 'center',
-  },
-  chipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  buttonContainer: {
-    width: '100%',
-  },
-  disclaimer: {
-    alignItems: 'center',
-  },
-  disclaimerText: {
-    lineHeight: 18,
-  },
-});

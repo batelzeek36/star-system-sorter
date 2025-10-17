@@ -8,14 +8,16 @@
  * 
  * Requirements: 1.7, 1.10
  * Task: 2.2.5
+ * 
+ * Migrated to NativeWind (Task 7.1)
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {View, Text, ScrollView, TouchableOpacity} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
-import {Card, StarSystemCrest, type StarSystemName} from '@/components';
+import {StarSystemCrest, type StarSystemName} from '@/components';
+import {Card} from '@/ui/Card';
 import {SettingsIcon} from '@/components/icons';
-import {useTheme} from '@/theme';
 import {StarfieldBackground} from '@/components/StarfieldBackground';
 
 type Props = ScreenProps<'Profile'>;
@@ -34,102 +36,56 @@ const MOCK_USER_DATA = {
 };
 
 export function ProfileScreen({navigation}: Props) {
-  const theme = useTheme();
-
   const handleGoToSettings = () => {
     navigation.navigate('Settings');
   };
 
   return (
-    <View style={styles.root}>
+    <View className="flex-1 bg-canvas-dark">
       <StarfieldBackground />
       
       {/* Header with Settings Icon */}
-      <View 
-        style={[
-          styles.header,
-          {
-            paddingHorizontal: theme.spacing[5],
-            paddingTop: theme.spacing[6],
-            paddingBottom: theme.spacing[4],
-          }
-        ]}>
+      <View className="flex-row justify-between items-center px-5 pt-6 pb-4">
         <Text 
-          style={[
-            styles.headerTitle,
-            {
-              fontSize: theme.typography.fontSize['2xl'],
-              fontWeight: theme.typography.fontWeight.bold,
-              color: theme.colors.text.primary,
-            }
-          ]}
+          className="flex-1 text-2xl font-bold text-text-primary"
           testID="profile-header">
           Profile
         </Text>
         <TouchableOpacity
           onPress={handleGoToSettings}
-          style={styles.settingsButton}
+          className="p-2 min-w-[44px] min-h-[44px] justify-center items-center"
           accessibilityLabel="Go to Settings"
           accessibilityRole="button"
           testID="settings-button">
-          <SettingsIcon size={28} color={theme.colors.lavender[400]} />
+          <SettingsIcon size={28} color="#c4b5fd" />
         </TouchableOpacity>
       </View>
 
       <ScrollView 
-        contentContainerStyle={[
-          styles.container,
-          {padding: theme.spacing[5]}
-        ]}
+        contentContainerStyle={{flexGrow: 1, padding: 20}}
         showsVerticalScrollIndicator={false}
         testID="profile-screen">
         
         {/* User Type Display */}
-        <View style={[styles.userTypeSection, {marginBottom: theme.spacing[8]}]}>
+        <View className="items-center mb-8">
           <Text 
-            style={[
-              styles.userType,
-              {
-                fontSize: theme.typography.fontSize.xl,
-                fontWeight: theme.typography.fontWeight.semibold,
-                color: theme.colors.text.primary,
-                textAlign: 'center',
-              }
-            ]}
+            className="text-xl font-semibold text-text-primary text-center"
             testID="user-type-display">
             {MOCK_USER_DATA.hdType} • {MOCK_USER_DATA.profile}
           </Text>
-          <Text 
-            style={[
-              styles.userTypeLabel,
-              {
-                fontSize: theme.typography.fontSize.sm,
-                color: theme.colors.text.muted,
-                textAlign: 'center',
-                marginTop: theme.spacing[1],
-              }
-            ]}>
+          <Text className="text-sm text-text-muted text-center mt-1">
             Human Design Type & Profile
           </Text>
         </View>
 
         {/* Primary Star System Card */}
-        <View style={[styles.section, {marginBottom: theme.spacing[6]}]}>
-          <Text 
-            style={[
-              styles.sectionTitle,
-              {
-                fontSize: theme.typography.fontSize.base,
-                fontWeight: theme.typography.fontWeight.semibold,
-                color: theme.colors.text.secondary,
-                marginBottom: theme.spacing[3],
-              }
-            ]}>
+        <View className="mb-6">
+          <Text className="text-base font-semibold text-text-secondary mb-3">
             Primary Star System
           </Text>
           <Card variant="emphasis" testID="primary-system-card">
-            <View style={styles.systemCard}>
-              <View style={[styles.crestContainer, {marginBottom: theme.spacing[3]}]}>
+            <View className="items-center">
+              <View className="items-center mb-3">
                 <StarSystemCrest
                   system={MOCK_USER_DATA.primarySystem}
                   size="lg"
@@ -137,29 +93,12 @@ export function ProfileScreen({navigation}: Props) {
                 />
               </View>
               <Text 
-                style={[
-                  styles.systemName,
-                  {
-                    fontSize: theme.typography.fontSize.xl,
-                    fontWeight: theme.typography.fontWeight.bold,
-                    color: theme.colors.text.primary,
-                    textAlign: 'center',
-                  }
-                ]}
+                className="text-xl font-bold text-text-primary text-center"
                 testID="primary-system-name">
                 {MOCK_USER_DATA.primarySystem}
               </Text>
               <Text 
-                style={[
-                  styles.systemPercentage,
-                  {
-                    fontSize: theme.typography.fontSize.lg,
-                    fontWeight: theme.typography.fontWeight.medium,
-                    color: theme.colors.lavender[400],
-                    textAlign: 'center',
-                    marginTop: theme.spacing[1],
-                  }
-                ]}
+                className="text-lg font-medium text-lavender-400 text-center mt-1"
                 testID="primary-system-percentage">
                 {MOCK_USER_DATA.primaryPercentage}%
               </Text>
@@ -169,55 +108,32 @@ export function ProfileScreen({navigation}: Props) {
 
         {/* Allied Systems Cards */}
         {MOCK_USER_DATA.allies.length > 0 && (
-          <View style={styles.section}>
-            <Text 
-              style={[
-                styles.sectionTitle,
-                {
-                  fontSize: theme.typography.fontSize.base,
-                  fontWeight: theme.typography.fontWeight.semibold,
-                  color: theme.colors.text.secondary,
-                  marginBottom: theme.spacing[3],
-                }
-              ]}>
+          <View>
+            <Text className="text-base font-semibold text-text-secondary mb-3">
               Allied Systems
             </Text>
             {MOCK_USER_DATA.allies.map((ally, index) => (
               <Card 
                 key={index} 
                 variant="default" 
-                style={{marginBottom: theme.spacing[3]}}
+                className="mb-3"
                 testID={`ally-system-card-${index}`}>
-                <View style={styles.allyCard}>
-                  <View style={styles.allyLeft}>
+                <View className="flex-row items-center">
+                  <View className="mr-4">
                     <StarSystemCrest
                       system={ally.system}
                       size="md"
                       variant="default"
                     />
                   </View>
-                  <View style={styles.allyRight}>
+                  <View className="flex-1">
                     <Text 
-                      style={[
-                        styles.allyName,
-                        {
-                          fontSize: theme.typography.fontSize.base,
-                          fontWeight: theme.typography.fontWeight.semibold,
-                          color: theme.colors.text.primary,
-                        }
-                      ]}
+                      className="text-base font-semibold text-text-primary"
                       testID={`ally-system-name-${index}`}>
                       {ally.system}
                     </Text>
                     <Text 
-                      style={[
-                        styles.allyPercentage,
-                        {
-                          fontSize: theme.typography.fontSize.sm,
-                          color: theme.colors.gold[400],
-                          marginTop: theme.spacing[1],
-                        }
-                      ]}
+                      className="text-sm text-gold-400 mt-1"
                       testID={`ally-system-percentage-${index}`}>
                       {ally.percentage}%
                     </Text>
@@ -232,70 +148,4 @@ export function ProfileScreen({navigation}: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#0a0612', // canvas.dark
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-  },
-  settingsButton: {
-    padding: 8,
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    flexGrow: 1,
-  },
-  userTypeSection: {
-    alignItems: 'center',
-  },
-  userType: {
-    // Styles applied inline with theme
-  },
-  userTypeLabel: {
-    // Styles applied inline with theme
-  },
-  section: {
-    // Styles applied inline with theme
-  },
-  sectionTitle: {
-    // Styles applied inline with theme
-  },
-  systemCard: {
-    alignItems: 'center',
-  },
-  crestContainer: {
-    alignItems: 'center',
-  },
-  systemName: {
-    // Styles applied inline with theme
-  },
-  systemPercentage: {
-    // Styles applied inline with theme
-  },
-  allyCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  allyLeft: {
-    marginRight: 16,
-  },
-  allyRight: {
-    flex: 1,
-  },
-  allyName: {
-    // Styles applied inline with theme
-  },
-  allyPercentage: {
-    // Styles applied inline with theme
-  },
-});
+

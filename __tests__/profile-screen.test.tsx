@@ -1,12 +1,12 @@
 /**
  * ProfileScreen Tests
- * Verify Figma design system integration for Profile screen
+ * Verify NativeWind migration and design system integration for Profile screen
+ * 
+ * Migrated to NativeWind (Task 7.2)
  */
 
-import React from 'react';
 import {render, fireEvent} from '@testing-library/react-native';
 import {ProfileScreen} from '../src/screens/ProfileScreen';
-import {ThemeProvider} from '../src/theme/ThemeProvider';
 
 // Mock navigation
 const createMockNavigation = () => ({
@@ -25,15 +25,10 @@ const createMockNavigation = () => ({
   setParams: jest.fn(),
 });
 
-// Wrapper with ThemeProvider
-const renderWithTheme = (component: React.ReactElement) => {
-  return render(<ThemeProvider>{component}</ThemeProvider>);
-};
-
 describe('ProfileScreen', () => {
-  it('renders with Figma design system components', () => {
+  it('renders with NativeWind design system components', () => {
     const navigation = createMockNavigation();
-    const {getByText, getByTestId} = renderWithTheme(
+    const {getByText, getByTestId} = render(
       <ProfileScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -82,7 +77,7 @@ describe('ProfileScreen', () => {
 
   it('has proper accessibility labels', () => {
     const navigation = createMockNavigation();
-    const {getByLabelText} = renderWithTheme(
+    const {getByLabelText} = render(
       <ProfileScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -91,7 +86,7 @@ describe('ProfileScreen', () => {
 
   it('navigates to Settings screen when settings button is pressed', () => {
     const navigation = createMockNavigation();
-    const {getByTestId} = renderWithTheme(
+    const {getByTestId} = render(
       <ProfileScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -103,7 +98,7 @@ describe('ProfileScreen', () => {
 
   it('displays star system crests for primary and allies', () => {
     const navigation = createMockNavigation();
-    const {getByTestId} = renderWithTheme(
+    const {getByTestId} = render(
       <ProfileScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -115,9 +110,9 @@ describe('ProfileScreen', () => {
     expect(getByTestId('ally-system-card-2')).toBeTruthy();
   });
 
-  it('uses Figma Card component with correct variants', () => {
+  it('uses NativeWind Card component with correct variants', () => {
     const navigation = createMockNavigation();
-    const {getByTestId} = renderWithTheme(
+    const {getByTestId} = render(
       <ProfileScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -130,14 +125,14 @@ describe('ProfileScreen', () => {
     expect(allyCard0).toBeTruthy();
   });
 
-  it('meets minimum touch target size (44px)', () => {
+  it('meets minimum touch target size (44px) with NativeWind classes', () => {
     const navigation = createMockNavigation();
-    const {getByTestId} = renderWithTheme(
+    const {getByTestId} = render(
       <ProfileScreen navigation={navigation as any} route={{} as any} />,
     );
 
     const settingsButton = getByTestId('settings-button');
     expect(settingsButton).toBeTruthy();
-    // Touch target size is enforced in styles (minWidth: 44, minHeight: 44)
+    // Touch target size is enforced with className="min-w-[44px] min-h-[44px]"
   });
 });

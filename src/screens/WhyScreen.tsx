@@ -8,17 +8,15 @@
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, ScrollView} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
 import {AppBar} from '@/components/AppBar';
-import {Card} from '@/components/Card';
-import {useTheme} from '@/theme';
+import {Card} from '@/ui/Card';
 
 type Props = ScreenProps<'Why'>;
 
 export function WhyScreen({route, navigation}: Props) {
   const {contributorsPerSystem, percentages} = route.params;
-  const theme = useTheme();
 
   // Sort systems by percentage (highest first)
   const sortedSystems = Object.keys(contributorsPerSystem).sort(
@@ -29,7 +27,7 @@ export function WhyScreen({route, navigation}: Props) {
   const primarySystem = sortedSystems[0] || 'Unknown';
 
   return (
-    <View style={[styles.wrapper, {backgroundColor: theme.colors.canvas.dark}]}>
+    <View className="flex-1 bg-canvas-dark">
       {/* AppBar Header */}
       <AppBar
         title={`Why ${primarySystem}`}
@@ -39,12 +37,12 @@ export function WhyScreen({route, navigation}: Props) {
       />
       
       <ScrollView 
-        contentContainerStyle={styles.container}
+        className="flex-grow p-5"
         showsVerticalScrollIndicator={false}>
         
         {/* Subtitle */}
-        <View style={styles.header}>
-          <Text style={[styles.subtitle, {color: theme.colors.text.secondary}]}>
+        <View className="mb-6">
+          <Text className="text-base leading-6 text-text-secondary">
             Your Human Design attributes contributed to these star systems
           </Text>
         </View>
@@ -61,32 +59,32 @@ export function WhyScreen({route, navigation}: Props) {
           <Card 
             key={system} 
             variant={variant}
-            style={styles.card}
+            className="mb-4"
             testID={`why-card-${system.toLowerCase()}`}
           >
             {/* System Header */}
-            <View style={styles.cardHeader}>
-              <Text style={[styles.systemName, {color: theme.colors.text.primary}]}>
+            <View className="flex-row justify-between items-center mb-3 pb-3 border-b border-borders-muted">
+              <Text className="text-xl font-semibold text-text-primary">
                 {system}
               </Text>
-              <Text style={[styles.percentage, {color: theme.colors.lavender[400]}]}>
+              <Text className="text-lg font-bold text-lavender-400">
                 {percentage.toFixed(1)}%
               </Text>
             </View>
 
             {/* Contributors List */}
-            <View style={styles.contributorsList}>
+            <View className="gap-2">
               {contributors.length > 0 ? (
                 contributors.map((contributor, idx) => (
-                  <View key={idx} style={styles.contributorItem}>
-                    <View style={[styles.bullet, {backgroundColor: theme.colors.lavender[500]}]} />
-                    <Text style={[styles.contributorText, {color: theme.colors.text.secondary}]}>
+                  <View key={idx} className="flex-row items-start gap-2">
+                    <View className="w-1.5 h-1.5 rounded-full bg-lavender-500 mt-1.5" />
+                    <Text className="flex-1 text-sm leading-5 text-text-secondary">
                       {formatContributor(contributor)}
                     </Text>
                   </View>
                 ))
               ) : (
-                <Text style={[styles.noContributors, {color: theme.colors.text.muted}]}>
+                <Text className="text-sm italic text-text-muted">
                   No contributing attributes
                 </Text>
               )}
@@ -96,8 +94,8 @@ export function WhyScreen({route, navigation}: Props) {
       })}
 
       {/* Footer Note */}
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, {color: theme.colors.text.muted}]}>
+      <View className="mt-6 pt-4 border-t border-borders-muted">
+        <Text className="text-xs text-center leading-[18px] text-text-muted">
           For insight & entertainment. Not medical, financial, or legal advice.
         </Text>
       </View>
@@ -140,74 +138,3 @@ function formatContributor(key: string): string {
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
-  container: {
-    flexGrow: 1,
-    padding: 20, // theme.spacing[5]
-  },
-  header: {
-    marginBottom: 24, // theme.spacing[6]
-  },
-  subtitle: {
-    fontSize: 16, // theme.typography.fontSize.base
-    lineHeight: 24, // base * 1.5
-  },
-  card: {
-    marginBottom: 16, // theme.spacing[4]
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12, // theme.spacing[3]
-    paddingBottom: 12, // theme.spacing[3]
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(167, 139, 250, 0.2)', // theme.colors.borders.muted
-  },
-  systemName: {
-    fontSize: 20, // theme.typography.fontSize.xl
-    fontWeight: '600', // theme.typography.fontWeight.semibold
-  },
-  percentage: {
-    fontSize: 18, // theme.typography.fontSize.lg
-    fontWeight: '700', // theme.typography.fontWeight.bold
-  },
-  contributorsList: {
-    gap: 8, // theme.spacing[2]
-  },
-  contributorItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8, // theme.spacing[2]
-  },
-  bullet: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 7,
-  },
-  contributorText: {
-    flex: 1,
-    fontSize: 14, // theme.typography.fontSize.sm
-    lineHeight: 20, // sm * ~1.43
-  },
-  noContributors: {
-    fontSize: 14, // theme.typography.fontSize.sm
-    fontStyle: 'italic',
-  },
-  footer: {
-    marginTop: 24, // theme.spacing[6]
-    paddingTop: 16, // theme.spacing[4]
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(167, 139, 250, 0.2)', // theme.colors.borders.muted
-  },
-  footerText: {
-    fontSize: 12, // theme.typography.fontSize.xs
-    textAlign: 'center',
-    lineHeight: 18, // xs * 1.5
-  },
-});

@@ -284,7 +284,8 @@ cd ..
 - **Navigation**: React Navigation (native stack)
 - **State Management**: zustand (minimal, 2-3 atoms)
 - **Forms**: react-hook-form + Zod validation (v4)
-- **UI Components**: shadcn/ui adapted for React Native
+- **Styling**: NativeWind (Tailwind CSS for React Native)
+- **UI Components**: Custom primitives in `src/ui/` (Button, Card, Input, Sheet)
 - **SVG**: react-native-svg
 - **Backend**: Node.js 20+ with Express (see `apps/server/`)
 
@@ -367,17 +368,290 @@ src/scorer/
 └── index.ts          # Public API (import from here only)
 ```
 
+## Styling with NativeWind
+
+This project uses **NativeWind** to bring Tailwind CSS utilities to React Native. NativeWind allows you to style components using the familiar `className` prop with Tailwind utility classes.
+
+### Installation & Setup
+
+NativeWind is already configured in this project. If you're setting up a new project or need to reinstall:
+
+```bash
+# Install dependencies
+npm install nativewind tailwindcss
+npm install --save-dev @types/react-native
+
+# Configuration files are already set up:
+# - tailwind.config.js (custom design tokens)
+# - global.css (Tailwind directives)
+# - metro.config.js (NativeWind wrapper)
+# - babel.config.js (nativewind/babel plugin)
+# - nativewind-env.d.ts (TypeScript types)
+```
+
+**Key Configuration Files:**
+
+1. **tailwind.config.js** - Custom design tokens (colors, spacing, typography)
+   - All tokens from `src/theme/tokens.ts` are mapped to Tailwind utilities
+   - Includes Figma design tokens from `Figma/design-tokens.json`
+
+2. **global.css** - Tailwind directives (imported in App.tsx)
+   ```css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   ```
+
+3. **metro.config.js** - NativeWind wrapper for Metro bundler
+   ```javascript
+   const { withNativeWind } = require('nativewind/metro');
+   module.exports = withNativeWind(config, { input: './global.css' });
+   ```
+
+4. **babel.config.js** - NativeWind Babel plugin
+   ```javascript
+   plugins: ['nativewind/babel']
+   ```
+
+### Quick Start
+
+```typescript
+import { View, Text } from 'react-native';
+
+// Use className with Tailwind utilities
+<View className="flex-1 bg-canvas-dark px-5 pt-16">
+  <Text className="text-3xl font-bold text-text-primary mb-4">
+    Welcome to S³
+  </Text>
+  <Text className="text-base text-text-secondary leading-relaxed">
+    Discover your star system alignment
+  </Text>
+</View>
+```
+
+### UI Primitives
+
+Custom primitive components are available in `src/ui/`:
+
+```typescript
+import { Button } from '@/ui/Button';
+import { Card } from '@/ui/Card';
+import { Input } from '@/ui/Input';
+import { Sheet } from '@/ui/Sheet';
+
+// Button with variants and sizes
+<Button variant="primary" size="lg" onPress={handlePress}>
+  Get Started
+</Button>
+
+// Card with gradient backgrounds
+<Card variant="emphasis">
+  <Text className="text-lg text-text-primary">Card Content</Text>
+</Card>
+
+// Input with label and error states
+<Input
+  label="Email"
+  value={email}
+  onChangeText={setEmail}
+  error={errors.email}
+/>
+
+// Sheet for modal presentations
+<Sheet isOpen={isOpen} onClose={handleClose}>
+  <Text className="text-xl font-bold">Modal Content</Text>
+</Sheet>
+```
+
+See `src/ui/README.md` for detailed documentation on all primitive components.
+
+### Common Patterns
+
+**Layout:**
+```typescript
+// Full height container
+<View className="flex-1 bg-canvas-dark">
+
+// Centered content
+<View className="items-center justify-center">
+
+// Horizontal row with gap
+<View className="flex-row gap-4">
+
+// Absolute positioning
+<View className="absolute inset-0">
+```
+
+**Spacing:**
+```typescript
+// Padding (all sides)
+<View className="p-4">  // 16px
+
+// Padding (directional)
+<View className="px-5 pt-16 pb-6">  // horizontal, top, bottom
+
+// Margin
+<View className="mx-5 mb-12">  // horizontal, bottom
+
+// Gap between children
+<View className="flex-row gap-4">  // 16px gap
+```
+
+**Colors:**
+```typescript
+// Background colors
+<View className="bg-canvas-dark">
+<View className="bg-lavender-500">
+<View className="bg-surface-subtle">
+
+// Text colors
+<Text className="text-text-primary">  // White
+<Text className="text-text-secondary">  // Light gray
+<Text className="text-lavender-400">  // Lavender accent
+
+// Border colors
+<View className="border border-borders-subtle">
+<View className="border-2 border-lavender-500">
+```
+
+**Typography:**
+```typescript
+// Font size and weight
+<Text className="text-3xl font-bold">  // 30px, bold
+<Text className="text-base font-medium">  // 16px, medium
+
+// Line height
+<Text className="leading-tight">  // 1.25
+<Text className="leading-relaxed">  // 1.75
+
+// Text alignment
+<Text className="text-center">
+```
+
+**Borders & Radius:**
+```typescript
+// Border radius
+<View className="rounded-md">  // 12px
+<View className="rounded-xl">  // 24px
+<View className="rounded-full">  // 9999px (circle)
+
+// Border width
+<View className="border">  // 1px
+<View className="border-2">  // 2px
+```
+
+**Touch Targets (WCAG 2.1 AA):**
+```typescript
+// Minimum 44px height for interactive elements
+<Pressable className="min-h-[44px] px-6 py-3">
+  <Text>Button</Text>
+</Pressable>
+
+// Using spacing-11 (44px)
+<View className="h-11 w-11">  // Icon button
+```
+
+**Conditional Styling:**
+```typescript
+const [isActive, setIsActive] = useState(false);
+
+<View className={`
+  p-4 rounded-md
+  ${isActive ? 'bg-lavender-500' : 'bg-surface-subtle'}
+`}>
+```
+
+**Platform-Specific Styling:**
+```typescript
+import { Platform } from 'react-native';
+
+// Shadows (iOS) and Elevation (Android)
+<View 
+  className="bg-surface-subtle rounded-md p-4"
+  style={Platform.select({
+    ios: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    android: {
+      elevation: 5,
+    },
+  })}
+>
+```
+
+### Design Token Reference
+
+All design tokens from `src/theme/tokens.ts` and `Figma/design-tokens.json` are available as Tailwind utilities:
+
+**Colors:**
+- Canvas: `bg-canvas-dark`, `bg-canvas-darker`
+- Surface: `bg-surface-subtle`, `bg-surface-muted`
+- Lavender: `bg-lavender-100` through `bg-lavender-900`
+- Gold: `bg-gold-100` through `bg-gold-700`
+- Text: `text-text-primary`, `text-text-secondary`, `text-text-muted`, `text-text-subtle`
+- Semantic: `bg-semantic-success`, `bg-semantic-error`, `bg-semantic-warning`, `bg-semantic-info`
+- Borders: `border-borders-subtle`, `border-borders-muted`, `border-borders-emphasis`
+
+**Spacing (4px grid):**
+- `p-1` through `p-16` (4px to 64px)
+- `p-11` = 44px (touch target minimum)
+
+**Typography:**
+- Font sizes: `text-xs` (12px) through `text-4xl` (36px)
+- Font weights: `font-normal`, `font-medium`, `font-semibold`, `font-bold`
+- Line heights: `leading-tight`, `leading-normal`, `leading-relaxed`
+
+**Border Radius:**
+- `rounded-sm` (8px), `rounded-md` (12px), `rounded-lg` (16px), `rounded-xl` (24px), `rounded-full` (9999px)
+
+For a complete mapping of Figma tokens to Tailwind classes, see the [Migration Guide](.kiro/specs/nativewind-migration/CHANGELOG.md#figma-token--tailwind-class-reference).
+
+### Troubleshooting
+
+**Styles not applying:**
+```bash
+# Clear Metro cache and restart
+npm start -- --reset-cache
+```
+
+**TypeScript errors with className:**
+- Ensure `nativewind-env.d.ts` exists in project root
+- Restart TypeScript server in your IDE
+
+**Custom colors not working:**
+- Verify colors are defined in `tailwind.config.js`
+- Restart Metro bundler after config changes
+
+**Hot reload not working:**
+- Save the file and shake device to reload
+- Or use Cmd+R (iOS) / Ctrl+R (Android)
+
+For more troubleshooting tips and advanced patterns, see the [Migration Guide](.kiro/specs/nativewind-migration/CHANGELOG.md).
+
+### Resources
+
+- **Migration Guide & Patterns**: [.kiro/specs/nativewind-migration/CHANGELOG.md](.kiro/specs/nativewind-migration/CHANGELOG.md)
+- **UI Primitives Documentation**: [src/ui/README.md](src/ui/README.md)
+- **Design Tokens**: `src/theme/tokens.ts`
+- **Figma Tokens**: `Figma/design-tokens.json`
+- **NativeWind Documentation**: https://www.nativewind.dev/
+- **Tailwind CSS Documentation**: https://tailwindcss.com/docs
+
 ## Development Status
 
 This is an MVP-focused implementation prioritizing:
 - ✅ Core React Native setup with TypeScript
 - ✅ Navigation structure
 - ✅ Dependency management and build tooling
-- ⏳ Human Design API integration
-- ⏳ Scorer library implementation
-- ⏳ UI components and screens
-- ⏳ Content moderation system
-- ⏳ Testing infrastructure
+- ✅ NativeWind styling system with custom primitives
+- ✅ Human Design API integration
+- ✅ Scorer library implementation
+- ✅ UI components and screens
+- ✅ Content moderation system
+- ✅ Testing infrastructure
 
 ## Troubleshooting
 

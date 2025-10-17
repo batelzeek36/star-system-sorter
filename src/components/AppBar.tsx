@@ -6,8 +6,8 @@
  */
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useTheme } from '../theme';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { colors, spacing, borderRadius, typography, components } from '../theme/tokens';
 
 interface AppBarProps {
   title?: string;
@@ -17,85 +17,60 @@ interface AppBarProps {
 }
 
 export function AppBar({ title, onBack, showBack, testID }: AppBarProps) {
-  const theme = useTheme();
-
   return (
     <View
       testID={testID}
-      style={[
-        styles.container,
-        {
-          height: 56,
-          paddingHorizontal: theme.spacing[4],
-        },
-      ]}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 56,
+        paddingHorizontal: spacing[4],
+      }}
     >
       {showBack && onBack ? (
         <TouchableOpacity
           onPress={onBack}
-          style={[
-            styles.backButton,
-            {
-              width: theme.components.touchTarget.minimum,
-              height: theme.components.touchTarget.minimum,
-              marginLeft: -theme.spacing[2],
-              borderRadius: theme.borderRadius.full,
-            },
-          ]}
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: components.touchTarget.minimum,
+            height: components.touchTarget.minimum,
+            marginLeft: -spacing[2],
+            borderRadius: borderRadius.full,
+          }}
           accessibilityLabel="Go back"
           accessibilityRole="button"
           testID={testID ? `${testID}-back` : 'app-bar-back'}
         >
           <Text
-            style={[
-              styles.backIcon,
-              {
-                color: theme.colors.lavender[300],
-                fontSize: theme.typography.fontSize['2xl'],
-              },
-            ]}
+            style={{
+              color: colors.lavender[300],
+              fontSize: typography.fontSize['2xl'],
+              lineHeight: 24,
+            }}
           >
             ‹
           </Text>
         </TouchableOpacity>
       ) : (
-        <View style={{ width: theme.components.touchTarget.minimum }} />
+        <View style={{ width: components.touchTarget.minimum }} />
       )}
 
       {title && (
         <Text
-          style={[
-            styles.title,
-            {
-              color: theme.colors.lavender[200],
-              fontSize: theme.typography.fontSize.lg,
-              fontWeight: theme.typography.fontWeight.medium,
-            },
-          ]}
+          style={{
+            color: colors.lavender[200],
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.medium,
+            textAlign: 'center',
+          }}
         >
           {title}
         </Text>
       )}
 
-      <View style={{ width: theme.components.touchTarget.minimum }} />
+      <View style={{ width: components.touchTarget.minimum }} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backIcon: {
-    lineHeight: 24,
-  },
-  title: {
-    textAlign: 'center',
-  },
-});

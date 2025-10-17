@@ -8,7 +8,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -20,13 +19,12 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import type {ScreenProps} from '@/navigation/types';
 import {TimeZonePicker} from '@/components/TimeZonePicker';
-import {Field} from '@/components/Field';
+import {Input} from '@/ui/Input';
 import {Button} from '@/components/Button';
 import {Toast} from '@/components/Toast';
 import {CalendarIcon, ClockIcon, LocationIcon} from '@/components/icons';
 import {computeHDExtract} from '@/hd';
 import {classify} from '@/scorer';
-import {useTheme} from '@/theme';
 
 type Props = ScreenProps<'Input'>;
 
@@ -91,7 +89,6 @@ const birthDataSchema = z.object({
 type BirthDataForm = z.infer<typeof birthDataSchema>;
 
 export function InputScreen({navigation}: Props) {
-  const theme = useTheme();
   const [activeTab, setActiveTab] = useState<TabType>('birthData');
   const [isProcessing, setIsProcessing] = useState(false);
   const [toast, setToast] = useState<{message: string; type: 'success' | 'error'} | null>(null);
@@ -99,7 +96,7 @@ export function InputScreen({navigation}: Props) {
   const {
     control,
     handleSubmit,
-    formState: {errors, isValid},
+    formState: {errors},
   } = useForm<BirthDataForm>({
     resolver: zodResolver(birthDataSchema),
     mode: 'onBlur', // Validate on blur for real-time feedback
@@ -257,7 +254,7 @@ export function InputScreen({navigation}: Props) {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, {backgroundColor: theme.colors.canvas.dark}]}
+      className="flex-1 bg-canvas-dark"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
       {toast && (
@@ -270,109 +267,49 @@ export function InputScreen({navigation}: Props) {
       )}
       
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1"
+        contentContainerStyle={{padding: 20}}
         keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Text
-            style={[
-              styles.title,
-              {
-                color: theme.colors.text.primary,
-                fontSize: theme.typography.fontSize['2xl'],
-                fontWeight: theme.typography.fontWeight.bold,
-              },
-            ]}>
+        <View className="mb-6">
+          <Text className="text-text-primary text-2xl font-bold leading-8">
             Enter Birth Data
           </Text>
-          <Text
-            style={[
-              styles.subtitle,
-              {
-                color: theme.colors.text.secondary,
-                fontSize: theme.typography.fontSize.sm,
-                marginTop: theme.spacing[2],
-              },
-            ]}>
+          <Text className="text-text-secondary text-sm mt-2 leading-5">
             We'll use this to calculate your star system classification
           </Text>
         </View>
 
         {/* Tabs */}
-        <View
-          style={[
-            styles.tabContainer,
-            {
-              borderBottomWidth: 1,
-              borderBottomColor: theme.colors.borders.subtle,
-              marginBottom: theme.spacing[6],
-            },
-          ]}>
+        <View className="flex-row gap-2 border-b border-borders-subtle mb-6">
           <TouchableOpacity
-            style={[
-              styles.tab,
-              {
-                minHeight: theme.components.touchTarget.minimum,
-                paddingVertical: theme.spacing[3],
-                paddingHorizontal: theme.spacing[4],
-                borderBottomWidth: 2,
-                borderBottomColor:
-                  activeTab === 'birthData'
-                    ? theme.colors.lavender[400]
-                    : 'transparent',
-              },
-            ]}
+            className={`flex-1 items-center justify-center min-h-[44px] py-3 px-4 border-b-2 ${
+              activeTab === 'birthData' ? 'border-lavender-400' : 'border-transparent'
+            }`}
             onPress={() => setActiveTab('birthData')}
             accessibilityLabel="Birth Data tab"
             accessibilityRole="tab"
             accessibilityState={{selected: activeTab === 'birthData'}}
             testID="tab-birth-data">
             <Text
-              style={[
-                styles.tabText,
-                {
-                  color:
-                    activeTab === 'birthData'
-                      ? theme.colors.lavender[300]
-                      : theme.colors.text.muted,
-                  fontSize: theme.typography.fontSize.sm,
-                  fontWeight: theme.typography.fontWeight.medium,
-                },
-              ]}>
+              className={`text-sm font-medium text-center ${
+                activeTab === 'birthData' ? 'text-lavender-300' : 'text-text-muted'
+              }`}>
               Birth Data
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.tab,
-              {
-                minHeight: theme.components.touchTarget.minimum,
-                paddingVertical: theme.spacing[3],
-                paddingHorizontal: theme.spacing[4],
-                borderBottomWidth: 2,
-                borderBottomColor:
-                  activeTab === 'uploadPdf'
-                    ? theme.colors.lavender[400]
-                    : 'transparent',
-              },
-            ]}
+            className={`flex-1 items-center justify-center min-h-[44px] py-3 px-4 border-b-2 ${
+              activeTab === 'uploadPdf' ? 'border-lavender-400' : 'border-transparent'
+            }`}
             onPress={() => setActiveTab('uploadPdf')}
             accessibilityLabel="Upload Chart PDF tab"
             accessibilityRole="tab"
             accessibilityState={{selected: activeTab === 'uploadPdf'}}
             testID="tab-upload-pdf">
             <Text
-              style={[
-                styles.tabText,
-                {
-                  color:
-                    activeTab === 'uploadPdf'
-                      ? theme.colors.lavender[300]
-                      : theme.colors.text.muted,
-                  fontSize: theme.typography.fontSize.sm,
-                  fontWeight: theme.typography.fontWeight.medium,
-                },
-              ]}>
+              className={`text-sm font-medium text-center ${
+                activeTab === 'uploadPdf' ? 'text-lavender-300' : 'text-text-muted'
+              }`}>
               Upload Chart PDF
             </Text>
           </TouchableOpacity>
@@ -380,13 +317,13 @@ export function InputScreen({navigation}: Props) {
 
         {/* Tab Content */}
         {activeTab === 'birthData' ? (
-          <View style={styles.form}>
+          <View className="gap-4">
             {/* Date Field with Calendar Icon */}
             <Controller
               control={control}
               name="date"
               render={({field: {onChange, onBlur, value}}) => (
-                <Field
+                <Input
                   label="Birth Date"
                   placeholder="MM/DD/YYYY"
                   value={value}
@@ -405,7 +342,7 @@ export function InputScreen({navigation}: Props) {
               control={control}
               name="time"
               render={({field: {onChange, onBlur, value}}) => (
-                <Field
+                <Input
                   label="Birth Time"
                   placeholder="HH:MM AM/PM"
                   value={value}
@@ -424,7 +361,7 @@ export function InputScreen({navigation}: Props) {
               control={control}
               name="location"
               render={({field: {onChange, onBlur, value}}) => (
-                <Field
+                <Input
                   label="Birth Location"
                   placeholder="City, State/Country"
                   value={value}
@@ -439,17 +376,8 @@ export function InputScreen({navigation}: Props) {
             />
 
             {/* Time Zone Field */}
-            <View style={{marginTop: theme.spacing[4]}}>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: theme.colors.lavender[300],
-                    fontSize: theme.typography.fontSize.sm,
-                    marginBottom: theme.spacing[2],
-                    fontWeight: theme.typography.fontWeight.medium,
-                  },
-                ]}>
+            <View className="mt-4">
+              <Text className="text-lavender-300 text-sm font-medium mb-2">
                 Time Zone
               </Text>
               <Controller
@@ -464,33 +392,17 @@ export function InputScreen({navigation}: Props) {
                 )}
               />
               {errors.timeZone && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    {
-                      color: theme.colors.semantic.error,
-                      fontSize: theme.typography.fontSize.xs,
-                      marginTop: theme.spacing[2],
-                    },
-                  ]}>
+                <Text className="text-semantic-error text-xs mt-2 leading-[18px]">
                   {errors.timeZone.message}
                 </Text>
               )}
-              <Text
-                style={[
-                  styles.helperText,
-                  {
-                    color: theme.colors.text.subtle,
-                    fontSize: theme.typography.fontSize.xs,
-                    marginTop: theme.spacing[2],
-                  },
-                ]}>
+              <Text className="text-text-subtle text-xs mt-2 leading-[18px]">
                 Detected: {Intl.DateTimeFormat().resolvedOptions().timeZone}
               </Text>
             </View>
 
             {/* Submit Button */}
-            <View style={{marginTop: theme.spacing[6]}}>
+            <View className="mt-6">
               <Button
                 variant="primary"
                 size="lg"
@@ -504,16 +416,8 @@ export function InputScreen({navigation}: Props) {
             </View>
           </View>
         ) : (
-          <View style={styles.uploadContainer}>
-            <Text
-              style={[
-                styles.uploadPlaceholder,
-                {
-                  color: theme.colors.text.muted,
-                  fontSize: theme.typography.fontSize.sm,
-                  textAlign: 'center',
-                },
-              ]}>
+          <View className="flex-1 items-center justify-center py-16">
+            <Text className="text-text-muted text-sm text-center leading-5">
               PDF upload functionality coming soon
             </Text>
           </View>
@@ -522,57 +426,3 @@ export function InputScreen({navigation}: Props) {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  title: {
-    lineHeight: 32,
-  },
-  subtitle: {
-    lineHeight: 20,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tabText: {
-    textAlign: 'center',
-  },
-  form: {
-    gap: 20,
-  },
-  label: {
-    fontWeight: '500',
-  },
-  errorText: {
-    lineHeight: 18,
-  },
-  helperText: {
-    lineHeight: 18,
-  },
-  uploadContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 64,
-  },
-  uploadPlaceholder: {
-    lineHeight: 20,
-  },
-});

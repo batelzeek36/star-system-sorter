@@ -1,12 +1,10 @@
 /**
  * OnboardingScreen Tests
- * Verify Figma design system integration
+ * Verify NativeWind styling and Figma design system integration
  */
 
-import React from 'react';
 import {render, fireEvent} from '@testing-library/react-native';
 import {OnboardingScreen} from '../src/screens/OnboardingScreen';
-import {ThemeProvider} from '../src/theme/ThemeProvider';
 
 // Mock navigation
 const createMockNavigation = () => ({
@@ -25,15 +23,10 @@ const createMockNavigation = () => ({
   setParams: jest.fn(),
 });
 
-// Wrapper with ThemeProvider
-const renderWithTheme = (component: React.ReactElement) => {
-  return render(<ThemeProvider>{component}</ThemeProvider>);
-};
-
 describe('OnboardingScreen', () => {
-  it('renders with Figma design system components', () => {
+  it('renders with NativeWind styling and Figma design system', () => {
     const navigation = createMockNavigation();
-    const {getByText, getByTestId} = renderWithTheme(
+    const {getByText, getByTestId} = render(
       <OnboardingScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -78,7 +71,7 @@ describe('OnboardingScreen', () => {
 
   it('has proper accessibility labels', () => {
     const navigation = createMockNavigation();
-    const {getByLabelText} = renderWithTheme(
+    const {getByLabelText} = render(
       <OnboardingScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -87,7 +80,7 @@ describe('OnboardingScreen', () => {
 
   it('navigates to Input screen when Begin Sorting is pressed', () => {
     const navigation = createMockNavigation();
-    const {getByTestId} = renderWithTheme(
+    const {getByTestId} = render(
       <OnboardingScreen navigation={navigation as any} route={{} as any} />,
     );
 
@@ -99,7 +92,7 @@ describe('OnboardingScreen', () => {
 
   it('displays step numbers correctly', () => {
     const navigation = createMockNavigation();
-    const {getByText} = renderWithTheme(
+    const {getByText} = render(
       <OnboardingScreen navigation={navigation as any} route={{} as any} />,
     );
 

@@ -12,11 +12,10 @@ import {
   Text,
   View,
   ActivityIndicator,
-  StyleSheet,
   type ViewStyle,
   type TextStyle,
 } from 'react-native';
-import { useTheme } from '../theme';
+import { colors, borderRadius, typography, elevation, components } from '../theme/tokens';
 
 interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
@@ -41,48 +40,47 @@ export function Button({
   testID,
   accessibilityLabel,
 }: ButtonProps) {
-  const theme = useTheme();
   const isDisabled = disabled || loading;
 
   const sizeStyles: Record<string, ViewStyle & TextStyle> = {
     sm: {
-      minHeight: theme.components.button.sizes.sm.minHeight,
-      paddingHorizontal: theme.components.button.sizes.sm.paddingX,
-      paddingVertical: theme.components.button.sizes.sm.paddingY,
-      fontSize: theme.components.button.sizes.sm.fontSize,
+      minHeight: components.button.sizes.sm.minHeight,
+      paddingHorizontal: components.button.sizes.sm.paddingX,
+      paddingVertical: components.button.sizes.sm.paddingY,
+      fontSize: components.button.sizes.sm.fontSize,
     },
     md: {
-      minHeight: theme.components.button.sizes.md.minHeight,
-      paddingHorizontal: theme.components.button.sizes.md.paddingX,
-      paddingVertical: theme.components.button.sizes.md.paddingY,
-      fontSize: theme.components.button.sizes.md.fontSize,
+      minHeight: components.button.sizes.md.minHeight,
+      paddingHorizontal: components.button.sizes.md.paddingX,
+      paddingVertical: components.button.sizes.md.paddingY,
+      fontSize: components.button.sizes.md.fontSize,
     },
     lg: {
-      minHeight: theme.components.button.sizes.lg.minHeight,
-      paddingHorizontal: theme.components.button.sizes.lg.paddingX,
-      paddingVertical: theme.components.button.sizes.lg.paddingY,
-      fontSize: theme.components.button.sizes.lg.fontSize,
+      minHeight: components.button.sizes.lg.minHeight,
+      paddingHorizontal: components.button.sizes.lg.paddingX,
+      paddingVertical: components.button.sizes.lg.paddingY,
+      fontSize: components.button.sizes.lg.fontSize,
     },
   };
 
   const variantStyles: Record<string, { container: ViewStyle; text: TextStyle }> = {
     primary: {
       container: {
-        backgroundColor: theme.colors.lavender[500],
-        ...theme.elevation[2],
+        backgroundColor: colors.lavender[500],
+        ...elevation[2],
       },
       text: {
-        color: theme.colors.text.primary,
+        color: colors.text.primary,
       },
     },
     secondary: {
       container: {
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderWidth: 1,
-        borderColor: theme.colors.borders.emphasis,
+        borderColor: colors.borders.emphasis,
       },
       text: {
-        color: theme.colors.text.primary,
+        color: colors.text.primary,
       },
     },
     ghost: {
@@ -90,16 +88,16 @@ export function Button({
         backgroundColor: 'transparent',
       },
       text: {
-        color: theme.colors.lavender[300],
+        color: colors.lavender[300],
       },
     },
     destructive: {
       container: {
-        backgroundColor: theme.colors.semantic.error,
-        ...theme.elevation[2],
+        backgroundColor: colors.semantic.error,
+        ...elevation[2],
       },
       text: {
-        color: theme.colors.text.primary,
+        color: colors.text.primary,
       },
     },
   };
@@ -117,35 +115,36 @@ export function Button({
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
       style={[
-        styles.container,
-        currentVariantStyle.container,
         {
+          alignItems: 'center',
+          justifyContent: 'center',
           minHeight: currentSizeStyle.minHeight,
           paddingHorizontal: currentSizeStyle.paddingHorizontal,
           paddingVertical: currentSizeStyle.paddingVertical,
-          borderRadius: theme.borderRadius.full,
+          borderRadius: borderRadius.full,
           opacity: isDisabled ? 0.4 : 1,
         },
+        currentVariantStyle.container,
       ]}
     >
-      <View style={styles.content}>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8}}>
         {loading ? (
           <ActivityIndicator
             size="small"
             color={currentVariantStyle.text.color}
-            style={styles.icon}
+            style={{flexShrink: 0}}
           />
         ) : leadingIcon ? (
-          <View style={styles.icon}>{leadingIcon}</View>
+          <View style={{flexShrink: 0}}>{leadingIcon}</View>
         ) : null}
         <Text
           style={[
-            styles.text,
-            currentVariantStyle.text,
             {
+              textAlign: 'center',
               fontSize: currentSizeStyle.fontSize,
-              fontWeight: theme.typography.fontWeight.semibold,
+              fontWeight: typography.fontWeight.semibold,
             },
+            currentVariantStyle.text,
           ]}
         >
           {children}
@@ -154,22 +153,3 @@ export function Button({
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  icon: {
-    flexShrink: 0,
-  },
-  text: {
-    textAlign: 'center',
-  },
-});

@@ -3,10 +3,11 @@
  * Adapted from Figma/components/s3/screens/SettingsScreen.tsx for React Native
  * 
  * App preferences and configuration with privacy notice
+ * Styled with NativeWind className utilities
  */
 
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking} from 'react-native';
+import {View, Text, ScrollView, TouchableOpacity, Linking} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
 import {AppBar} from '@/components/AppBar';
 import {Card} from '@/components/Card';
@@ -20,7 +21,6 @@ import {
   TrashIcon,
   ChevronRightIcon,
 } from '@/components/icons';
-import {useTheme} from '@/theme';
 
 type Props = ScreenProps<'Settings'>;
 
@@ -41,83 +41,52 @@ function SettingsItem({
   variant = 'default',
   testID,
 }: SettingsItemProps) {
-  const theme = useTheme();
-
   const isDestructive = variant === 'destructive';
-  const iconBgColor = isDestructive
-    ? `${theme.colors.semantic.error}1A` // 10% opacity
-    : `${theme.colors.lavender[500]}33`; // 20% opacity
-  const iconColor = isDestructive ? theme.colors.semantic.error : theme.colors.lavender[400];
-  const labelColor = isDestructive ? theme.colors.semantic.error : theme.colors.text.primary;
-  const chevronColor = isDestructive ? theme.colors.semantic.error : theme.colors.text.subtle;
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[
-        styles.settingsItem,
-        {
-          padding: theme.spacing[4],
-          borderRadius: theme.borderRadius.lg,
-        },
-      ]}
+      className="flex-row items-center gap-3 p-4 rounded-lg"
       activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={label}
       testID={testID}
     >
       <View
-        style={[
-          styles.iconContainer,
-          {
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: iconBgColor,
-          },
-        ]}
+        className={`w-10 h-10 rounded-full items-center justify-center ${
+          isDestructive ? 'bg-semantic-error/10' : 'bg-lavender-500/20'
+        }`}
       >
         {React.isValidElement(icon)
           ? React.cloneElement(icon as React.ReactElement<{size?: number; color?: string}>, {
               size: 20,
-              color: iconColor,
+              color: isDestructive ? '#ff4444' : '#b8a3ff',
             })
           : icon}
       </View>
-      <View style={styles.textContainer}>
+      <View className="flex-1">
         <Text
-          style={[
-            styles.label,
-            {
-              color: labelColor,
-              fontSize: theme.typography.fontSize.sm,
-            },
-          ]}
+          className={`text-sm font-normal ${
+            isDestructive ? 'text-semantic-error' : 'text-text-primary'
+          }`}
         >
           {label}
         </Text>
         {description && (
-          <Text
-            style={[
-              styles.description,
-              {
-                color: theme.colors.text.subtle,
-                fontSize: theme.typography.fontSize.xs,
-                marginTop: 2,
-              },
-            ]}
-          >
+          <Text className="text-xs text-text-subtle mt-0.5 leading-4">
             {description}
           </Text>
         )}
       </View>
-      <ChevronRightIcon size={20} color={chevronColor} />
+      <ChevronRightIcon
+        size={20}
+        color={isDestructive ? '#ff4444' : '#6b5b95'}
+      />
     </TouchableOpacity>
   );
 }
 
 export function SettingsScreen({navigation}: Props) {
-  const theme = useTheme();
   const [showPrivacyAlert, setShowPrivacyAlert] = useState(true);
 
   const handlePrivacySettings = () => {
@@ -149,7 +118,7 @@ export function SettingsScreen({navigation}: Props) {
   };
 
   return (
-    <View style={styles.container} testID="settings-screen">
+    <View className="flex-1" testID="settings-screen">
       <StarfieldBackground />
 
       <AppBar
@@ -160,15 +129,12 @@ export function SettingsScreen({navigation}: Props) {
       />
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollContent,
-          {paddingHorizontal: theme.spacing[4]},
-        ]}
+        className="flex-1"
+        contentContainerClassName="pt-4 px-4"
       >
         {/* Privacy Notice */}
         {showPrivacyAlert && (
-          <View style={{marginBottom: theme.spacing[6]}}>
+          <View className="mb-6">
             <InlineAlert
               type="info"
               message="S³ does not collect PII or sensitive data. All chart data stays on your device unless you opt-in to cloud sync."
@@ -179,18 +145,8 @@ export function SettingsScreen({navigation}: Props) {
         )}
 
         {/* Privacy Section */}
-        <View style={{marginBottom: theme.spacing[6]}}>
-          <Text
-            style={[
-              styles.sectionHeader,
-              {
-                color: theme.colors.text.subtle,
-                fontSize: theme.typography.fontSize.xs,
-                marginBottom: theme.spacing[3],
-                paddingHorizontal: theme.spacing[1],
-              },
-            ]}
-          >
+        <View className="mb-6">
+          <Text className="text-xs text-text-subtle tracking-widest uppercase mb-3 px-1">
             PRIVACY & SECURITY
           </Text>
           <Card testID="privacy-card">
@@ -205,18 +161,8 @@ export function SettingsScreen({navigation}: Props) {
         </View>
 
         {/* Notifications Section */}
-        <View style={{marginBottom: theme.spacing[6]}}>
-          <Text
-            style={[
-              styles.sectionHeader,
-              {
-                color: theme.colors.text.subtle,
-                fontSize: theme.typography.fontSize.xs,
-                marginBottom: theme.spacing[3],
-                paddingHorizontal: theme.spacing[1],
-              },
-            ]}
-          >
+        <View className="mb-6">
+          <Text className="text-xs text-text-subtle tracking-widest uppercase mb-3 px-1">
             NOTIFICATIONS
           </Text>
           <Card testID="notifications-card">
@@ -231,18 +177,8 @@ export function SettingsScreen({navigation}: Props) {
         </View>
 
         {/* Display Section */}
-        <View style={{marginBottom: theme.spacing[6]}}>
-          <Text
-            style={[
-              styles.sectionHeader,
-              {
-                color: theme.colors.text.subtle,
-                fontSize: theme.typography.fontSize.xs,
-                marginBottom: theme.spacing[3],
-                paddingHorizontal: theme.spacing[1],
-              },
-            ]}
-          >
+        <View className="mb-6">
+          <Text className="text-xs text-text-subtle tracking-widest uppercase mb-3 px-1">
             DISPLAY
           </Text>
           <Card testID="display-card">
@@ -257,21 +193,11 @@ export function SettingsScreen({navigation}: Props) {
         </View>
 
         {/* Account Section */}
-        <View style={{marginBottom: theme.spacing[6]}}>
-          <Text
-            style={[
-              styles.sectionHeader,
-              {
-                color: theme.colors.text.subtle,
-                fontSize: theme.typography.fontSize.xs,
-                marginBottom: theme.spacing[3],
-                paddingHorizontal: theme.spacing[1],
-              },
-            ]}
-          >
+        <View className="mb-6">
+          <Text className="text-xs text-text-subtle tracking-widest uppercase mb-3 px-1">
             ACCOUNT
           </Text>
-          <View style={{gap: theme.spacing[2]}}>
+          <View className="gap-2">
             <Card testID="sign-out-card">
               <SettingsItem
                 icon={<LogOutIcon />}
@@ -295,34 +221,17 @@ export function SettingsScreen({navigation}: Props) {
         </View>
 
         {/* Legal */}
-        <View style={{marginBottom: theme.spacing[8]}}>
-          <Text
-            style={[
-              styles.versionText,
-              {
-                color: theme.colors.text.subtle,
-                fontSize: theme.typography.fontSize.xs,
-                marginBottom: theme.spacing[2],
-              },
-            ]}
-          >
+        <View className="mb-8">
+          <Text className="text-xs text-text-subtle text-center mb-2">
             Version 1.0.0
           </Text>
-          <View style={styles.legalLinks}>
+          <View className="flex-row justify-center gap-4">
             <TouchableOpacity
               onPress={handleTermsPress}
               accessibilityRole="link"
               testID="terms-link"
             >
-              <Text
-                style={[
-                  styles.legalLink,
-                  {
-                    color: theme.colors.lavender[300],
-                    fontSize: theme.typography.fontSize.xs,
-                  },
-                ]}
-              >
+              <Text className="text-xs text-lavender-300 underline">
                 Terms of Service
               </Text>
             </TouchableOpacity>
@@ -331,15 +240,7 @@ export function SettingsScreen({navigation}: Props) {
               accessibilityRole="link"
               testID="privacy-policy-link"
             >
-              <Text
-                style={[
-                  styles.legalLink,
-                  {
-                    color: theme.colors.lavender[300],
-                    fontSize: theme.typography.fontSize.xs,
-                  },
-                ]}
-              >
+              <Text className="text-xs text-lavender-300 underline">
                 Privacy Policy
               </Text>
             </TouchableOpacity>
@@ -350,48 +251,4 @@ export function SettingsScreen({navigation}: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingTop: 16,
-  },
-  sectionHeader: {
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-  },
-  settingsItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  label: {
-    fontWeight: '400',
-  },
-  description: {
-    lineHeight: 16,
-  },
-  versionText: {
-    textAlign: 'center',
-  },
-  legalLinks: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  legalLink: {
-    textDecorationLine: 'underline',
-  },
-});
+

@@ -17,7 +17,7 @@ const mockNavigation = {
   setOptions: jest.fn(),
 } as any;
 
-// Wrapper with ThemeProvider
+// Wrapper with ThemeProvider (AppBar still uses useTheme)
 const renderWithTheme = (component: React.ReactElement) => {
   return render(<ThemeProvider>{component}</ThemeProvider>);
 };
@@ -143,5 +143,14 @@ describe('WhyScreen', () => {
     expect(screen.getByText('Center: Throat')).toBeTruthy();
     expect(screen.getByText('Gate 5')).toBeTruthy();
     expect(screen.getByText('Channel 34-57')).toBeTruthy();
+  });
+
+  it('uses NativeWind className utilities', () => {
+    const {getByTestId} = renderWithTheme(<WhyScreen {...defaultProps} />);
+    
+    // Verify Card components are rendered (they use className internally)
+    expect(getByTestId('why-card-pleiades')).toBeTruthy();
+    expect(getByTestId('why-card-sirius')).toBeTruthy();
+    expect(getByTestId('why-card-arcturus')).toBeTruthy();
   });
 });

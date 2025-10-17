@@ -3,15 +3,14 @@
  * Visual examples demonstrating Chip component usage
  * 
  * This file shows how to use the Chip component for star system ally chips
+ * Migrated to NativeWind - uses className utilities
  */
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { Chip } from './Chip';
-import { useTheme } from '../theme';
 
 export function ChipExamples() {
-  const theme = useTheme();
   const [selectedChip, setSelectedChip] = useState<string | null>(null);
   const [dismissedChips, setDismissedChips] = useState<Set<string>>(new Set());
 
@@ -22,13 +21,13 @@ export function ChipExamples() {
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView className="flex-1 p-4">
       {/* Basic Chips */}
-      <View style={[styles.section, { marginBottom: theme.spacing[6] }]}>
-        <Text style={[styles.heading, { color: theme.colors.text.primary }]}>
+      <View className="mb-6">
+        <Text className="text-lg font-semibold mb-3 text-text-primary">
           Basic Chips
         </Text>
-        <View style={styles.chipRow}>
+        <View className="flex-row flex-wrap gap-2">
           <Chip starSystem="Orion" percentage={62} variant="gold" />
           <Chip starSystem="Sirius" percentage={18} variant="lavender" />
           <Chip starSystem="Pleiades" percentage={15} variant="gold" />
@@ -36,11 +35,11 @@ export function ChipExamples() {
       </View>
 
       {/* Chips without Percentages */}
-      <View style={[styles.section, { marginBottom: theme.spacing[6] }]}>
-        <Text style={[styles.heading, { color: theme.colors.text.primary }]}>
+      <View className="mb-6">
+        <Text className="text-lg font-semibold mb-3 text-text-primary">
           Without Percentages
         </Text>
-        <View style={styles.chipRow}>
+        <View className="flex-row flex-wrap gap-2">
           <Chip starSystem="Andromeda" variant="lavender" />
           <Chip starSystem="Lyra" variant="gold" />
           <Chip starSystem="Arcturus" variant="lavender" />
@@ -48,11 +47,11 @@ export function ChipExamples() {
       </View>
 
       {/* Selectable Chips */}
-      <View style={[styles.section, { marginBottom: theme.spacing[6] }]}>
-        <Text style={[styles.heading, { color: theme.colors.text.primary }]}>
+      <View className="mb-6">
+        <Text className="text-lg font-semibold mb-3 text-text-primary">
           Selectable Chips
         </Text>
-        <View style={styles.chipRow}>
+        <View className="flex-row flex-wrap gap-2">
           {allies.map((ally, index) => (
             <Chip
               key={ally.system}
@@ -68,11 +67,11 @@ export function ChipExamples() {
       </View>
 
       {/* Dismissible Chips */}
-      <View style={[styles.section, { marginBottom: theme.spacing[6] }]}>
-        <Text style={[styles.heading, { color: theme.colors.text.primary }]}>
+      <View className="mb-6">
+        <Text className="text-lg font-semibold mb-3 text-text-primary">
           Dismissible Chips
         </Text>
-        <View style={styles.chipRow}>
+        <View className="flex-row flex-wrap gap-2">
           {allies
             .filter((ally) => !dismissedChips.has(ally.system))
             .map((ally, index) => (
@@ -91,11 +90,11 @@ export function ChipExamples() {
       </View>
 
       {/* All Star Systems */}
-      <View style={[styles.section, { marginBottom: theme.spacing[6] }]}>
-        <Text style={[styles.heading, { color: theme.colors.text.primary }]}>
+      <View className="mb-6">
+        <Text className="text-lg font-semibold mb-3 text-text-primary">
           All Star Systems
         </Text>
-        <View style={styles.chipRow}>
+        <View className="flex-row flex-wrap gap-2">
           <Chip starSystem="Orion" percentage={25} variant="gold" />
           <Chip starSystem="Sirius" percentage={20} variant="lavender" />
           <Chip starSystem="Pleiades" percentage={18} variant="gold" />
@@ -107,23 +106,3 @@ export function ChipExamples() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  heading: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-});
