@@ -1,120 +1,61 @@
-# Implementation Plan — Sorter-Only (No Flutter/Game)
+# Implementation Plan — MVP Star System Sorter
 
-This replaces the previous plan. Scope is **classification only**: collect birth data → call BodyGraph proxy → score → show results/why.  
-All Flutter/game/bridge/leaderboard/music/features are removed.  
-Additionally, this plan incorporates the **Figma UI system** from the local folder  
-`/Users/kingkamehameha/Documents/Kiro/GF_App/star-system-sorter/Figma`.
+This plan focuses on **MVP classification only**: collect birth data → call BodyGraph proxy → score → show results/why.  
+Scope is limited to core sorter functionality with Figma UI integration.  
+**Out of scope**: Community features, game integration, leaderboards, music system.
 
 ---
 
-## Definition of Done (Sorter-Only)
+## Definition of Done (MVP)
 
 - ✅ Enter birth data → **/internal/hd** proxy fetch → **scorer** produces primary/hybrid + contributors
 - ✅ Result & Why screens render (radial chart, crests, allies, disclaimers)
 - ✅ Client + server caching works; offline/timeout UX is sane
-- ✅ Jest unit tests pass; Detox covers Onboarding → Input → Result → Why
-- ✅ CI runs lint, typecheck, tests, import-graph, file-size gates; Android build succeeds (iOS optional on macOS)
+- ✅ Jest unit tests pass (≥80% core, ≥60% app-wide); Detox E2E covers critical path
+- ✅ CI runs lint, typecheck, tests, import-graph, file-size gates; Android build succeeds
 - ✅ No secrets in mobile bundle; BODYGRAPH_API_KEY only on server
-- ✅ Figma design system successfully integrated (components, tokens, and global styles functional)
+- ✅ Figma design system integrated (components, tokens, global styles functional)
+- ✅ Accessibility compliance (WCAG 2.1 AA, screen reader support, 44px touch targets)
 
 ---
 
-## Rollout Checklist (Trimmed)
+## MVP Rollout Checklist
 
 - [ ] BodyGraph proxy with caching working (`/internal/hd`)
-- [ ] Zod schemas for inputs/outputs; JSON Schemas generated for docs (optional but recommended)
-- [ ] Accessibility pass (labels, 44px targets, screen reader flow)
-- [ ] Release builds configured (RN only), size optimizations enabled
+- [ ] Zod schemas for inputs/outputs; JSON Schemas generated
+- [ ] Comprehensive test coverage (unit + E2E)
+- [ ] Accessibility compliance (WCAG 2.1 AA)
+- [ ] Release builds configured with size optimizations
+- [ ] Security review (no PII in logs, proper moderation)
 - [ ] Docs updated (README, SECURITY, CANON_GUIDE)
 
 ---
 
-## 0. Cutover & Removal (Do These First)
+## MVP Scope Boundaries
 
-> Branch & snapshot before changes.
+### In Scope (MVP)
 
-- [x] **0.1 Create cutover branch**
+- ✅ Birth data input and validation
+- ✅ BodyGraph API integration with caching
+- ✅ Deterministic star system classification
+- ✅ Result display with radial charts and ally chips
+- ✅ Why/explanation screen
+- ✅ Basic profile and settings
+- ✅ Comprehensive testing and accessibility
+- ✅ Figma design system integration
 
-  - `git checkout -b no-flutter`
-  - `git push -u origin no-flutter`
+### Out of Scope (Post-MVP)
 
-- [x] **0.2 Remove Flutter module & game directories**
-
-  - `git rm -r --ignore-unmatch runner_game/ super_dash/`
-  - `git rm -r --ignore-unmatch docs/FLUTTER_MODULE_INTEGRATION.md docs/!!!FLUTTER_TOGGLE_REFERENCE.md docs/ANDROID_TOOLCHAIN_MATRIX.md`
-  - `git rm -r --ignore-unmatch apps/server/src/routes/leaderboard.ts apps/server/src/routes/events.ts apps/server/src/routes/runs.ts apps/server/src/routes/music.ts`
-  - `git rm -r --ignore-unmatch apps/server/src/validate.ts apps/server/src/store/`
-
-- [x] **0.3 Delete native bridge code & references**
-
-  - **Android (Kotlin/Java)**
-    - `git rm --ignore-unmatch android/app/src/main/java/**/GameBridgeModule.*`
-    - `git rm --ignore-unmatch android/app/src/main/java/**/GameBridgePackage.*`
-    - Edit `android/app/src/main/java/**/MainApplication.kt`:
-      - Remove FlutterEngine caching (`s3_engine`) and any GameBridge registration.
-    - Edit `android/app/build.gradle`:
-      - Remove `flutter_debug/flutter_release` dependencies and any `implementation(name: ...)` from Flutter AARs.
-    - Edit `android/settings.gradle`:
-      - Remove `mavenLocal()`/`runner_game/build/host/outputs/repo` repository entries.
-    - Edit `android/app/src/main/AndroidManifest.xml`:
-      - Remove any Flutter Activity entries and custom landscape locks related to RunnerGame.
-  - **iOS**
-    - `git rm --ignore-unmatch ios/S3App/GameBridgeModule.m ios/S3App/GameBridgeModule.swift`
-    - Edit `ios/Podfile`:
-      - Remove `flutter_application_path` and any `runner_game` pod integration.
-      - Run: `cd ios && bundle exec pod install && cd ..`
-    - Edit `ios/S3App/AppDelegate.swift`:
-      - Remove FlutterEngine caching and warm-up calls.
-    - Edit `ios/S3App/Info.plist`:
-      - Remove game/landscape-only orientation overrides (restore standard portrait set).
-
-- [x] **0.4 Remove RN wrapper & game screens**
-
-  - `git rm --ignore-unmatch src/native/GameBridge.ts src/GameBridge.ts`
-  - `git rm --ignore-unmatch src/screens/GameHub.tsx src/screens/TeamSelect.tsx src/screens/Lobby.tsx src/screens/RunnerGame.tsx src/screens/MatchResult.tsx src/screens/Leaderboard.tsx`
-  - Update navigator:
-    - Remove routes for the above screens.
-    - Ensure only core routes remain: Onboarding, Input, Result, Why, Profile, Settings.
-
-- [x] **0.5 Purge code references (safety sweep)**
-
-  - Search & remove:
-    - Channels/strings: `S3_CMD_CHANNEL`, `S3_EVT_CHANNEL`, `"s3/game/cmd"`, `"s3/game/events"`
-    - Types: `GameCommand`, `GameEvent`, `GameResult`, `game_core_version`, `clientHash`
-    - Screens: `GameHub`, `TeamSelect`, `Lobby`, `RunnerGame`, `MatchResult`, `Leaderboard`
-  - Suggested commands:
-    - `rg -n "S3_CMD_CHANNEL|S3_EVT_CHANNEL|s3/game|GameBridge|GameHub|RunnerGame|MatchResult|Leaderboard|game_core_version|clientHash"`
-    - Edit or delete matches as appropriate.
-
-- [x] **0.6 Clean scripts & CI**
-
-  - `git rm --ignore-unmatch scripts/build-flutter-aar.sh scripts/release-flutter.sh`
-  - Edit `scripts/dev.sh`:
-    - Remove any Flutter build steps; keep Metro + server only.
-  - Edit CI config (e.g., `.github/workflows/*.yml` or similar):
-    - Remove steps that run `fvm flutter doctor/build aar`, bridge contract tests, cross-lang vectors, iOS build unless you want it.
-    - Keep: lint, typecheck, Jest, Detox (Android), dependency-cruiser, file size gate.
-
-- [x] **0.7 Remove unused docs**
-
-  - `git rm --ignore-unmatch docs/PROJECT_STATUS.md`
-  - Ensure `README.md` will be rewritten later (§7.1).
-  - Ensure `SECURITY.md` and `CANON_GUIDE.md` will be created/updated (§7.2–§7.3).
-
-- [x] **0.8 Dependency & cache cleanup**
-
-  - Remove dead deps in `package.json`:
-    - `flame`, Flutter tool runners, game/bridge libs.
-  - Keep RN deps, testing, MSW, zod, dependency-cruiser, pako, react-native-svg, etc.
-  - Reinstall:
-    - `rm -rf node_modules && pnpm i`
-  - Native rebuild:
-    - `cd android && ./gradlew clean && cd ..`
-    - `cd ios && bundle exec pod deintegrate && bundle exec pod install && cd ..`
-
-- [x] **0.9 Sanity builds**
-  - `npm run android`
-  - `npm run ios` (optional on macOS)
+- ❌ Community features (feed, quests, members)
+- ❌ Subscription/paywall system
+- ❌ AI avatar generation
+- ❌ Complex tab navigation (using simple stack navigation)
+- ❌ Game integration (Flutter/Flame)
+- ❌ Leaderboards and competitions
+- ❌ Music system
+- ❌ Push notifications
+- ❌ Authentication system
+- ❌ Analytics/telemetry
 
 ---
 
@@ -127,269 +68,165 @@ Additionally, this plan incorporates the **Figma UI system** from the local fold
 
 ---
 
-## 2. UI Components & Screens (Figma Integrated)
+## 2. Figma UI Implementation
 
-> **CRITICAL:** All UI implementation MUST use the complete Figma design system from:  
-> `/Users/kingkamehameha/Documents/Kiro/GF_App/star-system-sorter/Figma`
+> **Use Your Figma Design System:** Adapt the complete Figma components from `Figma/` directory to React Native
 
-### 2.0 Figma Design System Reference
+### 2.1 Figma Design System Integration
 
-**Location:** `/Users/kingkamehameha/Documents/Kiro/GF_App/star-system-sorter/Figma`
+- [x] **2.1.1 Design Tokens**
+  - [x] Import `Figma/design-tokens.json` and convert to React Native StyleSheet
+  - [x] Create theme provider with Figma color system (lavender primary, gold highlights)
+  - [x] Implement spacing scale (4px grid), typography, and elevation
+- [x] **2.1.2 Core Components (Adapt from Figma/components/s3/)**
+  - [x] **Button.tsx** - Adapt with variants (Primary, Secondary, Ghost, Destructive) and proper touch targets
+  - [x] **Field.tsx** - Form input with icons, validation states, and error handling
+  - [x] **Card.tsx** - Gradient backgrounds and variants (Default, Emphasis, Warning)
+  - [x] **Chip.tsx** - Star system ally chips with percentages (Gold, Lavender variants)
+  - [x] **AppBar.tsx** - Navigation header with back button
+  - [x] **Toast.tsx** - Toast notifications and InlineAlert components
+  - [x] **StarSystemCrests.tsx** - 6 geometric SVG icons (Orion, Sirius, Pleiades, Andromeda, Lyra, Arcturus)
 
-#### Design Tokens & Guidelines (Reference Files - Not Yet Integrated)
-- [ ] **design-tokens.json** - Complete token system (colors, spacing, typography, elevation, effects) - NEEDS INTEGRATION
-- [ ] **game-tokens.json** - Game layer tokens (HUD controls, team colors, game modes) - NEEDS INTEGRATION
-- [ ] **globals.css** - CSS variables for design tokens - NEEDS CONVERSION TO RN
-- [ ] **Guidelines.md** - Design system usage guidelines - REFERENCE ONLY
-- [ ] **IMPLEMENTATION_CHECKLIST.md** - 9 core screens implementation status - REFERENCE ONLY
-- [ ] **GAME_LAYER_CHECKLIST.md** - 10 game screens implementation status (screens 10-19) - REFERENCE ONLY
-- [ ] **Attributions.md** - Third-party asset attributions - REFERENCE ONLY
-- [ ] **App.tsx** - Complete Figma prototype with all screens - REFERENCE ONLY
+### 2.2 Figma Screens (Adapt to React Native)
 
-#### Core S³ Components (`Figma/components/s3/`)
-- [x] **AppBar.tsx** - Navigation header with back button
-- [x] **Button.tsx** - Button variants (Primary, Secondary, Ghost, Destructive)
-- [x] **Card.tsx** - Card variants (Default, Emphasis, Warning)
-- [x] **Chip.tsx** - Chip variants (Gold, Lavender, Selectable, Dismissible)
-- [x] **Field.tsx** - Form input with error states and icons
-- [x] **TabBar.tsx** - Bottom navigation (Home, Community, Profile)
-- [x] **Toast.tsx** - Toast notifications and InlineAlert
-- [x] **StarSystemCrests.tsx** - 6 star system SVG icons (Orion, Sirius, Pleiades, Andromeda, Lyra, Arcturus)
+- [x] **2.2.1 Onboarding Screen (01_Onboarding from Figma)**
+  - [x] S³ hero with logo icon and starfield background
+  - [x] "Begin Sorting" CTA using Figma Button component
+  - [x] 3-step explanation (Input → Sort → Narrative)
+  - [x] Navigate to Input screen
+- [x] **2.2.2 Input Screen (02_Input_BirthData from Figma)**
+  - [x] Tabs: Birth Data | Upload Chart PDF
+  - [x] Fields with icons (calendar, clock, location) using Figma Field component
+  - [x] "Compute Chart" CTA using Figma Button
+  - [x] Toast notification on submit using Figma Toast
+  - [x] Form validation and error states
+- [x] **2.2.3 Result Screen (03_Sort_Result from Figma)**
+  - [x] "Your Primary Star System" header
+  - [x] Radial percentage chart (62% example)
+  - [x] Primary star system display with crest
+  - [x] Ally chips (e.g., Sirius 18%, Lyra 12%, Andromeda 8%) using Figma Chip
+  - [x] "View Why" button using Figma Button
+  - [x] **Disclaimer:** "For insight & entertainment. Not medical, financial, or legal advice."
+- [x] **2.2.4 Why Screen (04_Why_This_Result from Figma)**
+  - [x] Header: "Why [Star System]" using Figma AppBar
+  - [x] Contributors list with weights and icons using Figma Card
+  - [x] Gradient backgrounds from design tokens
+  - [x] Back navigation
+- [x] **2.2.5 Profile Screen (06_Profile from Figma - Simplified)**
+  - [x] User type display (e.g., "Manifesting Generator • 1/3")
+  - [x] Star system profile cards (Primary + Allies) using Figma Card
+  - [x] Settings icon → Settings screen
+- [x] **2.2.6 Settings Screen (Figma/components/s3/screens/SettingsScreen.tsx)**
+  - [x] Adapt existing SettingsScreen.tsx to React Native
+  - [x] Privacy notice using Figma InlineAlert
+  - [x] Essential settings groups
+  - [x] Legal links and back navigation
+- [x] **2.2.7 Empty States & Errors (Figma/components/s3/screens/EmptyStatesScreen.tsx)**
+  - [x] Adapt existing EmptyStatesScreen.tsx to React Native
+  - [x] Error states (Network, Invalid Data)
+  - [x] Empty state examples
 
-#### Core Screens (`Figma/components/s3/screens/`)
-- [x] **PaywallScreen.tsx** - Subscription paywall
-- [x] **SettingsScreen.tsx** - Settings and privacy
-- [x] **EmptyStatesScreen.tsx** - Empty states and errors
+### 2.3 Figma Assets Integration
 
-#### Game Components (`Figma/components/s3/game/`)
-- [x] **HUDComponents.tsx** - Joystick, HUDButton, PauseButton, HPHearts, XPBar, DistanceMeter, Timer, Counter
-- [x] **GameCards.tsx** - GameModeCard, QuestCard
-- [x] **GameBadges.tsx** - TeamBadge (all 6 star systems)
-- [x] **PartyMember.tsx** - Party member list item
-- [x] **GameModals.tsx** - PauseModal, ConfirmExitModal, MusicThemeModal
-
-#### shadcn/ui Components (`Figma/components/ui/`)
-- [x] 50+ shadcn/ui components adapted for React Native (accordion, alert, avatar, badge, button, calendar, card, carousel, chart, checkbox, collapsible, command, context-menu, dialog, drawer, dropdown-menu, form, hover-card, input, label, menubar, navigation-menu, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, switch, table, tabs, textarea, toggle, tooltip, etc.)
-
-#### Figma Utilities
-- [x] **ImageWithFallback.tsx** - Image component with fallback handling
-
-#### Core Screens (from IMPLEMENTATION_CHECKLIST.md)
-1. **01_Onboarding** - Hero with "Begin Sorting" CTA, 3-step explanation
-2. **02_Input_BirthData** - Birth data form with tabs (Birth Data | Upload Chart PDF)
-3. **03_Sort_Result** - Primary star system with radial chart, ally chips, disclaimer
-4. **04_Why_This_Result** - Contributors list with weights and icons
-5. **05_Community_StarSystem** - Community feed, quests, members (tabs)
-6. **06_Profile & Avatar** - User profile with star system cards
-7. **07_Subscription_Paywall** - Feature list and pricing
-8. **08_Settings_Privacy** - Privacy settings and preferences
-9. **09_EmptyStates & Errors** - Empty states and error handling
-
-#### Game Screens (from GAME_LAYER_CHECKLIST.md)
-10. **10_Game_Hub** - Game entry point with team status
-11. **11_Team_Select** - 6 star system selection
-12. **12_Mode_Select** - Survivor Arena vs Side Runner
-13. **13_Lobby_Matchmaking** - Party and matchmaking
-14. **14_HUD_Survivor** - Survivor Arena HUD with joystick and action buttons
-15. **15_HUD_Runner** - Side Runner HUD with distance meter
-16. **16_Match_Result** - Victory screen with stats and rewards
-17. **17_Leaderboard_Season** - Global, team, and friends leaderboards
-18. **18_Music_Theme** - Star system music theme selection
-19. **19_Quests_Pass** - Daily, weekly, and season pass quests
-
-### 2.1 Implementation Tasks
-
-- [ ] **2.1.1 RadialChart**
-  - [ ] Re-implement with Figma design tokens (lavender/gold gradients)
-  - [ ] Match exact styling from 03_Sort_Result screen
-  - [ ] Use design-tokens.json for colors and spacing
-- [ ] **2.1.2 ScoreDisplay**
-  - [ ] Re-implement using Figma typography and spacing tokens
-  - [ ] Match exact styling from 03_Sort_Result screen
-  - [ ] Use design-tokens.json for font sizes and weights
-- [ ] **2.1.3 StarSystemCrest**
-  - [ ] Re-implement SVG crests from Figma/components/s3/StarSystemCrests.tsx
-  - [ ] Export sizes: 24px, 28px, 48px
-  - [ ] Ensure currentColor fill for theming
-  - [ ] Fallback for missing crests
-- [ ] **2.1.4 Onboarding Screen**
-  - [ ] Implement using Figma Button, Card, and layout from 01_Onboarding
-  - [ ] Starfield background with gradient blobs
-  - [ ] S³ hero with logo icon
-  - [ ] "Begin Sorting" CTA
-  - [ ] 3-step explanation (Input → Sort → Narrative)
-- [ ] **2.1.5 Input Screen**
-  - [ ] Re-implement using Figma Field component from 02_Input_BirthData
-  - [ ] Tabs: Birth Data | Upload Chart PDF
-  - [ ] Fields with icons (calendar, clock, location)
-  - [ ] "Compute Chart" CTA
-  - [ ] Toast notification on submit
-  - [ ] Match exact Figma styling and spacing
-- [ ] **2.1.6 Result Screen**
-  - [ ] Re-implement using Figma Card and layout from 03_Sort_Result
-  - [ ] "Your Primary Star System" header
-  - [ ] Radial percentage chart (using updated RadialChart)
-  - [ ] Ally chips (Sirius, Lyra, Andromeda) using Figma Chip component
-  - [ ] "View Why" and "Generate Narrative" buttons using Figma Button
-  - [ ] **Disclaimer:** "For insight & entertainment. Not medical, financial, or legal advice."
-  - [ ] TabBar navigation using Figma TabBar
-- [ ] **2.1.7 Why Screen**
-  - [ ] Re-implement using Figma layout from 04_Why_This_Result
-  - [ ] Contributors list with weights and icons
-  - [ ] Gradient backgrounds from design-tokens.json
-  - [ ] Back navigation using Figma AppBar
-- [ ] **2.1.8 Profile Screen**
-  - [ ] Implement using Figma layout from 06_Profile & Avatar
-  - [ ] Avatar placeholder
-  - [ ] User type display (Manifesting Generator • 1/3)
-  - [ ] Star system profile cards (Primary + Allies)
-  - [ ] "Generate Avatar" CTA
-  - [ ] Settings icon → Settings screen
-  - [ ] TabBar navigation
-- [ ] **2.1.9 Settings Screen**
-  - [ ] Implement using Figma SettingsScreen.tsx from 08_Settings_Privacy
-  - [ ] Privacy notice (inline alert)
-  - [ ] Data & Privacy settings
-  - [ ] Notification preferences
-  - [ ] Display preferences
-  - [ ] Account actions (Sign Out, Delete Account)
-  - [ ] Legal links (Terms, Privacy Policy)
-- [ ] **2.1.10 Empty States & Errors**
-  - [ ] Implement using Figma EmptyStatesScreen.tsx from 09_EmptyStates & Errors
-  - [ ] Empty state examples (No Chart, No Posts)
-  - [ ] Error states (Network, Invalid Data)
-  - [ ] Inline alerts (all 4 types: success, info, warning, error)
-- [ ] **2.1.11 Accessibility Pass**
-  - [ ] Add `accessibilityLabel`/`Hint` on all interactive elements
-  - [ ] Verify screen reader flow (TalkBack/VoiceOver)
-  - [ ] Ensure all touch targets ≥44px (WCAG 2.1 AA)
-  - [ ] Verify text contrast ratios (≥4.5:1 for body text)
-  - [ ] Test focus ring on keyboard navigation
-
-### 2.2 Design Token Integration
-
-- [ ] **2.2.1 Import design-tokens.json**
-  - [ ] Parse and convert to React Native StyleSheet constants
-  - [ ] Create theme provider with Figma tokens
-- [ ] **2.2.2 Typography System**
-  - [ ] Implement font sizes (xs to 4xl)
-  - [ ] Implement font weights (normal, medium, semibold, bold)
-  - [ ] Implement line heights (tight, normal, relaxed)
-- [ ] **2.2.3 Color System**
-  - [ ] Canvas colors (dark, darker, surface variants)
-  - [ ] Lavender primary scale (100-900)
-  - [ ] Gold highlight scale (100-700)
-  - [ ] Text colors with WCAG AA contrast
-  - [ ] Semantic colors (success, error, warning, info)
-  - [ ] Border colors (subtle, muted, emphasis)
-- [ ] **2.2.4 Spacing & Layout**
-  - [ ] Spacing scale (4px grid: 1-16)
-  - [ ] Border radius scale (sm/md/lg/xl/full)
-  - [ ] Touch target minimum: 44px
-- [ ] **2.2.5 Elevation & Effects**
-  - [ ] Elevation shadows (0-4 levels)
-  - [ ] Focus ring (default + error variants)
-  - [ ] Blur effects (sm/md/lg/xl)
-
-### 2.3 Component Adaptation
-
-- [ ] **2.3.1 Adapt Figma Button Component**
-  - [ ] Variants: Primary, Secondary, Ghost, Destructive
-  - [ ] Sizes: sm (44px), md (44px), lg (48px)
-  - [ ] States: default, hover, active, focus, disabled, loading
-  - [ ] leadingIcon prop
-  - [ ] Scale animation on press (0.98)
-- [ ] **2.3.2 Adapt Figma Chip Component**
-  - [ ] Variants: Gold, Lavender
-  - [ ] Selectable state (toggleable)
-  - [ ] Selected state (filled background)
-  - [ ] Dismissible with X icon
-  - [ ] Touch targets ≥44px
-- [ ] **2.3.3 Adapt Figma Field Component**
-  - [ ] Variants: default, focus, error
-  - [ ] Icon slot (leading)
-  - [ ] Helper text slot
-  - [ ] Error message display
-  - [ ] Focus ring animation
-- [ ] **2.3.4 Adapt Figma Card Component**
-  - [ ] Variants: Default, Emphasis, Warning
-  - [ ] Gradient backgrounds
-  - [ ] Border styling
-  - [ ] Backdrop blur
-- [ ] **2.3.5 Adapt Figma Toast & InlineAlert**
-  - [ ] Types: success, info, warning, error
-  - [ ] Toast: auto-dismiss (3s default)
-  - [ ] Toast: top-center positioning
-  - [ ] InlineAlert: dismissible variant
-  - [ ] Icon indicators
-- [ ] **2.3.6 Adapt Figma AppBar**
-  - [ ] Title prop
-  - [ ] Back button with onBack handler
-  - [ ] Height: 56px
-  - [ ] Touch targets ≥44px
-- [ ] **2.3.7 Adapt Figma TabBar**
-  - [ ] Tabs: Home, Community, Profile
-  - [ ] Active state indicator
-  - [ ] Icon + label
-  - [ ] onTabChange handler
-  - [ ] Touch targets ≥44px
-
-### 2.4 Figma Reference Documentation
-
-**When implementing any UI component or screen, you MUST:**
-1. Reference the corresponding Figma component in `/Users/kingkamehameha/Documents/Kiro/GF_App/star-system-sorter/Figma`
-2. Use design tokens from `design-tokens.json` and `game-tokens.json`
-3. Follow the implementation checklists in `IMPLEMENTATION_CHECKLIST.md` and `GAME_LAYER_CHECKLIST.md`
-4. Maintain the "Ethereal Flow" aesthetic (dark-mystic canvas, lavender primary, gold highlights)
-5. Ensure all touch targets are ≥44px (WCAG 2.1 AA)
-6. Apply proper accessibility labels and screen reader support
-7. Use the exact copy and disclaimers specified in the Figma screens
+- [x] **2.3.1 Star System Crests**
+  - [x] Export SVG crests from Figma/components/s3/StarSystemCrests.tsx
+  - [x] Convert to react-native-svg components
+  - [x] Support sizes: 24px, 28px, 48px
+  - [x] Ensure currentColor fill for theming
+- [x] **2.3.2 Design Consistency**
+  - [x] Match exact Figma styling (Ethereal Flow aesthetic)
+  - [x] Use Figma color tokens (lavender primary, gold highlights, dark canvas)
+  - [x] Implement proper spacing and typography from design tokens
+  - [x] Ensure all touch targets ≥44px (WCAG 2.1 AA)
 
 ---
 
 ## 3. Server (Minimal)
 
 - [x] **3.1 BodyGraph proxy `/internal/hd`**
-- [ ] **3.2 HTTP server bootstrap**
-  - [ ] `apps/server/src/http.ts`
-  - [ ] `apps/server/src/index.ts`
-- [ ] **3.3 Tests**
-  - [ ] Happy path, 400/401, 429, 5xx, caching
+- [x] **3.2 HTTP server bootstrap**
+  - [x] `apps/server/src/http.ts`
+  - [x] `apps/server/src/index.ts`
+- [x] **3.3 Tests**
+  - [x] Happy path, 400/401, 429, 5xx, caching
 
 ---
 
 ## 4. Validation & Schemas
 
-- [ ] **4.1 Zod schemas**
-  - [ ] Define client/server schemas for sorter flow
-- [ ] **4.2 Generate JSON Schemas**
-  - [ ] `zod-to-json-schema` → `schemas/*.json`
+- [x] **4.1 Zod schemas**
+  - [x] Define client/server schemas for sorter flow
+- [x] **4.2 Generate JSON Schemas**
+  - [x] `zod-to-json-schema` → `schemas/*.json`
 
 ---
 
-## 5. Build & CI (RN-Only)
+## 5. Basic Build Setup
 
-- [ ] **5.1 Android release config**
-  - [ ] Signing config; enable `minifyEnabled true` & `shrinkResources true`
-- [ ] **5.2 iOS release config (optional)**
-  - [ ] Signing/profiles; verify smaller build size
-- [ ] **5.3 CI gates**
-  - [ ] Lint + typecheck + Jest
-  - [ ] Detox (Android)
-  - [ ] dependency-cruiser (no cycles, no deep imports)
-  - [ ] File-size gate ≤150 LOC/file (`// @exception(max-lines)` allowed)
+- [x] **5.1 Android & ios debug build**
+  - [x] Ensure app builds and runs on Android
+  - [x] Ensure app builds and runs on iOS
+- [x] **5.2 Basic CI (optional for MVP)**
+  - [x] Lint + typecheck
+  - [x] Basic Jest tests
 
 ---
 
-## 6. Testing
+## 6. Comprehensive Testing (Leverage Existing Infrastructure)
 
-- [ ] **6.1 MSW v2 setup**
-  - [ ] `src/mocks/handlers.ts` for `/internal/hd`
-- [ ] **6.2 Detox E2E**
-  - [ ] Onboarding → Input → Result → Why
-  - [ ] Offline/timeout & caching
-- [ ] **6.3 Scorer goldens**
-  - [ ] Fixtures → expected classification
+> **Note**: Solid testing foundation already exists in `__tests__/` and `e2e/` directories
+
+### 6.1 Unit Tests
+
+- [x] **Scorer Library**: `scorer.test.ts`, `canon.test.ts`, `tie.test.ts`, `score.test.ts`
+- [x] **API Integration**: `api-client.test.ts`, `cache-integration.test.ts`, `hdkit-adapter.test.ts`
+- [x] **Core Components**: `star-system-crest.test.tsx`, `star-system-crests.test.tsx`, `radial-chart.test.tsx`, `score-display.test.tsx`
+- [x] **Figma UI Components**: `button.test.tsx`, `field.test.tsx`, `card.test.tsx`, `chip.test.tsx`, `app-bar.test.tsx`, `toast.test.tsx`
+- [x] **Screens**: `onboarding-screen.test.tsx`, `input-screen-integration.test.tsx`, `why-screen.test.tsx`, `settings-screen.test.tsx`, `profile-screen.test.tsx`, `empty-states-screen.test.tsx`
+- [x] **Moderation**: `moderation-service.test.ts`, `moderation-blocklists.test.ts`, `moderation-sanitizer.test.ts`
+- [x] **Validation**: `birth-data-schema.test.ts`, `birth-data-validation.test.ts`, `scorer-types.test.ts`, `schemas.test.ts`
+- [x] **Theme/Design System**: `theme-tokens.test.ts`, `touch-target-validation.test.ts`
+- [x] **Icons**: `field-icons.test.tsx`, `empty-state-icons.test.tsx`
+
+### 6.2 Integration Tests
+
+- [x] **Classification Flow**: `classify-integration.test.ts`
+- [x] **Cache Behavior**: `cache-integration.test.ts`
+- [x] **Determinism**: `canon-determinism.test.ts`
+- [x] **Navigation**: `navigation.test.tsx`
+
+### 6.3 E2E Tests (Maestro)
+
+- [ ] **Test Infrastructure**: `e2e/` directory with Maestro setup
+- [ ] **Critical Flows**:
+  - [ ] `e2e/flows/full_journey.yaml` - Complete user journey
+  - [ ] `e2e/flows/onboarding.yaml` - Onboarding flow
+  - [ ] `e2e/flows/input_chart.yaml` - Input and chart generation
+  - [ ] `e2e/flows/moderation.yaml` - Content moderation testing
+
+### 6.4 Additional Testing Tasks
+
+- [ ] **6.4.1 Result Screen Test**
+  - [ ] Create dedicated `result-screen.test.tsx` (currently only covered in navigation.test.tsx)
+  - [ ] Test radial chart rendering with classification data
+  - [ ] Test ally chips display and interaction
+  - [ ] Test "View Why" navigation
+- [ ] **6.4.2 E2E Flow Verification**
+  - [ ] Verify Maestro flows work with current UI and testIDs
+  - [ ] Update flows if testIDs have changed
+  - [ ] Test complete user journey with new Figma UI
+  - [ ] Verify accessibility with screen readers
+- [ ] **6.4.3 Performance Tests**
+  - [ ] Test app launch time (≤2.5s Android, ≤1.8s iOS)
+  - [ ] Test memory usage (≤350MB peak)
+  - [ ] Test UI responsiveness and animations
+
+### 6.5 Test Coverage Goals
+
+- **Existing Coverage**: Already strong coverage on core business logic
+- **Target for New Code**: ≥80% coverage on Figma component adaptations
+- **E2E Coverage**: 100% critical path (Onboarding → Input → Result → Why)
+- **Accessibility**: Full screen reader navigation testing
 
 ---
 
@@ -404,24 +241,48 @@ Additionally, this plan incorporates the **Figma UI system** from the local fold
 
 ---
 
-## 8. Post-Cutover Cleanup (Automatable)
+## 8. Final Validation
 
-- [ ] **8.1 Remove dead imports/exports**
-  - Run `ts-prune`; remove unused exports.
-  - Run `depcruise`; verify no deep imports or cycles.
-- [ ] **8.2 Repo hygiene**
-  - Ensure no references: `Flutter|GameBridge|RunnerGame`
-- [ ] **8.3 Final builds**
-  - `npm run android`
-  - `npm run build:android`
-  - `npm run ios` (optional)
+- [ ] **8.1 App functionality**
+  - [ ] Complete user flow works end-to-end
+  - [ ] No critical crashes or errors
+- [ ] **8.2 Basic polish**
+  - [ ] App looks presentable
+  - [ ] Essential accessibility features work
+
+---
+
+## MVP Testing Goals (Building on Solid Foundation)
+
+> **Strong Foundation**: Comprehensive test suite already exists with 20+ test files covering core business logic, API integration, components, and E2E flows
+
+### Testing Priorities for MVP
+
+- **Leverage Existing Tests**: 20+ unit tests already cover scorer, API client, moderation, and core components
+- **Figma Component Testing**: Ensure adapted Figma components work correctly in React Native
+- **Critical Path Validation**: E2E tests already exist for full user journey (Maestro flows)
+- **Accessibility Compliance**: Test Figma design system meets WCAG 2.1 AA standards
+- **Performance Validation**: Verify app meets performance targets (launch time, memory usage)
+
+### Test Quality Standards
+
+- **Unit Tests**: ≥80% coverage on new Figma component adaptations
+- **Integration Tests**: All API flows and caching behavior validated
+- **E2E Tests**: Complete user journey tested with Maestro
+- **Accessibility**: Full screen reader navigation and WCAG compliance
+- **Performance**: Launch time ≤2.5s, memory ≤350MB, smooth animations
 
 ---
 
 ## Notes & Conventions
 
-- Keep files ≤300 LOC.
+- Keep files ≤300 LOC (target 100-200 LOC).
 - Use **React Native primitives** — no CSS runtime.
-- All new UI components come from Figma design system in `/Users/kingkamehameha/Documents/Kiro/GF_App/star-system-sorter/Figma`.
+- **CRITICAL**: Implement your actual Figma design system from `Figma/` directory, not basic mock components.
+- Adapt Figma components (`Figma/components/s3/`) to React Native equivalents.
+- Use design tokens from `Figma/design-tokens.json` for consistent styling.
+- Reference `Figma/IMPLEMENTATION_CHECKLIST.md` for complete feature list.
 - Add `testID` and a11y props to every interactive element.
 - No secrets in mobile bundle; all keys on server.
+- **MVP Focus**: Use your Figma screens but exclude community, paywall, and game features.
+- **Design Fidelity**: Match the Ethereal Flow aesthetic from your Figma designs.
