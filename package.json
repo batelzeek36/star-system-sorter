@@ -16,6 +16,7 @@
     "maestro:android": "bash scripts/e2e-android.sh",
     "maestro:artifacts": "bash scripts/collect-artifacts.sh",
     "typecheck": "tsc --noEmit",
+    "schemas:generate": "tsx scripts/generate-json-schemas.ts",
     "build:detox:ios": "detox build --configuration ios.sim.debug",
     "build:detox:android": "detox build --configuration android.emu.debug",
     "rebuild:ios": "bash scripts/rebuild-native.sh ios",
@@ -74,7 +75,8 @@
     "prettier": "2.8.8",
     "react-test-renderer": "19.1.1",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod-to-json-schema": "^3.24.6"
   },
   "engines": {
     "node": ">=20"

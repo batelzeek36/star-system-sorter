@@ -11,10 +11,14 @@
 import React from 'react';
 import {render} from '@testing-library/react-native';
 import {RadialChart} from '../src/components/RadialChart';
+import {ThemeProvider} from '../src/theme';
 
 describe('RadialChart', () => {
+  const renderWithTheme = (component: React.ReactElement) => {
+    return render(<ThemeProvider>{component}</ThemeProvider>);
+  };
   it('renders with basic props', () => {
-    const {getByText, getByLabelText} = render(
+    const {getByText, getByLabelText} = renderWithTheme(
       <RadialChart percentage={75} label="Test System" color="#3B82F6" />
     );
 
@@ -24,19 +28,19 @@ describe('RadialChart', () => {
   });
 
   it('clamps percentage to 0-100 range', () => {
-    const {getByText: getByTextNegative} = render(
+    const {getByText: getByTextNegative} = renderWithTheme(
       <RadialChart percentage={-10} label="Negative" color="#3B82F6" />
     );
     expect(getByTextNegative('0.0%')).toBeTruthy();
 
-    const {getByText: getByTextOver} = render(
+    const {getByText: getByTextOver} = renderWithTheme(
       <RadialChart percentage={150} label="Over 100" color="#3B82F6" />
     );
     expect(getByTextOver('100.0%')).toBeTruthy();
   });
 
   it('formats percentage to 1 decimal place', () => {
-    const {getByText} = render(
+    const {getByText} = renderWithTheme(
       <RadialChart percentage={33.333} label="Decimal" color="#3B82F6" />
     );
 
@@ -44,7 +48,7 @@ describe('RadialChart', () => {
   });
 
   it('renders with custom size and stroke width', () => {
-    const {getByText} = render(
+    const {getByText} = renderWithTheme(
       <RadialChart
         percentage={50}
         label="Custom Size"
@@ -59,7 +63,7 @@ describe('RadialChart', () => {
   });
 
   it('uses default size and stroke width when not provided', () => {
-    const {getByText} = render(
+    const {getByText} = renderWithTheme(
       <RadialChart percentage={25} label="Defaults" color="#EF4444" />
     );
 
@@ -70,7 +74,7 @@ describe('RadialChart', () => {
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
 
     colors.forEach((color, index) => {
-      const {getByText} = render(
+      const {getByText} = renderWithTheme(
         <RadialChart
           percentage={25 * (index + 1)}
           label={`Color ${index}`}
@@ -83,7 +87,7 @@ describe('RadialChart', () => {
   });
 
   it('handles zero percentage', () => {
-    const {getByText} = render(
+    const {getByText} = renderWithTheme(
       <RadialChart percentage={0} label="Zero" color="#3B82F6" />
     );
 
@@ -91,7 +95,7 @@ describe('RadialChart', () => {
   });
 
   it('handles 100 percentage', () => {
-    const {getByText} = render(
+    const {getByText} = renderWithTheme(
       <RadialChart percentage={100} label="Full" color="#3B82F6" />
     );
 

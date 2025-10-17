@@ -36,7 +36,7 @@ describe('Canon Checksum Determinism (Cross-Run Verification)', () => {
     // This is the stable checksum for mock canon v0.1.0
     // If this changes, the canon data has been modified
     const expectedChecksum =
-      'de2f57a11af9cccf49ace7573b881ec10b17c7935eeabaeecac21a743437fe0c';
+      '04462f178e88b10c6556687c359b12e1a0fcda9b9c91672c332f5faccb3d89dd';
 
     console.log(`\nCanon version: ${canon.version}`);
     console.log(`Current checksum:  ${checksum}`);

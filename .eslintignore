@@ -22,3 +22,9 @@ jest.setup.js
 
 # Existing components (to be adapted in task 1.4)
 components/
+
+# Figma reference files (not part of build)
+Figma/
+
+# Example files (documentation only)
+src/components/ui/examples.tsx

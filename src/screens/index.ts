@@ -9,3 +9,4 @@ export {ResultScreen} from './ResultScreen';
 export {WhyScreen} from './WhyScreen';
 export {ProfileScreen} from './ProfileScreen';
 export {SettingsScreen} from './SettingsScreen';
+export {EmptyStatesScreen} from './EmptyStatesScreen';

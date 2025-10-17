@@ -197,8 +197,8 @@ describe('Canon Loading and Validation', () => {
 
       expect(pleiades.weights).toHaveProperty('type_manifestor');
       expect(pleiades.weights).toHaveProperty('authority_emotional');
-      expect(pleiades.weights).toHaveProperty('channel_34_57');
-      expect(pleiades.weights.channel_34_57).toBe(20);
+      expect(pleiades.weights).toHaveProperty('channel_3457');
+      expect(pleiades.weights.channel_3457).toBe(20);
     });
 
     it('should have Sirius system with expected weights', () => {
@@ -207,8 +207,8 @@ describe('Canon Loading and Validation', () => {
 
       expect(sirius.weights).toHaveProperty('type_projector');
       expect(sirius.weights).toHaveProperty('authority_splenic');
-      expect(sirius.weights).toHaveProperty('channel_18_58');
-      expect(sirius.weights.channel_18_58).toBe(18);
+      expect(sirius.weights).toHaveProperty('channel_1858');
+      expect(sirius.weights.channel_1858).toBe(18);
     });
 
     it('should have meaningful why explanations', () => {

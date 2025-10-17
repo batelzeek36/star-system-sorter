@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://star-system-sorter.app/schemas/ClassificationOptions.json",
+  "title": "ClassificationOptions",
+  "description": "Optional configuration for classification algorithm",
+  "category": "scorer",
+  "$ref": "#/definitions/ClassificationOptions",
+  "definitions": {
+    "ClassificationOptions": {
+      "type": "string"
+    }
+  }
+}

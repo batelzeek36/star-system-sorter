@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://star-system-sorter.app/schemas/ClassificationResult.json",
+  "title": "ClassificationResult",
+  "description": "Complete classification result from scorer",
+  "category": "scorer",
+  "$ref": "#/definitions/ClassificationResult",
+  "definitions": {
+    "ClassificationResult": {
+      "type": "string"
+    }
+  }
+}

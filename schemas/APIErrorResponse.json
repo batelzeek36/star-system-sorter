@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://star-system-sorter.app/schemas/APIErrorResponse.json",
+  "title": "APIErrorResponse",
+  "description": "Standard API error response format",
+  "category": "error",
+  "$ref": "#/definitions/APIErrorResponse",
+  "definitions": {
+    "APIErrorResponse": {
+      "type": "string"
+    }
+  }
+}

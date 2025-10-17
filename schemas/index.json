@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Star System Sorter - Schema Index",
+  "description": "Index of all JSON schemas for the Star System Sorter application",
+  "version": "1.0.0",
+  "schemas": [
+    {
+      "name": "BirthDataForm",
+      "description": "Birth data form validation schema for InputScreen",
+      "category": "client",
+      "file": "BirthDataForm.json"
+    },
+    {
+      "name": "BirthDataAPIRequest",
+      "description": "Birth data API request format (client → server)",
+      "category": "api",
+      "file": "BirthDataAPIRequest.json"
+    },
+    {
+      "name": "HDExtract",
+      "description": "Human Design data extracted from birth chart",
+      "category": "api",
+      "file": "HDExtract.json"
+    },
+    {
+      "name": "BodyGraphRequest",
+      "description": "BodyGraph Chart API request format",
+      "category": "server",
+      "file": "BodyGraphRequest.json"
+    },
+    {
+      "name": "BodyGraphResponse",
+      "description": "BodyGraph Chart API response format (partial)",
+      "category": "server",
+      "file": "BodyGraphResponse.json"
+    },
+    {
+      "name": "Contributor",
+      "description": "Single HD attribute contributor to system score",
+      "category": "scorer",
+      "file": "Contributor.json"
+    },
+    {
+      "name": "SystemScore",
+      "description": "Detailed scoring information for a star system",
+      "category": "scorer",
+      "file": "SystemScore.json"
+    },
+    {
+      "name": "Ally",
+      "description": "Allied star system with percentage",
+      "category": "scorer",
+      "file": "Ally.json"
+    },
+    {
+      "name": "ClassificationResult",
+      "description": "Complete classification result from scorer",
+      "category": "scorer",
+      "file": "ClassificationResult.json"
+    },
+    {
+      "name": "TiePolicy",
+      "description": "Configuration for tie-breaking logic",
+      "category": "scorer",
+      "file": "TiePolicy.json"
+    },
+    {
+      "name": "ClassificationOptions",
+      "description": "Optional configuration for classification algorithm",
+      "category": "scorer",
+      "file": "ClassificationOptions.json"
+    },
+    {
+      "name": "SystemWeights",
+      "description": "Weighted scoring rules for a star system",
+      "category": "canon",
+      "file": "SystemWeights.json"
+    },
+    {
+      "name": "Canon",
+      "description": "Complete canon data structure with all star system definitions",
+      "category": "canon",
+      "file": "Canon.json"
+    },
+    {
+      "name": "ResultScreenParams",
+      "description": "Parameters passed to Result screen after classification",
+      "category": "navigation",
+      "file": "ResultScreenParams.json"
+    },
+    {
+      "name": "WhyScreenParams",
+      "description": "Parameters passed to Why screen for explanation",
+      "category": "navigation",
+      "file": "WhyScreenParams.json"
+    },
+    {
+      "name": "APIErrorResponse",
+      "description": "Standard API error response format",
+      "category": "error",
+      "file": "APIErrorResponse.json"
+    },
+    {
+      "name": "ValidationError",
+      "description": "Zod validation error details",
+      "category": "error",
+      "file": "ValidationError.json"
+    },
+    {
+      "name": "CacheKey",
+      "description": "Key structure for HD data caching",
+      "category": "cache",
+      "file": "CacheKey.json"
+    },
+    {
+      "name": "CacheEntry",
+      "description": "Cached HD extract with metadata",
+      "category": "cache",
+      "file": "CacheEntry.json"
+    }
+  ],
+  "categories": {
+    "client": "Client-side form validation schemas",
+    "api": "API request/response schemas",
+    "server": "Server-side schemas for external APIs",
+    "scorer": "Star system classification and scoring schemas",
+    "canon": "Canon data structure schemas",
+    "navigation": "React Navigation parameter schemas",
+    "error": "Error response schemas",
+    "cache": "Client-side caching schemas"
+  }
+}

@@ -7,8 +7,9 @@ import React from 'react';
 import {render, fireEvent, waitFor} from '@testing-library/react-native';
 import {Alert} from 'react-native';
 import {InputScreen} from '../src/screens/InputScreen';
-import {computeHDExtract} from '../src/hd/hdkit-adapter';
+import {computeHDExtract} from '../src/hd';
 import {classify} from '../src/scorer';
+import {ThemeProvider} from '../src/theme';
 
 // Mock navigation
 const mockNavigate = jest.fn();
@@ -21,8 +22,8 @@ const mockNavigation = {
 // Mock Alert
 jest.spyOn(Alert, 'alert');
 
-// Mock hdkit adapter
-jest.mock('../src/hd/hdkit-adapter');
+// Mock HD module
+jest.mock('../src/hd');
 const mockComputeHDExtract = computeHDExtract as jest.MockedFunction<
   typeof computeHDExtract
 >;
@@ -31,9 +32,87 @@ const mockComputeHDExtract = computeHDExtract as jest.MockedFunction<
 jest.mock('../src/scorer');
 const mockClassify = classify as jest.MockedFunction<typeof classify>;
 
+// Helper to render with theme
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
+
 describe('InputScreen Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('Tab Navigation', () => {
+    it('should render both tabs with correct labels', () => {
+      const {getByTestId, getByText} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      expect(getByTestId('tab-birth-data')).toBeTruthy();
+      expect(getByTestId('tab-upload-pdf')).toBeTruthy();
+      expect(getByText('Birth Data')).toBeTruthy();
+      expect(getByText('Upload Chart PDF')).toBeTruthy();
+    });
+
+    it('should have Birth Data tab active by default', () => {
+      const {getByTestId, getByPlaceholderText} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      const birthDataTab = getByTestId('tab-birth-data');
+      expect(birthDataTab.props.accessibilityState.selected).toBe(true);
+
+      // Birth data form should be visible
+      expect(getByPlaceholderText('MM/DD/YYYY')).toBeTruthy();
+    });
+
+    it('should switch to Upload PDF tab when clicked', () => {
+      const {getByTestId, getByText, queryByPlaceholderText} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      const uploadTab = getByTestId('tab-upload-pdf');
+      fireEvent.press(uploadTab);
+
+      // Upload tab should be active
+      expect(uploadTab.props.accessibilityState.selected).toBe(true);
+
+      // Birth data form should be hidden
+      expect(queryByPlaceholderText('MM/DD/YYYY')).toBeNull();
+
+      // Upload placeholder should be visible
+      expect(getByText('PDF upload functionality coming soon')).toBeTruthy();
+    });
+
+    it('should switch back to Birth Data tab', () => {
+      const {getByTestId, getByPlaceholderText} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      // Switch to Upload tab
+      fireEvent.press(getByTestId('tab-upload-pdf'));
+
+      // Switch back to Birth Data tab
+      const birthDataTab = getByTestId('tab-birth-data');
+      fireEvent.press(birthDataTab);
+
+      expect(birthDataTab.props.accessibilityState.selected).toBe(true);
+      expect(getByPlaceholderText('MM/DD/YYYY')).toBeTruthy();
+    });
+
+    it('should have proper accessibility attributes for tabs', () => {
+      const {getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      const birthDataTab = getByTestId('tab-birth-data');
+      const uploadTab = getByTestId('tab-upload-pdf');
+
+      expect(birthDataTab.props.accessibilityRole).toBe('tab');
+      expect(birthDataTab.props.accessibilityLabel).toBe('Birth Data tab');
+      expect(uploadTab.props.accessibilityRole).toBe('tab');
+      expect(uploadTab.props.accessibilityLabel).toBe('Upload Chart PDF tab');
+    });
   });
 
   it('should wire form submission to hdkit adapter and scorer', async () => {
@@ -73,7 +152,7 @@ describe('InputScreen Integration', () => {
     };
     mockClassify.mockResolvedValue(mockResult);
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -86,7 +165,7 @@ describe('InputScreen Integration', () => {
     );
 
     // Submit form
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
     // Wait for async operations
     await waitFor(() => {
@@ -132,7 +211,7 @@ describe('InputScreen Integration', () => {
       meta: {canonVersion: '0.1.0', canonChecksum: 'abc'},
     });
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -143,7 +222,7 @@ describe('InputScreen Integration', () => {
       'Los Angeles, CA'
     );
 
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
     await waitFor(() => {
       expect(mockComputeHDExtract).toHaveBeenCalledWith({
@@ -173,7 +252,7 @@ describe('InputScreen Integration', () => {
       meta: {canonVersion: '0.1.0', canonChecksum: 'abc'},
     });
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -184,7 +263,7 @@ describe('InputScreen Integration', () => {
       'Chicago, IL'
     );
 
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
     await waitFor(() => {
       expect(mockComputeHDExtract).toHaveBeenCalledWith({
@@ -214,7 +293,7 @@ describe('InputScreen Integration', () => {
       meta: {canonVersion: '0.1.0', canonChecksum: 'abc'},
     });
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -225,7 +304,7 @@ describe('InputScreen Integration', () => {
       'Miami, FL'
     );
 
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
     await waitFor(() => {
       expect(mockComputeHDExtract).toHaveBeenCalledWith({
@@ -251,7 +330,7 @@ describe('InputScreen Integration', () => {
       new Error('classify() not yet implemented')
     );
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -262,7 +341,7 @@ describe('InputScreen Integration', () => {
       'Boston, MA'
     );
 
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
@@ -283,7 +362,7 @@ describe('InputScreen Integration', () => {
       new Error('Invalid timezone: XYZ')
     );
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -294,17 +373,179 @@ describe('InputScreen Integration', () => {
       'Seattle, WA'
     );
 
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
+    // Toast should be shown with error message
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Error',
-        'Invalid timezone. Please select a valid timezone.',
-        [{text: 'OK'}]
-      );
+      expect(getByTestId('input-toast')).toBeTruthy();
+      expect(getByText(/Invalid timezone/i)).toBeTruthy();
     });
 
+    // Should not navigate on error
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  describe('Toast Notifications', () => {
+    it('should show success toast when computing chart', async () => {
+      mockComputeHDExtract.mockResolvedValue({
+        type: 'Generator',
+        authority: 'Sacral',
+        profile: '2/4',
+        centers: [],
+        channels: [],
+        gates: [],
+      });
+
+      mockClassify.mockResolvedValue({
+        classification: 'primary',
+        primary: 'Sirius',
+        allies: [],
+        percentages: {Sirius: 100},
+        contributorsPerSystem: {},
+        meta: {canonVersion: '0.1.0', canonChecksum: 'abc'},
+      });
+
+      const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(getByPlaceholderText('HH:MM AM/PM'), '03:30 PM');
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'New York, NY'
+      );
+
+      fireEvent.press(getByText('Compute Chart'));
+
+      // Toast should appear with success message
+      await waitFor(() => {
+        expect(getByTestId('input-toast')).toBeTruthy();
+        expect(getByText('Computing your chart...')).toBeTruthy();
+      });
+    });
+
+    it('should show error toast for network errors', async () => {
+      mockComputeHDExtract.mockRejectedValue(
+        new Error('No internet connection')
+      );
+
+      const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(getByPlaceholderText('HH:MM AM/PM'), '03:30 PM');
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'New York, NY'
+      );
+
+      fireEvent.press(getByText('Compute Chart'));
+
+      await waitFor(() => {
+        expect(getByTestId('input-toast')).toBeTruthy();
+        expect(
+          getByText('No internet connection. Please check your network and try again.')
+        ).toBeTruthy();
+      });
+    });
+
+    it('should show error toast for server errors', async () => {
+      mockComputeHDExtract.mockRejectedValue(new Error('Server error'));
+
+      const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(getByPlaceholderText('HH:MM AM/PM'), '03:30 PM');
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'New York, NY'
+      );
+
+      fireEvent.press(getByText('Compute Chart'));
+
+      await waitFor(() => {
+        expect(getByTestId('input-toast')).toBeTruthy();
+        expect(
+          getByText('Service temporarily unavailable. Please try again later.')
+        ).toBeTruthy();
+      });
+    });
+
+    it('should show error toast for rate limiting', async () => {
+      mockComputeHDExtract.mockRejectedValue(new Error('Rate limit exceeded'));
+
+      const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(getByPlaceholderText('HH:MM AM/PM'), '03:30 PM');
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'New York, NY'
+      );
+
+      fireEvent.press(getByText('Compute Chart'));
+
+      await waitFor(() => {
+        expect(getByTestId('input-toast')).toBeTruthy();
+        expect(
+          getByText('Too many requests. Please wait a moment before trying again.')
+        ).toBeTruthy();
+      });
+    });
+
+    it('should show error toast for invalid input', async () => {
+      mockComputeHDExtract.mockRejectedValue(new Error('Invalid input data'));
+
+      const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(getByPlaceholderText('HH:MM AM/PM'), '03:30 PM');
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'New York, NY'
+      );
+
+      fireEvent.press(getByText('Compute Chart'));
+
+      await waitFor(() => {
+        expect(getByTestId('input-toast')).toBeTruthy();
+        expect(
+          getByText('Invalid data. Please check your birth date, time, and timezone.')
+        ).toBeTruthy();
+      });
+    });
+
+    it('should show generic error toast for unknown errors', async () => {
+      mockComputeHDExtract.mockRejectedValue(new Error('Unknown error'));
+
+      const {getByPlaceholderText, getByText, getByTestId} = renderWithTheme(
+        <InputScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.changeText(getByPlaceholderText('MM/DD/YYYY'), '01/15/1990');
+      fireEvent.changeText(getByPlaceholderText('HH:MM AM/PM'), '03:30 PM');
+      fireEvent.changeText(
+        getByPlaceholderText('City, State/Country'),
+        'New York, NY'
+      );
+
+      fireEvent.press(getByText('Compute Chart'));
+
+      await waitFor(() => {
+        expect(getByTestId('input-toast')).toBeTruthy();
+        expect(
+          getByText('Unable to process your birth data. Please check your inputs and try again.')
+        ).toBeTruthy();
+      });
+    });
   });
 
   it('should handle hybrid classification correctly', async () => {
@@ -338,7 +579,7 @@ describe('InputScreen Integration', () => {
     };
     mockClassify.mockResolvedValue(mockHybridResult);
 
-    const {getByPlaceholderText, getByText} = render(
+    const {getByPlaceholderText, getByText} = renderWithTheme(
       <InputScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -349,7 +590,7 @@ describe('InputScreen Integration', () => {
       'Denver, CO'
     );
 
-    fireEvent.press(getByText('Calculate'));
+    fireEvent.press(getByText('Compute Chart'));
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('Result', {

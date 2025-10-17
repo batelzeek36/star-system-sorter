@@ -143,17 +143,76 @@ function normalizeProfile(raw?: string): string {
 
 function extractGates(props: any): number[] {
   const gatesList = props.Gates?.list || [];
-  return gatesList.map((g: any) => g.option).filter((n: any) => typeof n === 'number');
+  const gates = gatesList.map((g: any) => g.option).filter((n: any) => typeof n === 'number');
+  return gates.sort((a, b) => a - b);
 }
 
+// Gate-to-Center mapping based on Human Design system
+const GATE_TO_CENTER: Record<number, string> = {
+  // Head Center
+  61: 'Head', 63: 'Head', 64: 'Head',
+  // Ajna Center
+  47: 'Ajna', 24: 'Ajna', 4: 'Ajna', 17: 'Ajna', 43: 'Ajna', 11: 'Ajna',
+  // Throat Center
+  62: 'Throat', 23: 'Throat', 56: 'Throat', 35: 'Throat', 12: 'Throat',
+  45: 'Throat', 33: 'Throat', 8: 'Throat', 31: 'Throat', 20: 'Throat', 16: 'Throat',
+  // G Center (Identity)
+  7: 'G', 1: 'G', 13: 'G', 10: 'G',
+  // Will/Ego Center
+  21: 'Will', 40: 'Will', 26: 'Will', 51: 'Will',
+  // Sacral Center
+  5: 'Sacral', 14: 'Sacral', 29: 'Sacral', 59: 'Sacral', 9: 'Sacral',
+  3: 'Sacral', 42: 'Sacral', 27: 'Sacral', 34: 'Sacral',
+  // Spleen Center
+  48: 'Spleen', 57: 'Spleen', 44: 'Spleen', 50: 'Spleen', 32: 'Spleen',
+  28: 'Spleen', 18: 'Spleen',
+  // Solar Plexus Center
+  6: 'Solar Plexus', 37: 'Solar Plexus', 22: 'Solar Plexus', 36: 'Solar Plexus',
+  30: 'Solar Plexus', 55: 'Solar Plexus', 49: 'Solar Plexus',
+  // Root Center
+  58: 'Root', 38: 'Root', 54: 'Root', 53: 'Root', 60: 'Root',
+  52: 'Root', 19: 'Root', 39: 'Root', 41: 'Root',
+  // Additional gates
+  2: 'G', 15: 'G', 46: 'G', 25: 'G',
+};
+
+// Channel definitions (gate pairs)
+const CHANNELS: Array<[number, number]> = [
+  // Format Design channels
+  [1, 8], [2, 14], [3, 60], [4, 63], [5, 15], [6, 59], [7, 31],
+  [9, 52], [10, 20], [10, 34], [10, 57], [11, 56], [12, 22], [13, 33],
+  [16, 48], [17, 62], [18, 58], [19, 49], [20, 34], [20, 57], [21, 45],
+  [23, 43], [24, 61], [25, 51], [26, 44], [27, 50], [28, 38], [29, 46],
+  [30, 41], [32, 54], [35, 36], [37, 40], [39, 55], [42, 53], [47, 64],
+];
+
 function deriveCenters(props: any): string[] {
-  // TODO: Implement center derivation logic
-  return [];
+  const gates = extractGates(props);
+  const centerSet = new Set<string>();
+  
+  gates.forEach(gate => {
+    const center = GATE_TO_CENTER[gate];
+    if (center) {
+      centerSet.add(center);
+    }
+  });
+  
+  return Array.from(centerSet).sort();
 }
 
 function deriveChannels(props: any): number[] {
-  // TODO: Implement channel derivation logic
-  return [];
+  const gates = extractGates(props);
+  const gateSet = new Set(gates);
+  const channels: number[] = [];
+  
+  CHANNELS.forEach(([gate1, gate2]) => {
+    if (gateSet.has(gate1) && gateSet.has(gate2)) {
+      // Use the smaller gate number as the channel identifier
+      channels.push(Math.min(gate1, gate2));
+    }
+  });
+  
+  return channels.sort((a, b) => a - b);
 }
 
 // Export cache utilities for testing

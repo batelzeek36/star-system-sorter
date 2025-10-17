@@ -1,59 +1,102 @@
 /**
- * StarSystemCrest Usage Examples
+ * StarSystemCrests Usage Examples
  * 
- * This file demonstrates various ways to use the StarSystemCrest component.
- * Not included in production bundle.
+ * Demonstrates how to use the individual crest components and lookup map
  */
 
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {StarSystemCrest} from './StarSystemCrest';
+import {View, StyleSheet, Text} from 'react-native';
+import {
+  OrionCrest,
+  SiriusCrest,
+  PleiadesCrest,
+  AndromedaCrest,
+  LyraCrest,
+  ArcturusCrest,
+  StarSystemCrests,
+} from './StarSystemCrests';
 
-export function StarSystemCrestExamples() {
+/**
+ * Example 1: Using individual crest components directly
+ */
+export function DirectCrestExample() {
   return (
     <View style={styles.container}>
-      {/* Basic usage with all known systems */}
+      <Text style={styles.title}>Direct Crest Components</Text>
       <View style={styles.row}>
-        <StarSystemCrest system="Pleiades" />
-        <StarSystemCrest system="Sirius" />
-        <StarSystemCrest system="Arcturus" />
-        <StarSystemCrest system="Andromeda" />
-        <StarSystemCrest system="Orion" />
+        <OrionCrest size={48} />
+        <SiriusCrest size={48} />
+        <PleiadesCrest size={48} />
       </View>
-
-      {/* Size variants */}
       <View style={styles.row}>
-        <StarSystemCrest system="Pleiades" size="sm" />
-        <StarSystemCrest system="Pleiades" size="md" />
-        <StarSystemCrest system="Pleiades" size="lg" />
+        <AndromedaCrest size={48} />
+        <LyraCrest size={48} />
+        <ArcturusCrest size={48} />
       </View>
+    </View>
+  );
+}
 
-      {/* Visual variants */}
-      <View style={styles.row}>
-        <StarSystemCrest system="Sirius" variant="default" />
-        <StarSystemCrest system="Sirius" variant="outlined" />
+/**
+ * Example 2: Using the lookup map for dynamic rendering
+ */
+export function DynamicCrestExample() {
+  const systems = ['Orion', 'Sirius', 'Pleiades', 'Andromeda', 'Lyra', 'Arcturus'] as const;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Dynamic Crests from Map</Text>
+      <View style={styles.grid}>
+        {systems.map((system) => {
+          const CrestComponent = StarSystemCrests[system];
+          return (
+            <View key={system} style={styles.crestItem}>
+              <CrestComponent size={48} />
+              <Text style={styles.label}>{system}</Text>
+            </View>
+          );
+        })}
       </View>
+    </View>
+  );
+}
 
-      {/* Custom color */}
+/**
+ * Example 3: Different sizes
+ */
+export function SizeVariantsExample() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Size Variants</Text>
       <View style={styles.row}>
-        <StarSystemCrest system="Arcturus" color="#FF6B6B" />
-        <StarSystemCrest system="Andromeda" color="#4ECDC4" />
+        <View style={styles.crestItem}>
+          <OrionCrest size={24} />
+          <Text style={styles.label}>24px</Text>
+        </View>
+        <View style={styles.crestItem}>
+          <OrionCrest size={28} />
+          <Text style={styles.label}>28px</Text>
+        </View>
+        <View style={styles.crestItem}>
+          <OrionCrest size={48} />
+          <Text style={styles.label}>48px</Text>
+        </View>
       </View>
+    </View>
+  );
+}
 
-      {/* Fallback for unknown system */}
+/**
+ * Example 4: Custom colors
+ */
+export function ColoredCrestsExample() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Custom Colors</Text>
       <View style={styles.row}>
-        <StarSystemCrest system="UnknownSystem" />
-        <StarSystemCrest system="UnknownSystem" showFallbackText={true} />
-      </View>
-
-      {/* Combined variants */}
-      <View style={styles.row}>
-        <StarSystemCrest
-          system="Orion"
-          size="lg"
-          variant="outlined"
-          color="#9B59B6"
-        />
+        <SiriusCrest size={48} color="#FFD700" />
+        <PleiadesCrest size={48} color="#9B59B6" />
+        <AndromedaCrest size={48} color="#3498DB" />
       </View>
     </View>
   );
@@ -61,14 +104,33 @@ export function StarSystemCrestExamples() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    gap: 20,
+    padding: 16,
+    backgroundColor: '#1a1a2e',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 16,
   },
   row: {
     flexDirection: 'row',
-    gap: 16,
+    justifyContent: 'space-around',
     alignItems: 'center',
+    marginVertical: 8,
+  },
+  grid: {
+    flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  crestItem: {
+    alignItems: 'center',
+    margin: 8,
+  },
+  label: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#a0a0a0',
   },
 });

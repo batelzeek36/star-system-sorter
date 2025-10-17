@@ -11,5 +11,12 @@
     }
   },
   "include": ["src", "index.js", "index.ts", "index.tsx", "App.tsx"],
-  "exclude": ["node_modules", "android", "ios", "src/bridge/generate-schemas.ts"]
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    "src/bridge/generate-schemas.ts",
+    "src/components/ui/examples.tsx",
+    "Figma"
+  ]
 }

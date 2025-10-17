@@ -10,6 +10,7 @@
 import React, {useEffect, useRef} from 'react';
 import {View, Text, StyleSheet, Animated} from 'react-native';
 import Svg, {Circle, G} from 'react-native-svg';
+import {useTheme} from '../theme';
 
 export interface RadialChartProps {
   /** Percentage value (0-100) */
@@ -39,6 +40,7 @@ export function RadialChart({
   size = 120,
   strokeWidth = 8,
 }: RadialChartProps) {
+  const theme = useTheme();
   const animatedValue = useRef(new Animated.Value(0)).current;
   
   // Calculate circle properties
@@ -75,7 +77,7 @@ export function RadialChart({
               cx={center}
               cy={center}
               r={radius}
-              stroke="#E5E7EB"
+              stroke={theme.colors.borders.muted}
               strokeWidth={strokeWidth}
               fill="none"
             />
@@ -97,14 +99,33 @@ export function RadialChart({
         
         {/* Center text */}
         <View style={styles.centerText}>
-          <Text style={[styles.percentage, {color}]}>
+          <Text 
+            style={[
+              styles.percentage, 
+              {
+                color,
+                fontSize: theme.typography.fontSize['2xl'],
+                fontWeight: theme.typography.fontWeight.bold,
+              }
+            ]}>
             {clampedPercentage.toFixed(1)}%
           </Text>
         </View>
       </View>
       
       {/* Label */}
-      <Text style={styles.label}>{label}</Text>
+      <Text 
+        style={[
+          styles.label,
+          {
+            marginTop: theme.spacing[2],
+            fontSize: theme.typography.fontSize.sm,
+            fontWeight: theme.typography.fontWeight.semibold,
+            color: theme.colors.text.secondary,
+          }
+        ]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -124,14 +145,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   percentage: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    // Dynamic styles applied inline
   },
   label: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
     textAlign: 'center',
+    // Dynamic styles applied inline
   },
 });

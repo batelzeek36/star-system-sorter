@@ -6,7 +6,6 @@
 import { http, HttpResponse } from 'msw';
 import { computeHDExtract, clearCache } from '../src/hd/api-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { HDExtract } from '../src/hd/types';
 
 const baseUrl = 'http://localhost:3000';
 
@@ -41,8 +40,8 @@ const GOLDEN_FIXTURES = [
       type: 'Manifestor',
       authority: 'Emotional',
       profile: '1/3',
-      centers: [],
-      channels: [],
+      centers: ['G', 'Solar Plexus', 'Throat'], // Gates: 1,13,25→G, 8,33→Throat, 55→Solar Plexus
+      channels: [1, 13], // Channels: [1,8] and [13,33]
       gates: [1, 8, 13, 25, 33, 55],
     },
   },
@@ -74,8 +73,8 @@ const GOLDEN_FIXTURES = [
       type: 'Projector',
       authority: 'Splenic',
       profile: '6/2',
-      centers: [],
-      channels: [],
+      centers: ['G', 'Sacral'],
+      channels: [2, 29], // Channels: [2,14] and [29,46]
       gates: [2, 14, 29, 46],
     },
   },
@@ -109,8 +108,8 @@ const GOLDEN_FIXTURES = [
       type: 'Manifesting Generator',
       authority: 'Sacral',
       profile: '5/1',
-      centers: [],
-      channels: [],
+      centers: ['Sacral', 'Spleen'], // Gates: 3,9,27,34,59→Sacral, 50→Spleen
+      channels: [27], // Only channel [27,50] is complete
       gates: [3, 9, 27, 34, 50, 59],
     },
   },
@@ -153,9 +152,9 @@ describe('computeHDExtract', () => {
       type: 'Manifesting Generator',
       authority: 'Emotional',
       profile: '2/4',
-      centers: [],
-      channels: [],
-      gates: [2, 1, 53],
+      centers: ['G', 'Root'],
+      channels: [], // No complete channels (1 needs 8, 2 needs 14, 53 needs 42)
+      gates: [1, 2, 53],
     });
   });
 
@@ -367,8 +366,8 @@ describe('computeHDExtract', () => {
       type: 'Generator',
       authority: 'Sacral',
       profile: '1/3',
-      centers: [],
-      channels: [],
+      centers: [], // No gates, so no centers
+      channels: [], // No gates, so no channels
       gates: [],
     });
   });
@@ -401,6 +400,8 @@ describe('computeHDExtract', () => {
     });
 
     expect(result.gates).toEqual([1, 13, 25, 46]);
+    expect(result.centers).toContain('G'); // Gates 1, 13, 25, 46 map to G and Sacral
+    expect(result.channels).toEqual([]); // No complete channels (1 needs 8, 13 needs 33, 25 needs 51, 46 needs 29)
   });
 
   it('should handle various authority types', async () => {

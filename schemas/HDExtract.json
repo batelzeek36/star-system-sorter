@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://star-system-sorter.app/schemas/HDExtract.json",
+  "title": "HDExtract",
+  "description": "Human Design data extracted from birth chart",
+  "category": "api",
+  "$ref": "#/definitions/HDExtract",
+  "definitions": {
+    "HDExtract": {
+      "type": "string"
+    }
+  }
+}

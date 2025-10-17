@@ -7,10 +7,14 @@
 import React from 'react';
 import {render, screen} from '@testing-library/react-native';
 import {ScoreDisplay} from '../src/components/ScoreDisplay';
+import {ThemeProvider} from '../src/theme';
 
 describe('ScoreDisplay', () => {
+  const renderWithTheme = (component: React.ReactElement) => {
+    return render(<ThemeProvider>{component}</ThemeProvider>);
+  };
   it('renders primary classification correctly', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={45.3}
@@ -29,7 +33,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('renders hybrid classification correctly', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={42.5}
@@ -45,7 +49,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('renders allied systems', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={45.3}
@@ -65,7 +69,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('renders disclaimer text', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={45.3}
@@ -82,7 +86,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('handles empty allies array', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={45.3}
@@ -95,7 +99,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('formats percentages to one decimal place', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={45.678}
@@ -109,7 +113,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('has proper accessibility labels', () => {
-    const {getByLabelText} = render(
+    const {getByLabelText} = renderWithTheme(
       <ScoreDisplay
         primary="Pleiades"
         percentage={45.3}
@@ -122,7 +126,7 @@ describe('ScoreDisplay', () => {
   });
 
   it('handles undefined primary for hybrid classification', () => {
-    render(
+    renderWithTheme(
       <ScoreDisplay
         percentage={42.5}
         allies={[]}

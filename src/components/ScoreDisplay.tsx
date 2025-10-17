@@ -11,6 +11,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {StarSystemCrest, StarSystemName} from './StarSystemCrest';
+import {useTheme} from '../theme';
 
 export interface ScoreDisplayProps {
   /** Primary star system (optional for hybrid classifications) */
@@ -38,13 +39,25 @@ export function ScoreDisplay({
   hybrid,
   classification,
 }: ScoreDisplayProps) {
+  const theme = useTheme();
   const displaySystem = classification === 'hybrid' && hybrid ? hybrid[0] : (primary || 'Unknown');
   
   return (
-    <View style={styles.card}>
+    <View 
+      style={[
+        styles.card,
+        {
+          backgroundColor: `${theme.colors.lavender[900]}33`, // 20% opacity
+          borderRadius: theme.borderRadius.xl,
+          borderWidth: 1,
+          borderColor: theme.colors.borders.muted,
+          padding: theme.spacing[5],
+          ...theme.elevation[2],
+        }
+      ]}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.crestContainer}>
+      <View style={[styles.header, {marginBottom: theme.spacing[5]}]}>
+        <View style={[styles.crestContainer, {marginRight: theme.spacing[4]}]}>
           <StarSystemCrest
             system={displaySystem as StarSystemName}
             size="lg"
@@ -53,34 +66,115 @@ export function ScoreDisplay({
         </View>
         
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>
+          <Text 
+            style={[
+              styles.title,
+              {
+                fontSize: theme.typography.fontSize['2xl'],
+                fontWeight: theme.typography.fontWeight.bold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing[1],
+              }
+            ]}>
             {classification === 'hybrid' && hybrid
               ? `${hybrid[0]} / ${hybrid[1]}`
               : (primary || 'Unknown')}
           </Text>
-          <Text style={styles.subtitle}>
+          <Text 
+            style={[
+              styles.subtitle,
+              {
+                fontSize: theme.typography.fontSize.sm,
+                color: theme.colors.text.muted,
+                fontWeight: theme.typography.fontWeight.medium,
+              }
+            ]}>
             {classification === 'hybrid' ? 'Hybrid System' : 'Primary System'}
           </Text>
         </View>
       </View>
 
       {/* Percentage */}
-      <View style={styles.percentageContainer}>
-        <Text style={styles.percentageValue}>{percentage.toFixed(1)}%</Text>
-        <Text style={styles.percentageLabel}>Alignment</Text>
+      <View 
+        style={[
+          styles.percentageContainer,
+          {
+            alignItems: 'center',
+            paddingVertical: theme.spacing[5],
+            borderTopWidth: 1,
+            borderBottomWidth: 1,
+            borderColor: theme.colors.borders.subtle,
+            marginBottom: theme.spacing[5],
+          }
+        ]}>
+        <Text 
+          style={[
+            styles.percentageValue,
+            {
+              fontSize: theme.typography.fontSize['4xl'],
+              fontWeight: theme.typography.fontWeight.bold,
+              color: theme.colors.lavender[400],
+              marginBottom: theme.spacing[1],
+            }
+          ]}>
+          {percentage.toFixed(1)}%
+        </Text>
+        <Text 
+          style={[
+            styles.percentageLabel,
+            {
+              fontSize: theme.typography.fontSize.sm,
+              color: theme.colors.text.muted,
+              fontWeight: theme.typography.fontWeight.semibold,
+            }
+          ]}>
+          Alignment
+        </Text>
       </View>
 
       {/* Allies */}
       {allies.length > 0 && (
-        <View style={styles.alliesSection}>
-          <Text style={styles.alliesTitle}>Allied Systems</Text>
+        <View style={[styles.alliesSection, {marginBottom: theme.spacing[5]}]}>
+          <Text 
+            style={[
+              styles.alliesTitle,
+              {
+                fontSize: theme.typography.fontSize.base,
+                fontWeight: theme.typography.fontWeight.semibold,
+                color: theme.colors.text.secondary,
+                marginBottom: theme.spacing[3],
+              }
+            ]}>
+            Allied Systems
+          </Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.alliesContainer}>
             {allies.map((ally, index) => (
-              <View key={index} style={styles.badge}>
-                <Text style={styles.badgeText}>
+              <View 
+                key={index} 
+                style={[
+                  styles.badge,
+                  {
+                    backgroundColor: `${theme.colors.lavender[500]}33`, // 20% opacity
+                    borderRadius: theme.borderRadius.full,
+                    paddingHorizontal: theme.spacing[3],
+                    paddingVertical: theme.spacing[1],
+                    borderWidth: 1,
+                    borderColor: `${theme.colors.lavender[400]}4D`, // 30% opacity
+                    marginRight: theme.spacing[2],
+                  }
+                ]}>
+                <Text 
+                  style={[
+                    styles.badgeText,
+                    {
+                      fontSize: theme.typography.fontSize.xs,
+                      fontWeight: theme.typography.fontWeight.medium,
+                      color: theme.colors.lavender[300],
+                    }
+                  ]}>
                   {ally.system} {ally.percentage.toFixed(1)}%
                 </Text>
               </View>
@@ -90,8 +184,27 @@ export function ScoreDisplay({
       )}
 
       {/* Disclaimer */}
-      <View style={styles.disclaimer}>
-        <Text style={styles.disclaimerText}>
+      <View 
+        style={[
+          styles.disclaimer,
+          {
+            backgroundColor: `${theme.colors.gold[400]}1A`, // 10% opacity
+            borderRadius: theme.borderRadius.md,
+            padding: theme.spacing[3],
+            borderWidth: 1,
+            borderColor: `${theme.colors.gold[400]}33`, // 20% opacity
+          }
+        ]}>
+        <Text 
+          style={[
+            styles.disclaimerText,
+            {
+              fontSize: theme.typography.fontSize.xs,
+              color: theme.colors.gold[300],
+              textAlign: 'center',
+              fontStyle: 'italic',
+            }
+          ]}>
           For insight & entertainment. Not medical, financial, or legal advice.
         </Text>
       </View>
@@ -101,96 +214,53 @@ export function ScoreDisplay({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    // Dynamic styles applied inline
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
   },
   crestContainer: {
-    marginRight: 16,
+    // Dynamic styles applied inline
   },
   titleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 4,
+    // Dynamic styles applied inline
   },
   subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '500',
+    // Dynamic styles applied inline
   },
   percentageContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#E5E7EB',
-    marginBottom: 20,
+    // Dynamic styles applied inline
   },
   percentageValue: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#4A90E2',
-    marginBottom: 4,
+    // Dynamic styles applied inline
   },
   percentageLabel: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '600',
+    // Dynamic styles applied inline
   },
   alliesSection: {
-    marginBottom: 20,
+    // Dynamic styles applied inline
   },
   alliesTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 12,
+    // Dynamic styles applied inline
   },
   alliesContainer: {
     flexDirection: 'row',
     gap: 8,
   },
   badge: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginRight: 8,
+    // Dynamic styles applied inline
   },
   badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#374151',
+    // Dynamic styles applied inline
   },
   disclaimer: {
-    backgroundColor: '#FEF3C7',
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
+    // Dynamic styles applied inline
   },
   disclaimerText: {
-    fontSize: 12,
-    color: '#92400E',
-    textAlign: 'center',
-    fontStyle: 'italic',
+    // Dynamic styles applied inline
   },
 });

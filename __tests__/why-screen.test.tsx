@@ -7,6 +7,7 @@
 import React from 'react';
 import {render, screen} from '@testing-library/react-native';
 import {WhyScreen} from '@/screens/WhyScreen';
+import {ThemeProvider} from '@/theme/ThemeProvider';
 import type {ScreenProps} from '@/navigation/types';
 
 // Mock navigation
@@ -15,6 +16,11 @@ const mockNavigation = {
   goBack: jest.fn(),
   setOptions: jest.fn(),
 } as any;
+
+// Wrapper with ThemeProvider
+const renderWithTheme = (component: React.ReactElement) => {
+  return render(<ThemeProvider>{component}</ThemeProvider>);
+};
 
 describe('WhyScreen', () => {
   const defaultProps: ScreenProps<'Why'> = {
@@ -42,16 +48,16 @@ describe('WhyScreen', () => {
   });
 
   it('renders title and subtitle', () => {
-    render(<WhyScreen {...defaultProps} />);
+    renderWithTheme(<WhyScreen {...defaultProps} />);
     
-    expect(screen.getByText('Why This Classification?')).toBeTruthy();
+    expect(screen.getByText('Why Pleiades')).toBeTruthy();
     expect(
       screen.getByText('Your Human Design attributes contributed to these star systems')
     ).toBeTruthy();
   });
 
   it('displays systems sorted by percentage', () => {
-    render(<WhyScreen {...defaultProps} />);
+    renderWithTheme(<WhyScreen {...defaultProps} />);
     
     // All systems should be displayed
     expect(screen.getByText('Pleiades')).toBeTruthy();
@@ -65,7 +71,7 @@ describe('WhyScreen', () => {
   });
 
   it('displays formatted contributors for each system', () => {
-    render(<WhyScreen {...defaultProps} />);
+    renderWithTheme(<WhyScreen {...defaultProps} />);
     
     // Check formatted contributor labels
     expect(screen.getByText('Type: Manifestor')).toBeTruthy();
@@ -77,7 +83,7 @@ describe('WhyScreen', () => {
   });
 
   it('displays disclaimer footer', () => {
-    render(<WhyScreen {...defaultProps} />);
+    renderWithTheme(<WhyScreen {...defaultProps} />);
     
     expect(
       screen.getByText('For insight & entertainment. Not medical, financial, or legal advice.')
@@ -100,7 +106,7 @@ describe('WhyScreen', () => {
       },
     };
 
-    render(<WhyScreen {...propsWithEmpty} />);
+    renderWithTheme(<WhyScreen {...propsWithEmpty} />);
     
     expect(screen.getByText('Pleiades')).toBeTruthy();
     expect(screen.getByText('No contributing attributes')).toBeTruthy();
@@ -129,7 +135,7 @@ describe('WhyScreen', () => {
       },
     };
 
-    render(<WhyScreen {...propsWithVariety} />);
+    renderWithTheme(<WhyScreen {...propsWithVariety} />);
     
     expect(screen.getByText('Type: Generator')).toBeTruthy();
     expect(screen.getByText('Authority: Sacral')).toBeTruthy();

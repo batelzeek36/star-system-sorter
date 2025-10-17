@@ -1,32 +1,38 @@
 /**
- * Result Screen
+ * Result Screen (03_Sort_Result from Figma)
  * 
- * Displays classification results with visual components.
- * Shows star system crest, radial chart, score display, and action buttons.
+ * Displays classification results with Figma design system.
+ * Shows "Your Primary Star System" header, radial chart, primary system display,
+ * ally chips, "View Why" button, and disclaimer.
  * 
  * Requirements: 1.3, 1.7, 1.10
+ * Task: 2.2.3
  */
 
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import type {ScreenProps} from '@/navigation/types';
 import {
   StarSystemCrest,
   RadialChart,
-  ScoreDisplay,
+  Chip,
+  Button,
   type StarSystemName,
 } from '@/components';
+import {useTheme} from '@/theme';
+import {StarfieldBackground} from '@/components/StarfieldBackground';
 
 type Props = ScreenProps<'Result'>;
 
 export function ResultScreen({navigation, route}: Props) {
+  const theme = useTheme();
   const {classification, primary, hybrid, percentage, allies, contributorsPerSystem, percentages} = route.params;
 
   // Determine which system to display crest for
   const displaySystem = (primary || (hybrid && hybrid[0])) as StarSystemName | undefined;
   
   // Get color for the primary/hybrid system
-  const systemColor = displaySystem ? getSystemColor(displaySystem) : '#4F46E5';
+  const systemColor = displaySystem ? getSystemColor(displaySystem) : theme.colors.lavender[500];
 
   const handleViewWhy = () => {
     navigation.navigate('Why', {
@@ -35,76 +41,148 @@ export function ResultScreen({navigation, route}: Props) {
     });
   };
 
-  const handleGenerateNarrative = () => {
-    // TODO: Implement narrative generation in future task
-    // For now, navigate to Profile as placeholder
-    navigation.navigate('Profile');
-  };
-
   return (
-    <ScrollView 
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}>
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Your Classification</Text>
-      </View>
+    <View style={styles.root}>
+      <StarfieldBackground />
+      <ScrollView 
+        contentContainerStyle={[styles.container, {padding: theme.spacing[5]}]}
+        showsVerticalScrollIndicator={false}
+        testID="result-screen">
+        
+        {/* Header: "Your Primary Star System" */}
+        <View style={[styles.header, {marginBottom: theme.spacing[8]}]}>
+          <Text 
+            style={[
+              styles.title, 
+              {
+                fontSize: theme.typography.fontSize['3xl'],
+                fontWeight: theme.typography.fontWeight.bold,
+                color: theme.colors.text.primary,
+              }
+            ]}
+            testID="result-header">
+            Your Primary Star System
+          </Text>
+        </View>
 
-      {/* Star System Crest */}
-      {displaySystem && (
-        <View style={styles.crestContainer}>
-          <StarSystemCrest
-            system={displaySystem}
-            size="lg"
-            variant="default"
+        {/* Radial percentage chart (62% example) */}
+        <View style={[styles.chartContainer, {marginBottom: theme.spacing[8]}]}>
+          <RadialChart
+            percentage={percentage}
+            label={displaySystem || 'System'}
+            color={systemColor}
+            size={200}
+            strokeWidth={16}
           />
         </View>
-      )}
 
-      {/* Radial Chart */}
-      <View style={styles.chartContainer}>
-        <RadialChart
-          percentage={percentage}
-          label={displaySystem || 'System'}
-          color={systemColor}
-          size={160}
-          strokeWidth={12}
-        />
-      </View>
+        {/* Primary star system display with crest */}
+        {displaySystem && (
+          <View style={[styles.primarySystemContainer, {marginBottom: theme.spacing[6]}]}>
+            <View style={[styles.crestContainer, {marginBottom: theme.spacing[4]}]}>
+              <StarSystemCrest
+                system={displaySystem}
+                size="lg"
+                variant="default"
+              />
+            </View>
+            <Text 
+              style={[
+                styles.systemName,
+                {
+                  fontSize: theme.typography.fontSize['2xl'],
+                  fontWeight: theme.typography.fontWeight.bold,
+                  color: theme.colors.text.primary,
+                }
+              ]}
+              testID="primary-system-name">
+              {classification === 'hybrid' && hybrid
+                ? `${hybrid[0]} / ${hybrid[1]}`
+                : (primary || 'Unknown')}
+            </Text>
+            <Text 
+              style={[
+                styles.systemType,
+                {
+                  fontSize: theme.typography.fontSize.sm,
+                  color: theme.colors.text.muted,
+                  marginTop: theme.spacing[1],
+                }
+              ]}>
+              {classification === 'hybrid' ? 'Hybrid System' : 'Primary System'}
+            </Text>
+          </View>
+        )}
 
-      {/* Score Display Card */}
-      <View style={styles.scoreContainer}>
-        <ScoreDisplay
-          classification={classification}
-          primary={primary}
-          hybrid={hybrid}
-          percentage={percentage}
-          allies={allies}
-        />
-      </View>
+        {/* Ally chips (e.g., Sirius 18%, Lyra 12%, Andromeda 8%) using Figma Chip */}
+        {allies.length > 0 && (
+          <View style={[styles.alliesSection, {marginBottom: theme.spacing[8]}]}>
+            <Text 
+              style={[
+                styles.alliesTitle,
+                {
+                  fontSize: theme.typography.fontSize.base,
+                  fontWeight: theme.typography.fontWeight.semibold,
+                  color: theme.colors.text.secondary,
+                  marginBottom: theme.spacing[3],
+                }
+              ]}>
+              Allied Systems
+            </Text>
+            <View style={styles.chipsContainer}>
+              {allies.map((ally, index) => (
+                <Chip
+                  key={index}
+                  starSystem={ally.system}
+                  percentage={Math.round(ally.percentage)}
+                  variant={index % 2 === 0 ? 'gold' : 'lavender'}
+                  testID={`ally-chip-${index}`}
+                />
+              ))}
+            </View>
+          </View>
+        )}
 
-      {/* Action Buttons */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={handleViewWhy}
-          accessibilityLabel="View Why - See detailed explanation"
-          accessibilityRole="button"
-          accessibilityHint="Opens explanation of your classification">
-          <Text style={styles.primaryButtonText}>View Why</Text>
-        </TouchableOpacity>
+        {/* "View Why" button using Figma Button */}
+        <View style={[styles.buttonContainer, {marginBottom: theme.spacing[6]}]}>
+          <Button
+            variant="primary"
+            size="lg"
+            onPress={handleViewWhy}
+            testID="view-why-button"
+            accessibilityLabel="View Why - See detailed explanation">
+            View Why
+          </Button>
+        </View>
 
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={handleGenerateNarrative}
-          accessibilityLabel="Generate Narrative"
-          accessibilityRole="button"
-          accessibilityHint="Creates a personalized narrative">
-          <Text style={styles.secondaryButtonText}>Generate Narrative</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        {/* Disclaimer: "For insight & entertainment. Not medical, financial, or legal advice." */}
+        <View 
+          style={[
+            styles.disclaimer,
+            {
+              backgroundColor: `${theme.colors.gold[400]}1A`, // 10% opacity
+              borderColor: `${theme.colors.gold[400]}33`, // 20% opacity
+              borderRadius: theme.borderRadius.md,
+              padding: theme.spacing[4],
+              borderWidth: 1,
+            }
+          ]}>
+          <Text 
+            style={[
+              styles.disclaimerText,
+              {
+                fontSize: theme.typography.fontSize.xs,
+                color: theme.colors.gold[300],
+                textAlign: 'center',
+                fontStyle: 'italic',
+              }
+            ]}
+            testID="disclaimer-text">
+            For insight & entertainment. Not medical, financial, or legal advice.
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -119,70 +197,57 @@ function getSystemColor(system: StarSystemName): string {
     Andromeda: '#BD10E0',
     Orion: '#D0021B',
   };
-  return colors[system] || '#4F46E5';
+  return colors[system] || '#a78bfa';
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#0a0612', // canvas.dark
+  },
   container: {
     flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#F9FAFB',
   },
   header: {
-    marginBottom: 24,
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  crestContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
+    textAlign: 'center',
   },
   chartContainer: {
     alignItems: 'center',
-    marginBottom: 32,
   },
-  scoreContainer: {
-    marginBottom: 24,
+  primarySystemContainer: {
+    alignItems: 'center',
+  },
+  crestContainer: {
+    alignItems: 'center',
+  },
+  systemName: {
+    textAlign: 'center',
+  },
+  systemType: {
+    textAlign: 'center',
+  },
+  alliesSection: {
+    alignItems: 'center',
+  },
+  alliesTitle: {
+    textAlign: 'center',
+  },
+  chipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
   },
   buttonContainer: {
-    gap: 12,
-    marginBottom: 32,
+    width: '100%',
   },
-  primaryButton: {
-    backgroundColor: '#4F46E5',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
+  disclaimer: {
     alignItems: 'center',
-    minHeight: 44,
-    shadowColor: '#4F46E5',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
   },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    minHeight: 44,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-  },
-  secondaryButtonText: {
-    color: '#374151',
-    fontSize: 16,
-    fontWeight: '600',
+  disclaimerText: {
+    lineHeight: 18,
   },
 });
