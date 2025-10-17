@@ -197,25 +197,25 @@ Scope is limited to core sorter functionality with Figma UI integration.
 
 ### 6.3 E2E Tests (Maestro)
 
-- [ ] **Test Infrastructure**: `e2e/` directory with Maestro setup
-- [ ] **Critical Flows**:
-  - [ ] `e2e/flows/full_journey.yaml` - Complete user journey
-  - [ ] `e2e/flows/onboarding.yaml` - Onboarding flow
-  - [ ] `e2e/flows/input_chart.yaml` - Input and chart generation
-  - [ ] `e2e/flows/moderation.yaml` - Content moderation testing
+- [x] **Test Infrastructure**: `e2e/` directory with Maestro setup
+- [x] **Critical Flows**:
+  - [x] `e2e/flows/full_journey.yaml` - Complete user journey
+  - [x] `e2e/flows/onboarding.yaml` - Onboarding flow
+  - [x] `e2e/flows/input_chart.yaml` - Input and chart generation
+  - [x] `e2e/flows/moderation.yaml` - Content moderation testing
 
 ### 6.4 Additional Testing Tasks
 
-- [ ] **6.4.1 Result Screen Test**
-  - [ ] Create dedicated `result-screen.test.tsx` (currently only covered in navigation.test.tsx)
-  - [ ] Test radial chart rendering with classification data
-  - [ ] Test ally chips display and interaction
-  - [ ] Test "View Why" navigation
-- [ ] **6.4.2 E2E Flow Verification**
-  - [ ] Verify Maestro flows work with current UI and testIDs
-  - [ ] Update flows if testIDs have changed
-  - [ ] Test complete user journey with new Figma UI
-  - [ ] Verify accessibility with screen readers
+- [x] **6.4.1 Result Screen Test**
+  - [x] Create dedicated `result-screen.test.tsx` (currently only covered in navigation.test.tsx)
+  - [x] Test radial chart rendering with classification data
+  - [x] Test ally chips display and interaction
+  - [x] Test "View Why" navigation
+- [x] **6.4.2 E2E Flow Verification**
+  - [x] Verify Maestro flows work with current UI and testIDs
+  - [x] Update flows if testIDs have changed
+  - [x] Test complete user journey with new Figma UI
+  - [x] Verify accessibility with screen readers
 - [ ] **6.4.3 Performance Tests**
   - [ ] Test app launch time (≤2.5s Android, ≤1.8s iOS)
   - [ ] Test memory usage (≤350MB peak)

@@ -8,7 +8,7 @@ set -euo pipefail
 FLOW="${1:-full_journey}"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 ARTIFACTS_DIR=".artifacts/${TIMESTAMP}-android"
-AVD_NAME="Pixel_7_API_35"
+AVD_NAME="Medium_Phone_API_36.1"
 
 echo "🚀 Starting Android E2E test: ${FLOW}"
 echo "📱 Emulator: ${AVD_NAME}"
@@ -62,6 +62,7 @@ sleep 2
 # Run Maestro test
 echo "🎭 Running Maestro flow: ${FLOW}"
 maestro test "e2e/flows/${FLOW}.yaml" \
+    --env APP_ID=com.s3app \
     --format junit \
     --output "${ARTIFACTS_DIR}/results.xml" \
     || TEST_RESULT=$?

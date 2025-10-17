@@ -1,60 +1,74 @@
-appId: com.s3app
+appId: ${APP_ID}
 ---
 # Complete user journey: onboarding → input → result → why screen
+# Tests the full flow from app launch to viewing classification results
 
 - launchApp
+
+# Step 1: Onboarding Screen
 - assertVisible:
-    id: "screen-onboarding"
+    text: "Star System Sorter"
+- assertVisible:
+    text: "Begin Sorting"
 
 # Complete onboarding
 - tapOn:
-    id: "btn-get-started"
+    id: "get-started-button"
 - assertVisible:
-    id: "screen-input"
+    text: "Enter Birth Data"
 
-# Fill in birth data (known test case)
+# Step 2: Input Screen - Fill in birth data (known test case)
+# Using test data: 1992-10-03 00:03 in Attleboro, MA
 - tapOn:
-    id: "input-name"
-- inputText: "Test User"
+    id: "tab-birth-data"
+
+# Input birth date (MM/DD/YYYY format)
 - tapOn:
-    id: "input-birthdate"
-- inputText: "1992-10-03"
+    id: "field-date-input"
+- inputText: "10/03/1992"
+
+# Input birth time (HH:MM AM/PM format)
 - tapOn:
-    id: "input-birthtime"
-- inputText: "00:03"
+    id: "field-time-input"
+- inputText: "12:03 AM"
+
+# Input location
 - tapOn:
-    id: "input-location"
+    id: "field-location-input"
 - inputText: "Attleboro, MA"
 
 # Compute chart
 - tapOn:
-    id: "btn-compute-chart"
-- assertVisible:
-    id: "screen-result"
-    timeout: 10000
+    id: "button-compute-chart"
 
-# Verify result elements
+# Wait for processing and navigation to result screen
 - assertVisible:
-    id: "label-hd-type"
+    id: "result-screen"
+
+# Step 3: Result Screen - Verify result elements
 - assertVisible:
-    id: "label-star-system"
+    text: "Your Primary Star System"
 - assertVisible:
-    id: "radial-chart"
+    id: "primary-system-name"
+- assertVisible:
+    id: "disclaimer-text"
 
 # Navigate to Why screen
 - tapOn:
-    id: "btn-why"
-- assertVisible:
-    id: "screen-why"
-- assertVisible:
-    text: "Why This Star System?"
+    id: "view-why-button"
 
-# Verify explanation content
+# Step 4: Why Screen - Verify explanation content
 - assertVisible:
-    id: "explanation-text"
+    id: "why-screen-app-bar"
+- assertVisible:
+    text: "Your Human Design attributes contributed to these star systems"
 
-# Go back to result
+# Verify at least one system card is shown
+- assertVisible:
+    text: "%"
+
+# Go back to result screen
 - tapOn:
-    id: "btn-back"
+    id: "why-screen-app-bar-back"
 - assertVisible:
-    id: "screen-result"
+    id: "result-screen"

@@ -8,7 +8,7 @@ set -euo pipefail
 FLOW="${1:-full_journey}"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 ARTIFACTS_DIR=".artifacts/${TIMESTAMP}-ios"
-SIMULATOR="iPhone 15"
+SIMULATOR="iPhone 17 Pro"
 
 echo "🚀 Starting iOS E2E test: ${FLOW}"
 echo "📱 Simulator: ${SIMULATOR}"
@@ -49,6 +49,7 @@ sleep 2
 # Run Maestro test
 echo "🎭 Running Maestro flow: ${FLOW}"
 maestro test "e2e/flows/${FLOW}.yaml" \
+    --env APP_ID=org.reactjs.native.example.S3App \
     --format junit \
     --output "${ARTIFACTS_DIR}/results.xml" \
     || TEST_RESULT=$?

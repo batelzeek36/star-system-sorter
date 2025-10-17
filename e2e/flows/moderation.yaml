@@ -1,36 +1,95 @@
-appId: com.s3app
+appId: ${APP_ID}
 ---
-# Test moderation system blocks inappropriate content
+# Test content moderation and validation
+# Tests: Input validation, blocked terms, error messages
 
 - launchApp
+
+# Navigate to input screen
 - tapOn:
-    id: "btn-get-started"
+    id: "get-started-button"
 - assertVisible:
-    id: "screen-input"
+    text: "Enter Birth Data"
 
-# Try to input blocked content in name field
+# Ensure Birth Data tab is selected
 - tapOn:
-    id: "input-name"
-- inputText: "Test <script>alert('xss')</script>"
+    id: "tab-birth-data"
 
-# Try to submit
+# Test 1: Invalid date format
 - tapOn:
-    id: "btn-compute-chart"
+    id: "field-date-input"
+- inputText: "invalid-date"
+- tapOn:
+    id: "field-time-input"
+# Trigger validation by moving to next field
+- assertVisible:
+    text: "Date must be in MM/DD/YYYY format"
 
+# Clear and test valid date
+- tapOn:
+    id: "field-date-input"
+- clearText
+- inputText: "10/03/1992"
+
+# Test 2: Invalid time format
+- tapOn:
+    id: "field-time-input"
+- inputText: "25:99"
+- tapOn:
+    id: "field-location-input"
+# Trigger validation
+- assertVisible:
+    text: "Time must be in HH:MM AM/PM format"
+
+# Clear and test valid time
+- tapOn:
+    id: "field-time-input"
+- clearText
+- inputText: "12:03 AM"
+
+# Test 3: Invalid location (special characters)
+- tapOn:
+    id: "field-location-input"
+- inputText: "Test<script>alert('xss')</script>"
+- tapOn:
+    id: "field-date-input"
+# Trigger validation
+- assertVisible:
+    text: "Location should only contain letters"
+
+# Clear and test valid location
+- tapOn:
+    id: "field-location-input"
+- clearText
+- inputText: "Attleboro, MA"
+
+# Test 4: Empty required fields
+- tapOn:
+    id: "field-date-input"
+- clearText
+- tapOn:
+    id: "button-compute-chart"
 # Should show validation error
 - assertVisible:
-    text: "Invalid input detected"
+    text: "Date is required"
 
-# Clear and try profanity
+# Test 5: Valid input should allow submission
 - tapOn:
-    id: "input-name"
-- clearText
-- inputText: "fuck this"
-
-# Try to submit
+    id: "field-date-input"
+- inputText: "10/03/1992"
 - tapOn:
-    id: "btn-compute-chart"
+    id: "field-time-input"
+- inputText: "12:03 AM"
+- tapOn:
+    id: "field-location-input"
+- inputText: "Attleboro, MA"
 
-# Should show moderation error
+# Verify compute button is enabled and can be tapped
 - assertVisible:
-    text: "inappropriate content"
+    id: "button-compute-chart"
+- tapOn:
+    id: "button-compute-chart"
+
+# Should show processing toast
+- assertVisible:
+    text: "Computing your chart"

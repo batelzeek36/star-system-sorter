@@ -1,15 +1,48 @@
-appId: com.s3app
+appId: ${APP_ID}
 ---
 # Basic onboarding flow - verify app launches and navigation works
+# Tests: App launch, onboarding screen display, navigation to input screen
 
 - launchApp
-- assertVisible:
-    id: "screen-onboarding"
+
+# Verify onboarding screen loads
 - assertVisible:
     text: "Star System Sorter"
+
+# Verify S³ subtitle is visible
 - assertVisible:
-    id: "btn-get-started"
+    text: "S³"
+
+# Verify tagline is visible
+- assertVisible:
+    text: "Discover your star system classification based on Human Design principles."
+
+# Verify 3-step explanation is visible
+- assertVisible:
+    text: "Input"
+- assertVisible:
+    text: "Sort"
+- assertVisible:
+    text: "Narrative"
+
+# Verify disclaimer is visible
+- assertVisible:
+    text: "For insight & entertainment. Not medical, financial, or legal advice."
+
+# Verify Begin Sorting button is visible
+- assertVisible:
+    id: "get-started-button"
+
+# Tap Begin Sorting button
 - tapOn:
-    id: "btn-get-started"
+    id: "get-started-button"
+
+# Verify navigation to input screen
 - assertVisible:
-    id: "screen-input"
+    text: "Enter Birth Data"
+
+# Verify input screen tabs are visible
+- assertVisible:
+    id: "tab-birth-data"
+- assertVisible:
+    id: "tab-upload-pdf"

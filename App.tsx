@@ -9,6 +9,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {RootNavigator, linking} from './src/navigation';
 import {NavigationErrorBoundary} from './src/navigation/ErrorBoundary';
+import {ThemeProvider} from './src/theme/ThemeProvider';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -28,20 +29,22 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <SafeAreaProvider>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
-      />
-      <NavigationErrorBoundary onReset={handleErrorBoundaryReset}>
-        <NavigationContainer
-          linking={linking}
-          onUnhandledAction={handleNavigationError}
-          fallback={null}>
-          <RootNavigator />
-        </NavigationContainer>
-      </NavigationErrorBoundary>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
+        />
+        <NavigationErrorBoundary onReset={handleErrorBoundaryReset}>
+          <NavigationContainer
+            linking={linking}
+            onUnhandledAction={handleNavigationError}
+            fallback={null}>
+            <RootNavigator />
+          </NavigationContainer>
+        </NavigationErrorBoundary>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }
 

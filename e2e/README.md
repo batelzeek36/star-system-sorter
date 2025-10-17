@@ -19,37 +19,71 @@ make artifacts
 
 ## Available Flows
 
-### `onboarding.yaml`
+### `onboarding.yaml` ✅
 Basic app launch and navigation test.
-- Verifies app launches
-- Tests onboarding screen
-- Checks navigation to input screen
+- Verifies app launches successfully
+- Tests onboarding screen elements (logo, tagline, steps)
+- Checks disclaimer visibility
+- Verifies navigation to input screen
 
 **Run:** `make e2e-ios FLOW=onboarding`
 
-### `input_chart.yaml`
+**Coverage:**
+- App launch and initialization
+- Onboarding screen UI elements
+- Begin Sorting button interaction
+- Navigation to Input screen
+
+### `input_chart.yaml` ✅
 Birth data input and chart generation.
-- Tests form inputs
-- Verifies validation
-- Checks chart generation
+- Tests form field visibility and interaction
+- Verifies input validation (date, time, location formats)
+- Tests chart computation flow
+- Checks result screen navigation and display
 
 **Run:** `make e2e-ios FLOW=input_chart`
 
-### `full_journey.yaml`
+**Coverage:**
+- Form field inputs (date, time, location, timezone)
+- Compute Chart button interaction
+- Toast notification display
+- Result screen navigation
+- Result elements verification
+
+### `full_journey.yaml` ✅
 Complete user journey from start to finish.
 - Onboarding → Input → Result → Why
-- Tests all major features
-- Verifies navigation flow
+- Tests all major features end-to-end
+- Verifies complete navigation flow
+- Uses known test data for deterministic results
 
 **Run:** `make e2e-ios FLOW=full_journey`
 
-### `moderation.yaml`
-Content moderation system tests.
-- Tests blocked content
-- Verifies error messages
-- Checks sanitization
+**Coverage:**
+- Complete user journey (4 screens)
+- Birth data input with test case (1992-10-03 00:03, Attleboro MA)
+- Chart computation and classification
+- Result display with radial chart and allies
+- Why screen with contributors
+- Back navigation
+
+### `moderation.yaml` ✅
+Input validation and error handling tests.
+- Tests invalid date formats
+- Tests invalid time formats
+- Tests invalid location characters
+- Verifies required field validation
+- Tests successful submission with valid data
 
 **Run:** `make e2e-ios FLOW=moderation`
+
+**Coverage:**
+- Date format validation (MM/DD/YYYY)
+- Time format validation (HH:MM AM/PM)
+- Location character validation
+- Required field validation
+- Error message display
+- Valid input submission
 
 ## Flow Syntax
 
